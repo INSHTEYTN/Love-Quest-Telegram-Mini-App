@@ -43,8 +43,13 @@
       --radius-sm: 14px;
       --radius-pill: 999px;
       --spring: cubic-bezier(0.22, 1, 0.36, 1);
-      --safe-top: max(env(safe-area-inset-top, 0px), var(--tg-content-safe-area-inset-top, 0px));
-      --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--tg-content-safe-area-inset-bottom, 0px));
+      --tg-safe-area-inset-top: 0px;
+      --tg-safe-area-inset-bottom: 0px;
+      --tg-content-safe-area-inset-top: 0px;
+      --tg-content-safe-area-inset-bottom: 0px;
+      --safe-top: max(env(safe-area-inset-top, 0px), calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px)));
+      --safe-bottom: max(env(safe-area-inset-bottom, 0px), calc(var(--tg-safe-area-inset-bottom, 0px) + var(--tg-content-safe-area-inset-bottom, 0px)));
+      --app-height: var(--tg-viewport-stable-height, 100dvh);
       --tabbar-height: 70px;
     }
 
@@ -60,7 +65,7 @@
       position: fixed;
       inset: 0;
       width: 100%;
-      height: 100dvh;
+      height: var(--app-height, 100dvh);
       margin: 0;
       padding: 0;
       overflow: hidden;
@@ -293,7 +298,7 @@
       position: relative;
       z-index: 1;
       width: 100%;
-      height: 100dvh;
+      height: var(--app-height, 100dvh);
       display: flex;
       flex-direction: column;
       overflow: hidden;
@@ -1466,13 +1471,13 @@
         <span class="balance-pill">🪙 <span id="withdraw-avail-coins">0</span></span>
       </div>
       <div style="font-size:13px; color:var(--text-secondary);">
-        Курс: <strong>100 монет = 10 000 ₸</strong> (минимум 100 монет)
+        Курс: <strong>100 монет = 1 000 ₸</strong> (минимум 100 монет)
       </div>
       <div class="preset-grid">
         <button type="button" class="preset-btn" data-preset="100">100</button>
         <button type="button" class="preset-btn" data-preset="200">200</button>
-        <button type="button" class="preset-btn" data-preset="300">300</button>
         <button type="button" class="preset-btn" data-preset="500">500</button>
+        <button type="button" class="preset-btn" data-preset="1000">1000</button>
       </div>
       <div>
         <label style="font-size:12.5px; color:var(--text-secondary); display:block; margin-bottom:6px;">Сумма в монетах</label>
@@ -1532,25 +1537,88 @@
       const DAY_MS = 24 * 60 * 60 * 1000;
       const WEEK_MS = 7 * DAY_MS;
       const MAX_SWAPS_PER_DAY = 2;
-      const TENGE_PER_COIN = 100; // 100 монет = 10 000 ₸
+      const TENGE_PER_COIN = 10; // 100 монет = 1 000 ₸
       const STORAGE_TIMEOUT_MS = 1500;
       const NETWORK_TIMEOUT_MS = 7000;
 
       /* ========================================================================
-         2. TELEGRAM MINI APP SDK, HAPTICS & ANTI-ZOOM GUARDS
+         2. TELEGRAM MINI APP SDK, FULLSCREEN, HAPTICS & ANTI-ZOOM GUARDS
          ======================================================================== */
       const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+      let tgFullscreenUnsupported = false;
+
+      function syncTelegramSafeAreas() {
+        const root = document.documentElement;
+        try {
+          if (tg) {
+            const safe = tg.safeAreaInset || {};
+            const contentSafe = tg.contentSafeAreaInset || {};
+            if (typeof safe.top === 'number') root.style.setProperty('--tg-safe-area-inset-top', `${safe.top}px`);
+            if (typeof safe.bottom === 'number') root.style.setProperty('--tg-safe-area-inset-bottom', `${safe.bottom}px`);
+            if (typeof contentSafe.top === 'number') root.style.setProperty('--tg-content-safe-area-inset-top', `${contentSafe.top}px`);
+            if (typeof contentSafe.bottom === 'number') root.style.setProperty('--tg-content-safe-area-inset-bottom', `${contentSafe.bottom}px`);
+
+            if (typeof tg.viewportStableHeight === 'number' && tg.viewportStableHeight > 0) {
+              root.style.setProperty('--app-height', `${tg.viewportStableHeight}px`);
+            } else {
+              root.style.setProperty('--app-height', '100dvh');
+            }
+          }
+        } catch (_) {}
+      }
+
+      function ensureTelegramFullscreen() {
+        if (!tg) return;
+        try {
+          if (!tg.isExpanded && typeof tg.expand === 'function') {
+            tg.expand();
+          }
+          if (!tgFullscreenUnsupported && typeof tg.requestFullscreen === 'function' && !tg.isFullscreen) {
+            tg.requestFullscreen();
+          }
+        } catch (_) {}
+      }
 
       function initTelegramSDK() {
         try {
           if (tg) {
             tg.ready();
-            tg.expand();
+            ensureTelegramFullscreen();
             if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
+            if (typeof tg.lockOrientation === 'function') tg.lockOrientation();
             if (typeof tg.setHeaderColor === 'function') tg.setHeaderColor('#160a18');
             if (typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor('#140817');
+            if (typeof tg.setBottomBarColor === 'function') tg.setBottomBarColor('#140817');
+
+            syncTelegramSafeAreas();
+
+            if (typeof tg.onEvent === 'function') {
+              tg.onEvent('fullscreenFailed', () => {
+                tgFullscreenUnsupported = true;
+                if (typeof tg.expand === 'function') tg.expand();
+                syncTelegramSafeAreas();
+              });
+              tg.onEvent('fullscreenChanged', () => {
+                syncTelegramSafeAreas();
+                if (!tg.isFullscreen && !tgFullscreenUnsupported && typeof tg.expand === 'function') {
+                  tg.expand();
+                }
+              });
+              tg.onEvent('safeAreaChanged', syncTelegramSafeAreas);
+              tg.onEvent('contentSafeAreaChanged', syncTelegramSafeAreas);
+              tg.onEvent('viewportChanged', () => {
+                if (!tg.isExpanded && typeof tg.expand === 'function') tg.expand();
+                syncTelegramSafeAreas();
+              });
+              tg.onEvent('activated', () => {
+                ensureTelegramFullscreen();
+                syncTelegramSafeAreas();
+              });
+            }
           }
         } catch (_) {}
+
+        window.addEventListener('resize', syncTelegramSafeAreas);
 
         // Anti-zoom & multi-touch prevention for iOS WebView
         ['gesturestart', 'gesturechange', 'gestureend'].forEach(ev => {
@@ -1642,55 +1710,55 @@
       ];
 
       /* ========================================================================
-         4. GIFT SHOP CATALOG (12 ITEMS WITH UNIQUE CUSTOM INLINE SVGs)
+         4. GIFT SHOP CATALOG (12 ITEMS — 100 COINS = 1 000 ₸)
          ======================================================================== */
       const SHOP_ITEMS = [
         {
-          id: 'ga_20k', title: 'Сертификат в Золотое Яблоко — 20 000 ₸', price: 250,
+          id: 'ga_20k', title: 'Сертификат в Золотое Яблоко — 20 000 ₸', price: 2000,
           svg: `<svg viewBox="0 0 120 96" fill="none"><rect x="10" y="16" width="100" height="64" rx="14" fill="url(#ga1)" stroke="rgba(255,255,255,0.55)" stroke-width="2"/><circle cx="38" cy="48" r="14" fill="#d9ff2e"/><path d="M38 34c2-6 7-9 11-8-1 5-4 8-11 8z" fill="#67e87a"/><text x="60" y="45" fill="#171a0b" font-size="11" font-weight="800" font-family="-apple-system,sans-serif">20 000 ₸</text><text x="60" y="60" fill="#2a3011" font-size="8.5" font-weight="700" font-family="-apple-system,sans-serif">GOLD APPLE</text><defs><linearGradient id="ga1" x1="10" y1="16" x2="110" y2="80"><stop stop-color="#c6ff3d"/><stop offset="1" stop-color="#87e82b"/></linearGradient></defs></svg>`
         },
         {
-          id: 'ga_30k', title: 'Сертификат в Золотое Яблоко — 30 000 ₸', price: 400,
+          id: 'ga_30k', title: 'Сертификат в Золотое Яблоко — 30 000 ₸', price: 3000,
           svg: `<svg viewBox="0 0 120 96" fill="none"><rect x="10" y="16" width="100" height="64" rx="14" fill="url(#ga2)" stroke="rgba(255,255,255,0.6)" stroke-width="2"/><circle cx="38" cy="48" r="14" fill="#fff275"/><path d="M38 34c2-6 7-9 11-8-1 5-4 8-11 8z" fill="#b4ff4d"/><text x="58" y="45" fill="#18121f" font-size="11" font-weight="800" font-family="-apple-system,sans-serif">30 000 ₸</text><text x="58" y="60" fill="#2c2238" font-size="8.5" font-weight="700" font-family="-apple-system,sans-serif">GOLD APPLE</text><defs><linearGradient id="ga2" x1="10" y1="16" x2="110" y2="80"><stop stop-color="#e3ff52"/><stop offset="1" stop-color="#3fe0a8"/></linearGradient></defs></svg>`
         },
         {
-          id: 'ga_50k', title: 'Сертификат в Золотое Яблоко — 50 000 ₸', price: 650,
+          id: 'ga_50k', title: 'Сертификат в Золотое Яблоко — 50 000 ₸', price: 5000,
           svg: `<svg viewBox="0 0 120 96" fill="none"><rect x="10" y="16" width="100" height="64" rx="14" fill="url(#ga3)" stroke="#ffe58f" stroke-width="2.2"/><circle cx="38" cy="48" r="14" fill="url(#ga3b)"/><path d="M38 34c2-6 7-9 11-8-1 5-4 8-11 8z" fill="#d9ff2e"/><text x="58" y="45" fill="#fff7d6" font-size="11" font-weight="800" font-family="-apple-system,sans-serif">50 000 ₸</text><text x="58" y="60" fill="#d9ff2e" font-size="8.5" font-weight="700" font-family="-apple-system,sans-serif">VIP CARD</text><defs><linearGradient id="ga3" x1="10" y1="16" x2="110" y2="80"><stop stop-color="#2b213a"/><stop offset="1" stop-color="#140d1e"/></linearGradient><linearGradient id="ga3b" x1="24" y1="34" x2="52" y2="62"><stop stop-color="#ffe782"/><stop offset="1" stop-color="#d9ff2e"/></linearGradient></defs></svg>`
         },
         {
-          id: 'coffee_dessert', title: 'Кофе и любимый десерт', price: 60,
+          id: 'coffee_dessert', title: 'Кофе и любимый десерт', price: 350,
           svg: `<svg viewBox="0 0 120 96" fill="none"><ellipse cx="60" cy="78" rx="34" ry="7" fill="rgba(255,255,255,0.22)"/><path d="M36 42h38v20c0 10-8 16-19 16s-19-6-19-16V42z" fill="url(#cof)" stroke="#fff" stroke-width="2"/><path d="M74 47h7a7 7 0 0 1 0 14h-7" stroke="#fff" stroke-width="3" stroke-linecap="round"/><path d="M47 34c0-5 4-5 4-10M57 34c0-5 4-5 4-10" stroke="#ffd3e6" stroke-width="2.5" stroke-linecap="round"/><circle cx="88" cy="67" r="11" fill="#ff7ab8"/><path d="M80 65c4-7 12-7 16 0" fill="#fff0f6"/><circle cx="88" cy="56" r="3" fill="#ff2e74"/><defs><linearGradient id="cof" x1="36" y1="42" x2="74" y2="78"><stop stop-color="#ffb88c"/><stop offset="1" stop-color="#de6262"/></linearGradient></defs></svg>`
         },
         {
-          id: 'massage', title: 'Расслабляющий массаж от парня (30 мин)', price: 80,
+          id: 'massage', title: 'Расслабляющий массаж от парня (30 мин)', price: 400,
           svg: `<svg viewBox="0 0 120 96" fill="none"><circle cx="60" cy="48" r="32" fill="url(#msg)" opacity="0.28"/><path d="M42 64c6-18 14-26 18-32 4 6 12 14 18 32-8 6-28 6-36 0z" fill="url(#msg)" stroke="#fff" stroke-width="1.8"/><path d="M60 28v38M48 48c5 3 19 3 24 0" stroke="rgba(255,255,255,0.65)" stroke-width="1.8" stroke-linecap="round"/><circle cx="34" cy="34" r="4" fill="#ffd166"/><circle cx="86" cy="30" r="3" fill="#5ae2ff"/><defs><linearGradient id="msg" x1="40" y1="28" x2="80" y2="72"><stop stop-color="#ff9ec8"/><stop offset="1" stop-color="#9b51ff"/></linearGradient></defs></svg>`
         },
         {
-          id: 'movie_night', title: 'Уютный киновечер с любыми снеками', price: 100,
+          id: 'movie_night', title: 'Уютный киновечер с любыми снеками', price: 500,
           svg: `<svg viewBox="0 0 120 96" fill="none"><rect x="20" y="24" width="80" height="52" rx="12" fill="url(#mov)" stroke="#fff" stroke-width="2"/><polygon points="53,41 72,50 53,59" fill="#fff"/><circle cx="34" cy="34" r="3.5" fill="#ffd166"/><circle cx="44" cy="34" r="3.5" fill="#ff6ba9"/><circle cx="54" cy="34" r="3.5" fill="#5ae2ff"/><defs><linearGradient id="mov" x1="20" y1="24" x2="100" y2="76"><stop stop-color="#533483"/><stop offset="1" stop-color="#e94560"/></linearGradient></defs></svg>`
         },
         {
-          id: 'sushi_dinner', title: 'Доставка любимого ужина / суши', price: 140,
+          id: 'sushi_dinner', title: 'Доставка любимого ужина / суши', price: 1000,
           svg: `<svg viewBox="0 0 120 96" fill="none"><rect x="20" y="54" width="80" height="14" rx="7" fill="#3a1c42" stroke="rgba(255,255,255,0.45)" stroke-width="1.8"/><ellipse cx="44" cy="48" rx="13" ry="9" fill="#fff"/><ellipse cx="44" cy="46" rx="8" ry="4.5" fill="#ff6b6b"/><ellipse cx="74" cy="48" rx="13" ry="9" fill="#fff"/><ellipse cx="74" cy="46" rx="8" ry="4.5" fill="#ff9f43"/><path d="M26 26l68 10M30 34l64 6" stroke="#ffd166" stroke-width="3" stroke-linecap="round"/></svg>`
         },
         {
-          id: 'flowers', title: 'Букет любимых цветов', price: 180,
+          id: 'flowers', title: 'Букет любимых цветов', price: 1500,
           svg: `<svg viewBox="0 0 120 96" fill="none"><path d="M44 50l16 32 16-32H44z" fill="url(#flw)" stroke="#fff" stroke-width="1.8"/><circle cx="60" cy="36" r="11" fill="#ff4d8d"/><circle cx="45" cy="43" r="10" fill="#ff85b3"/><circle cx="75" cy="43" r="10" fill="#ff85b3"/><circle cx="60" cy="36" r="4" fill="#ffe066"/><circle cx="45" cy="43" r="3.5" fill="#ffe066"/><circle cx="75" cy="43" r="3.5" fill="#ffe066"/><defs><linearGradient id="flw" x1="44" y1="50" x2="76" y2="82"><stop stop-color="#ffd6e7"/><stop offset="1" stop-color="#ff85b3"/></linearGradient></defs></svg>`
         },
         {
-          id: 'surprise_box', title: 'Сюрприз-бокс от парня', price: 320,
+          id: 'surprise_box', title: 'Сюрприз-бокс от парня', price: 2500,
           svg: `<svg viewBox="0 0 120 96" fill="none"><rect x="28" y="40" width="64" height="40" rx="10" fill="url(#box)" stroke="#fff" stroke-width="2"/><rect x="24" y="30" width="72" height="14" rx="6" fill="#ff5d9e" stroke="#fff" stroke-width="2"/><rect x="55" y="30" width="10" height="50" fill="#ffe066"/><path d="M60 30c-10-12-20-6-16 0h16zm0 0c10-12 20-6 16 0H60z" fill="#ffe066"/><defs><linearGradient id="box" x1="28" y1="40" x2="92" y2="80"><stop stop-color="#ff3b82"/><stop offset="1" stop-color="#9b51ff"/></linearGradient></defs></svg>`
         },
         {
-          id: 'restaurant', title: 'Романтический ужин в ресторане', price: 450,
+          id: 'restaurant', title: 'Романтический ужин в ресторане', price: 3500,
           svg: `<svg viewBox="0 0 120 96" fill="none"><path d="M36 22h16l-2 22a6 6 0 0 1-12 0l-2-22z" fill="rgba(255,107,169,0.55)" stroke="#fff" stroke-width="2"/><path d="M44 50v22M36 72h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M68 22h16l-2 22a6 6 0 0 1-12 0l-2-22z" fill="rgba(255,209,102,0.55)" stroke="#fff" stroke-width="2"/><path d="M76 50v22M68 72h16" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M60 22l3 6-3 4-3-4 3-6z" fill="#ffd166"/></svg>`
         },
         {
-          id: 'spa_day', title: 'SPA-процедура или бьюти-день', price: 500,
+          id: 'spa_day', title: 'SPA-процедура или бьюти-день', price: 4000,
           svg: `<svg viewBox="0 0 120 96" fill="none"><ellipse cx="60" cy="64" rx="34" ry="14" fill="url(#spa)" stroke="#fff" stroke-width="2"/><ellipse cx="60" cy="50" rx="22" ry="9" fill="#5ae2ff" opacity="0.65"/><circle cx="45" cy="34" r="5" fill="#ffd3e6"/><circle cx="62" cy="26" r="7" fill="#fff" opacity="0.8"/><circle cx="77" cy="36" r="4" fill="#ffe066"/><defs><linearGradient id="spa" x1="26" y1="50" x2="94" y2="78"><stop stop-color="#ff85b3"/><stop offset="1" stop-color="#5ae2ff"/></linearGradient></defs></svg>`
         },
         {
-          id: 'dream_wish', title: 'Исполнение одного заветного желания', price: 750,
+          id: 'dream_wish', title: 'Исполнение одного заветного желания', price: 6000,
           svg: `<svg viewBox="0 0 120 96" fill="none"><path d="M60 14l10 22 24 3-18 16 5 24-21-12-21 12 5-24-18-16 24-3 10-22z" fill="url(#wish)" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="28" cy="24" r="3" fill="#5ae2ff"/><circle cx="94" cy="28" r="3.5" fill="#ff6ba9"/><defs><linearGradient id="wish" x1="36" y1="14" x2="84" y2="79"><stop stop-color="#fff099"/><stop offset="1" stop-color="#ff5d9e"/></linearGradient></defs></svg>`
         }
       ];
@@ -1795,7 +1863,6 @@
                   this.fadeTo(this.prefs.volume);
                   renderTrackLists();
                 }).catch(() => {
-                  // Autoplay blocked or file missing — stay silent without crashing
                   if (this.audioEl.error) {
                     this.missingTracks.add(track.id);
                   }
@@ -2376,7 +2443,6 @@
       function pickQuestFromPool(type, usedSet, excludeIds = new Set()) {
         let candidates = QUEST_POOL.filter(q => q.type === type && !usedSet.has(q.id) && !excludeIds.has(q.id));
         if (!candidates.length) {
-          // Cycle pool for this category when all used
           candidates = QUEST_POOL.filter(q => q.type === type && !excludeIds.has(q.id));
         }
         const chosen = shuffle(candidates)[0] || QUEST_POOL[0];
@@ -2397,7 +2463,6 @@
         const exclude = new Set();
         const quests = [];
 
-        // Balanced daily pack: 1 message, 1 call, 2 special (4 quests total; between 3 and 5)
         const targetCount = 3 + Math.floor(Math.random() * 3); // 3, 4, or 5
         const blueprint = ['message', 'call', 'special'];
         while (blueprint.length < targetCount) {
@@ -2597,8 +2662,12 @@
         return `${h} ч.`;
       }
 
+      function formatNumber(n) {
+        return Number(n || 0).toLocaleString('ru-RU');
+      }
+
       function formatTenge(amount) {
-        return Number(amount || 0).toLocaleString('ru-RU') + ' ₸';
+        return formatNumber(amount) + ' ₸';
       }
 
       /* ========================================================================
@@ -2691,7 +2760,7 @@
 
         renderPairStatusPill();
 
-        document.getElementById('home-coin-balance').textContent = wallet.coins || 0;
+        document.getElementById('home-coin-balance').textContent = formatNumber(wallet.coins || 0);
         document.getElementById('btn-open-withdraw').style.display = role === 'girlfriend' ? 'inline-flex' : 'none';
 
         // Daily timer & progress
@@ -2718,7 +2787,7 @@
                   <strong>Заявка на вывод ⏳</strong>
                   <span style="font-weight:800; color:var(--accent-gold);">${formatTenge(w.tenge)}</span>
                 </div>
-                <div style="font-size:13px; color:var(--text-secondary);">Зарезервировано ${w.coins} монет — ждём подтверждения парня.</div>
+                <div style="font-size:13px; color:var(--text-secondary);">Зарезервировано ${formatNumber(w.coins)} монет — ждём подтверждения парня.</div>
               </div>
             `).join('');
           }
@@ -2770,7 +2839,7 @@
               <article class="glass-card withdraw-alert-card">
                 <div style="font-size:16px; font-weight:800;">Запрос на вывод 💸</div>
                 <div style="font-size:14px; line-height:1.4;">
-                  Девушка хочет вывести <strong>${w.coins} монет</strong> → к переводу <strong style="color:var(--accent-gold);">${formatTenge(w.tenge)}</strong>
+                  Девушка хочет вывести <strong>${formatNumber(w.coins)} монет</strong> → к переводу <strong style="color:var(--accent-gold);">${formatTenge(w.tenge)}</strong>
                 </div>
                 <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:8px;">
                   <button type="button" class="glass-btn success" data-act="approve-withdraw" data-wid="${w.id}">Выплачено ✅</button>
@@ -2836,7 +2905,7 @@
         const purchases = data.shop?.purchases || [];
         const now = Date.now();
 
-        document.getElementById('shop-coin-balance').textContent = coins;
+        document.getElementById('shop-coin-balance').textContent = formatNumber(coins);
         const container = document.getElementById('shop-scroll-list');
         let html = '';
 
@@ -2848,7 +2917,7 @@
             html += unack.map(p => `
               <article class="glass-card withdraw-alert-card">
                 <div style="font-size:15px; font-weight:800;">Девушка выбрала подарок 🎁</div>
-                <div style="font-size:14px;">${escapeHtml(p.title)} · <strong>${p.price} 🪙</strong></div>
+                <div style="font-size:14px;">${escapeHtml(p.title)} · <strong>${formatNumber(p.price)} 🪙</strong></div>
                 <button type="button" class="glass-btn success" data-act="ack-gift" data-pid="${p.id}">Подарено 🎁</button>
               </article>
             `).join('');
@@ -2879,7 +2948,7 @@
             <article class="glass-card gift-card">
               <div class="gift-art">${item.svg}</div>
               <div class="gift-title">${escapeHtml(item.title)}</div>
-              <div class="gift-price">🪙 ${item.price} монет</div>
+              <div class="gift-price">🪙 ${formatNumber(item.price)} монет</div>
               ${btnHtml}
               ${lockOverlay}
             </article>
@@ -2952,7 +3021,7 @@
         const events = [
           ...(data.withdrawals || []).map(w => ({
             ts: w.createdAt || 0,
-            title: `Вывод ${formatTenge(w.tenge)} (${w.coins} 🪙)`,
+            title: `Вывод ${formatTenge(w.tenge)} (${formatNumber(w.coins)} 🪙)`,
             status: w.status === 'approved' ? 'Выплачено ✅' : (w.status === 'rejected' ? 'Отклонён ❌' : 'В обработке ⏳')
           })),
           ...(data.shop?.purchases || []).map(p => ({
@@ -3091,7 +3160,7 @@
         const coins = State.pairData?.wallet?.coins || 0;
         if (coins < item.price) {
           Haptic.notify('error');
-          showToast(`Не хватает ${item.price - coins} монет 🪙`);
+          showToast(`Не хватает ${formatNumber(item.price - coins)} монет 🪙`);
           return;
         }
         let bought = false;
@@ -3491,7 +3560,7 @@
           Haptic.impact('light');
           AudioEngine.sfx('tap');
           const avail = State.pairData?.wallet?.coins || 0;
-          document.getElementById('withdraw-avail-coins').textContent = avail;
+          document.getElementById('withdraw-avail-coins').textContent = formatNumber(avail);
           withdrawInput.value = avail >= 100 ? Math.min(avail, 100) : 100;
           updateWithdrawPreview();
           withdrawModal.classList.add('open');

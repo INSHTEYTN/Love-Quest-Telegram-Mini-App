@@ -1,0 +1,3585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#160a18">
+  <title>NVR • Игра для парочек</title>
+
+  <!-- Telegram Mini App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Firebase Realtime Database Compat SDK (опционально для облачной синхронизации; при офлайне работает локальный режим) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js" defer></script>
+
+  <style>
+    /* ==========================================================================
+       1. iOS 27 LIQUID GLASS DESIGN TOKENS & VARIABLES
+       ========================================================================== */
+    :root {
+      --bg-deep: #130916;
+      --bg-plum: #25102a;
+      --bg-rose: #3d1431;
+      --accent-pink: #ff6ba9;
+      --accent-rose: #ff3b81;
+      --accent-cyan: #5ae2ff;
+      --accent-gold: #ffd166;
+      --accent-green: #38e59b;
+      --accent-red: #ff5c77;
+
+      --glass-bg: rgba(255, 255, 255, 0.085);
+      --glass-bg-strong: rgba(28, 16, 32, 0.72);
+      --glass-bg-card: rgba(255, 255, 255, 0.10);
+      --glass-border: rgba(255, 255, 255, 0.22);
+      --glass-border-soft: rgba(255, 255, 255, 0.13);
+      --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      --glass-shadow: 0 14px 38px rgba(7, 2, 12, 0.45);
+
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 240, 248, 0.72);
+      --text-muted: rgba(255, 232, 244, 0.48);
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+      --radius-sm: 12px;
+      --radius-pill: 999px;
+
+      --spring: cubic-bezier(0.22, 1, 0.36, 1);
+      --safe-top: max(env(safe-area-inset-top, 0px), var(--tg-content-safe-area-inset-top, 0px), var(--tg-safe-area-inset-top, 0px));
+      --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--tg-content-safe-area-inset-bottom, 0px), var(--tg-safe-area-inset-bottom, 0px));
+      --tabbar-height: 68px;
+    }
+
+    /* ==========================================================================
+       2. STATIC VIEWPORT LOCK & ANTI-ZOOM (iOS / TELEGRAM WEBVIEW)
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+    }
+
+    html, body {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+      -webkit-user-select: none;
+      user-select: none;
+      background-color: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+      font-variant-numeric: tabular-nums;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    input, textarea, select {
+      font-family: inherit;
+      font-size: 16px !important; /* Критично: отключает автозум iOS WebView */
+      -webkit-user-select: text;
+      user-select: text;
+      color: var(--text-primary);
+      outline: none;
+    }
+
+    button {
+      font-family: inherit;
+      color: inherit;
+      border: none;
+      background: none;
+      cursor: pointer;
+      padding: 0;
+      touch-action: manipulation;
+    }
+
+    /* ==========================================================================
+       3. MULTI-LAYER ANIMATED ROMANTIC BOKEH BACKGROUND
+       ========================================================================== */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      background: radial-gradient(circle at 20% 10%, #44163d 0%, #1d0c24 45%, #0e0612 100%);
+      pointer-events: none;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(72px);
+      opacity: 0.55;
+      will-change: transform;
+    }
+    .orb-1 {
+      width: 320px; height: 320px;
+      top: -90px; left: -60px;
+      background: radial-gradient(circle, rgba(255, 92, 168, 0.72), transparent 70%);
+      animation: floatOrb1 14s ease-in-out infinite alternate;
+    }
+    .orb-2 {
+      width: 340px; height: 340px;
+      bottom: 8%; right: -100px;
+      background: radial-gradient(circle, rgba(164, 72, 255, 0.55), transparent 70%);
+      animation: floatOrb2 18s ease-in-out infinite alternate;
+    }
+    .orb-3 {
+      width: 240px; height: 240px;
+      top: 42%; left: 32%;
+      background: radial-gradient(circle, rgba(255, 146, 186, 0.32), transparent 70%);
+      animation: floatOrb3 16s ease-in-out infinite alternate;
+    }
+
+    @keyframes floatOrb1 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(45px, 35px) scale(1.14); }
+    }
+    @keyframes floatOrb2 {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-40px, -45px) scale(1.12); }
+    }
+    @keyframes floatOrb3 {
+      0% { transform: translate(-20px, 10px) scale(0.95); }
+      100% { transform: translate(25px, -30px) scale(1.15); }
+    }
+
+    /* ==========================================================================
+       4. LIQUID GLASS PRIMITIVES
+       ========================================================================== */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--glass-highlight), var(--glass-shadow);
+    }
+
+    .glass-card {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.05));
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--glass-highlight), 0 10px 30px rgba(8, 2, 14, 0.35);
+    }
+
+    .glass-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 18px;
+      border-radius: var(--radius-pill);
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      transition: transform 0.22s var(--spring), background 0.22s ease, opacity 0.2s ease;
+    }
+    .glass-btn:active {
+      transform: scale(0.95);
+    }
+    .glass-btn.primary {
+      background: linear-gradient(135deg, #ff5f9e 0%, #ff3377 100%);
+      border-color: rgba(255, 200, 224, 0.45);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 8px 22px rgba(255, 51, 119, 0.38);
+    }
+    .glass-btn.success {
+      background: linear-gradient(135deg, #2ed892 0%, #1ab678 100%);
+      border-color: rgba(180, 255, 224, 0.42);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.38), 0 8px 20px rgba(26, 182, 120, 0.32);
+    }
+    .glass-btn.danger {
+      background: rgba(255, 76, 108, 0.22);
+      border-color: rgba(255, 110, 136, 0.42);
+      color: #ff9eb0;
+    }
+    .glass-btn:disabled {
+      opacity: 0.42;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       5. PRELOADER / SPLASH SCREEN (NVR)
+       ========================================================================== */
+    #splash-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      background: radial-gradient(circle at 50% 35%, #3a1236 0%, #150819 70%, #0b040e 100%);
+      transition: opacity 0.55s var(--spring), transform 0.55s var(--spring);
+    }
+    #splash-screen.hidden {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
+
+    .splash-heart-wrap {
+      width: 96px;
+      height: 96px;
+      border-radius: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(145deg, rgba(255, 118, 178, 0.28), rgba(255, 255, 255, 0.08));
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45), 0 18px 44px rgba(255, 59, 129, 0.34);
+      animation: heartPulse 1.7s ease-in-out infinite;
+    }
+    @keyframes heartPulse {
+      0%, 100% { transform: scale(1); box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 16px 40px rgba(255,59,129,0.30); }
+      50% { transform: scale(1.07); box-shadow: inset 0 1px 0 rgba(255,255,255,0.55), 0 22px 54px rgba(255,59,129,0.52); }
+    }
+
+    .splash-brand {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      padding-left: 0.22em;
+      background: linear-gradient(135deg, #ffffff 0%, #ffc4df 60%, #ff7bb3 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .splash-status {
+      font-size: 13px;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .splash-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent-pink);
+      box-shadow: 0 0 10px var(--accent-pink);
+      animation: dotBlink 1.1s infinite alternate;
+    }
+    @keyframes dotBlink {
+      from { opacity: 0.35; transform: scale(0.8); }
+      to { opacity: 1; transform: scale(1.2); }
+    }
+
+    /* ==========================================================================
+       6. APP SHELL & VIEWS
+       ========================================================================== */
+    #app-shell {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding-top: var(--safe-top);
+    }
+
+    /* Onboarding Screen */
+    #onboarding-view {
+      position: absolute;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      flex-direction: column;
+      padding: calc(18px + var(--safe-top)) 18px calc(24px + var(--safe-bottom));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+    #onboarding-view.active {
+      display: flex;
+    }
+    #onboarding-view::-webkit-scrollbar { display: none; }
+
+    .onboard-inner {
+      margin: auto 0;
+      width: 100%;
+      max-width: 440px;
+      align-self: center;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .onboard-header {
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .onboard-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      background: rgba(255, 107, 169, 0.18);
+      border: 1px solid rgba(255, 130, 184, 0.36);
+      color: #ffd0e5;
+      margin-bottom: 10px;
+    }
+    .onboard-title {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .onboard-sub {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .role-card {
+      padding: 20px 14px;
+      border-radius: var(--radius-lg);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.25s var(--spring), border-color 0.25s ease, background 0.25s ease;
+    }
+    .role-card:active { transform: scale(0.96); }
+    .role-card.selected {
+      background: linear-gradient(145deg, rgba(255, 95, 158, 0.28), rgba(255, 255, 255, 0.08));
+      border-color: rgba(255, 148, 194, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 12px 30px rgba(255, 59, 129, 0.26);
+    }
+    .role-emoji { font-size: 34px; line-height: 1; }
+    .role-name { font-size: 16px; font-weight: 700; }
+    .role-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.35; }
+
+    .glass-input {
+      width: 100%;
+      height: 48px;
+      padding: 0 16px;
+      border-radius: var(--radius-md);
+      background: rgba(15, 7, 20, 0.46);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      transition: border-color 0.2s ease, background 0.2s ease;
+    }
+    .glass-input:focus {
+      border-color: var(--accent-pink);
+      background: rgba(15, 7, 20, 0.65);
+    }
+    .glass-input::placeholder { color: var(--text-muted); }
+
+    .code-cells {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      margin: 8px 0;
+    }
+    .code-cell {
+      width: 100%;
+      height: 54px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 20px !important;
+      border-radius: 14px;
+      background: rgba(14, 7, 18, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      color: #fff;
+      padding: 0;
+    }
+    .code-cell:focus {
+      border-color: var(--accent-pink);
+      box-shadow: 0 0 0 3px rgba(255, 95, 158, 0.22);
+    }
+
+    .big-pair-code {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 0.22em;
+      padding-left: 0.22em;
+      text-align: center;
+      margin: 6px 0;
+      background: linear-gradient(135deg, #fff 10%, #ffc2df 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* ==========================================================================
+       7. MAIN TAB CONTAINER (STATIC FRAME + INNER SCROLL ONLY)
+       ========================================================================== */
+    #main-view {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #main-view.active {
+      display: flex;
+    }
+
+    .tab-page {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      flex-direction: column;
+      overflow: hidden;
+      width: 100%;
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+    .tab-page.active {
+      display: flex;
+      animation: tabFadeIn 0.28s var(--spring);
+    }
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* --- STATIC HOME HEADER (AVATAR + NAME + BALANCE) --- */
+    .home-static-header {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 12px 0 10px;
+      text-align: center;
+    }
+
+    .avatar-ring {
+      position: relative;
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(135deg, rgba(255, 128, 184, 0.9), rgba(145, 224, 255, 0.75), rgba(255, 255, 255, 0.45));
+      box-shadow: 0 10px 28px rgba(255, 59, 129, 0.34);
+    }
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: linear-gradient(145deg, #3c173d, #1f0d24);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 700;
+      color: #ffd2e7;
+    }
+    .avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .avatar-status-dot {
+      position: absolute;
+      right: 3px;
+      bottom: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-green);
+      border: 2.5px solid #200d24;
+      box-shadow: 0 0 10px rgba(56, 229, 155, 0.7);
+    }
+
+    .user-name-title {
+      margin: 10px 0 0;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .nvr-pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, rgba(90, 226, 255, 0.25), rgba(255, 107, 169, 0.28));
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      letter-spacing: 0.04em;
+    }
+
+    .status-balance-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .mini-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.10);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    .coin-pill {
+      background: linear-gradient(135deg, rgba(255, 209, 102, 0.22), rgba(255, 107, 169, 0.16));
+      border-color: rgba(255, 214, 120, 0.42);
+      color: #ffe8a8;
+    }
+    .withdraw-quick-btn {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: var(--radius-pill);
+      font-size: 13px;
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff5f9e, #ff3377);
+      border: 1px solid rgba(255, 206, 228, 0.45);
+      box-shadow: 0 4px 14px rgba(255, 51, 119, 0.32);
+      transition: transform 0.2s var(--spring);
+    }
+    .withdraw-quick-btn:active { transform: scale(0.94); }
+
+    /* Compact Cycle Info Strip */
+    .cycle-strip {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 11px 14px;
+      margin-bottom: 10px;
+      border-radius: 18px;
+    }
+    .cycle-strip-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12.5px;
+      color: var(--text-secondary);
+    }
+    .cycle-strip-top strong {
+      color: #fff;
+      font-weight: 700;
+    }
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #ff6ba9, #ffd166);
+      transition: width 0.45s var(--spring);
+    }
+
+    /* Static Section Headers for Shop & Settings */
+    .page-static-header {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 2px 12px;
+    }
+    .page-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    /* --- LOCAL SCROLL CONTAINER ONLY --- */
+    .scroll-area {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      padding-bottom: calc(var(--tabbar-height) + var(--safe-bottom) + 28px);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .scroll-area::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ==========================================================================
+       8. QUEST CARDS & BOYFRIEND APPROVAL CARDS
+       ========================================================================== */
+    .section-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin: 4px 2px -2px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .quest-card {
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      transition: transform 0.25s var(--spring), opacity 0.25s ease;
+    }
+    .quest-card.completed {
+      border-color: rgba(56, 229, 155, 0.42);
+      background: linear-gradient(145deg, rgba(56, 229, 155, 0.14), rgba(255, 255, 255, 0.04));
+    }
+    .quest-card.pending {
+      border-color: rgba(255, 209, 102, 0.48);
+      background: linear-gradient(145deg, rgba(255, 209, 102, 0.14), rgba(255, 255, 255, 0.05));
+    }
+
+    .quest-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .quest-cat-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(255, 255, 255, 0.11);
+      color: #ffe3f0;
+    }
+    .quest-cat-badge.message { background: rgba(90, 226, 255, 0.18); color: #bdf3ff; }
+    .quest-cat-badge.call { background: rgba(255, 107, 169, 0.22); color: #ffc7df; }
+    .quest-cat-badge.special { background: rgba(186, 118, 255, 0.24); color: #e4c7ff; }
+
+    .quest-reward {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--accent-gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .quest-title {
+      font-size: 15.5px;
+      font-weight: 600;
+      line-height: 1.38;
+      color: #fff;
+    }
+
+    .quest-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quest-actions .glass-btn {
+      flex: 1;
+      min-height: 40px;
+      font-size: 14px;
+      padding: 0 12px;
+    }
+    .quest-actions .swap-btn {
+      flex: 0 0 auto;
+      padding: 0 13px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .status-banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 38px;
+      border-radius: var(--radius-pill);
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+    .status-banner.pending {
+      background: rgba(255, 209, 102, 0.16);
+      border: 1px solid rgba(255, 209, 102, 0.36);
+      color: #ffe59e;
+    }
+    .status-banner.done {
+      background: rgba(56, 229, 155, 0.18);
+      border: 1px solid rgba(56, 229, 155, 0.38);
+      color: #a8ffda;
+    }
+
+    /* Highlighted Withdrawal Card for Boyfriend */
+    .withdraw-alert-card {
+      padding: 16px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(255, 95, 158, 0.26), rgba(255, 209, 102, 0.18));
+      border: 1px solid rgba(255, 198, 222, 0.48);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 12px 30px rgba(255, 59, 129, 0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .withdraw-amount-big {
+      font-size: 22px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    /* ==========================================================================
+       9. SHOP GRID (2 COLUMNS + SVG + 7-DAY LOCK OVERLAY)
+       ========================================================================== */
+    .shop-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .gift-card {
+      position: relative;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      overflow: hidden;
+    }
+    .gift-art {
+      width: 100%;
+      aspect-ratio: 1.25 / 1;
+      border-radius: 16px;
+      background: radial-gradient(circle at 50% 35%, rgba(255, 255, 255, 0.16), rgba(18, 8, 24, 0.38));
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px;
+    }
+    .gift-art svg {
+      width: 100%;
+      height: 100%;
+      max-width: 82px;
+      max-height: 82px;
+      filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.32));
+    }
+    .gift-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      line-height: 1.3;
+      min-height: 36px;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .gift-footer {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .gift-price {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+    .gift-buy-btn {
+      width: 100%;
+      min-height: 36px;
+      font-size: 13px;
+      padding: 0 10px;
+    }
+
+    /* Cooldown Lock Overlay */
+    .gift-lock-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 5;
+      background: rgba(16, 8, 20, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 12px;
+      gap: 6px;
+    }
+    .gift-lock-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .gift-lock-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .gift-lock-timer {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      line-height: 1.3;
+    }
+
+    /* ==========================================================================
+       10. SETTINGS SCREEN (iOS SWITCHES, MUSIC PLAYLIST & PAIR INFO)
+       ========================================================================== */
+    .settings-group {
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .settings-group-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #ffd5e8;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 4px 0;
+    }
+    .setting-row-label {
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .setting-row-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* Native iOS Toggle Switch */
+    .ios-switch {
+      position: relative;
+      width: 50px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+    .ios-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+    }
+    .ios-slider {
+      position: absolute;
+      inset: 0;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      transition: background 0.25s var(--spring), border-color 0.25s ease;
+      cursor: pointer;
+    }
+    .ios-slider::before {
+      content: "";
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      left: 2px;
+      top: 2px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      transition: transform 0.28s var(--spring);
+    }
+    .ios-switch input:checked + .ios-slider {
+      background: var(--accent-green);
+      border-color: rgba(160, 255, 214, 0.55);
+    }
+    .ios-switch input:checked + .ios-slider::before {
+      transform: translateX(20px);
+    }
+
+    /* Volume Slider */
+    .volume-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      appearance: none;
+      height: 6px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.2);
+      outline: none;
+    }
+    .volume-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+      cursor: pointer;
+    }
+
+    /* Music Track Cards */
+    .mood-header {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    .track-list {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+    .track-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s var(--spring);
+      text-align: left;
+      width: 100%;
+    }
+    .track-item:active { transform: scale(0.98); }
+    .track-item.active {
+      background: linear-gradient(135deg, rgba(255, 107, 169, 0.24), rgba(90, 226, 255, 0.14));
+      border-color: rgba(255, 152, 200, 0.55);
+    }
+    .track-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .track-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .track-name {
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .track-file {
+      font-size: 11.5px;
+      color: var(--text-muted);
+    }
+    .track-missing {
+      font-size: 11px;
+      color: #ffb3c4;
+      background: rgba(255, 92, 119, 0.16);
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 13.5px;
+    }
+    .history-item:last-child { border-bottom: none; }
+
+    /* ==========================================================================
+       11. iOS 27 FLOATING LIQUID GLASS PILL TAB BAR (STRICTLY 3 TABS)
+       ========================================================================== */
+    .tabbar-dock {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: calc(12px + var(--safe-bottom));
+      z-index: 40;
+      display: flex;
+      justify-content: center;
+      padding: 0 18px;
+      pointer-events: none;
+    }
+
+    .tabbar-pill {
+      pointer-events: auto;
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      height: var(--tabbar-height);
+      padding: 6px;
+      border-radius: var(--radius-pill);
+      background: rgba(22, 22, 26, 0.72);
+      backdrop-filter: blur(28px) saturate(180%);
+      -webkit-backdrop-filter: blur(28px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 16px 40px rgba(0, 0, 0, 0.55);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: center;
+    }
+
+    /* Smooth sliding inner dark-glass active pill */
+    .tab-active-slider {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      width: calc((100% - 12px) / 3);
+      height: calc(100% - 12px);
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.14);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 4px 16px rgba(0, 0, 0, 0.35);
+      transition: transform 0.38s var(--spring);
+      pointer-events: none;
+    }
+
+    .tab-btn {
+      position: relative;
+      z-index: 2;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      color: #ffffff;
+      transition: color 0.25s ease, transform 0.2s var(--spring);
+    }
+    .tab-btn:active { transform: scale(0.93); }
+    .tab-btn svg {
+      width: 23px;
+      height: 23px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .tab-btn span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+    .tab-btn.active {
+      color: var(--accent-cyan);
+    }
+    .tab-btn.active svg {
+      filter: drop-shadow(0 0 8px rgba(90, 226, 255, 0.55));
+    }
+
+    .tab-badge {
+      position: absolute;
+      top: 6px;
+      right: calc(50% - 20px);
+      min-width: 17px;
+      height: 17px;
+      padding: 0 5px;
+      border-radius: 99px;
+      background: var(--accent-rose);
+      color: #fff;
+      font-size: 10.5px;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255, 59, 129, 0.65);
+    }
+    .tab-badge.show { display: inline-flex; }
+
+    /* ==========================================================================
+       12. GLASS BOTTOM SHEETS, MODALS & TOASTS (NO NATIVE ALERT/CONFIRM)
+       ========================================================================== */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: rgba(8, 3, 12, 0.62);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 14px 14px calc(14px + var(--safe-bottom));
+    }
+    .modal-backdrop.open {
+      display: flex;
+      animation: fadeBackdrop 0.22s ease;
+    }
+    @keyframes fadeBackdrop {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .bottom-sheet {
+      width: 100%;
+      max-width: 440px;
+      padding: 20px 18px 18px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(160deg, rgba(44, 22, 50, 0.92), rgba(20, 10, 26, 0.94));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 24px 60px rgba(0, 0, 0, 0.65);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: sheetUp 0.32s var(--spring);
+    }
+    @keyframes sheetUp {
+      from { opacity: 0; transform: translateY(34px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .sheet-handle {
+      width: 40px;
+      height: 4px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, 0.28);
+      align-self: center;
+      margin-top: -6px;
+    }
+
+    .preset-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .preset-chip {
+      height: 38px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 14px;
+      font-weight: 700;
+      transition: background 0.2s ease, transform 0.2s var(--spring);
+    }
+    .preset-chip:active { transform: scale(0.94); }
+    .preset-chip.active {
+      background: rgba(255, 95, 158, 0.34);
+      border-color: rgba(255, 148, 194, 0.72);
+    }
+
+    #toast-container {
+      position: fixed;
+      top: calc(14px + var(--safe-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 300;
+      width: calc(100% - 32px);
+      max-width: 390px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+    .toast-pill {
+      padding: 12px 16px;
+      border-radius: var(--radius-pill);
+      background: rgba(28, 16, 34, 0.88);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      font-size: 13.5px;
+      font-weight: 600;
+      text-align: center;
+      animation: toastIn 0.32s var(--spring);
+    }
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-16px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Confetti Celebration Layer */
+    #confetti-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 250;
+      pointer-events: none;
+    }
+
+    .empty-state {
+      padding: 26px 18px;
+      text-align: center;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .divider {
+      height: 1px;
+      background: rgba(255, 255, 255, 0.1);
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+  <!-- Multi-layer Ambient Background -->
+  <div class="ambient-bg" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Confetti Layer -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container"></div>
+
+  <!-- ========================================================================
+       SPLASH SCREEN / PRELOADER (NVR)
+       ======================================================================== -->
+  <div id="splash-screen">
+    <div class="splash-heart-wrap">
+      <svg width="46" height="46" viewBox="0 0 24 24" fill="url(#splashHeartGrad)">
+        <defs>
+          <linearGradient id="splashHeartGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#ff9ec8"/>
+            <stop offset="100%" stop-color="#ff2e74"/>
+          </linearGradient>
+        </defs>
+        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+      </svg>
+    </div>
+    <div class="splash-brand">NVR</div>
+    <div class="splash-status">
+      <span class="splash-dot"></span>
+      <span id="splash-status-text">Синхронизация пары…</span>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MAIN APPLICATION SHELL
+       ======================================================================== -->
+  <div id="app-shell">
+
+    <!-- ONBOARDING & PAIR LINKING VIEW -->
+    <section id="onboarding-view">
+      <div class="onboard-inner">
+        <div class="onboard-header">
+          <div class="onboard-badge" id="onboard-user-badge">✨ Добро пожаловать</div>
+          <h1 class="onboard-title">Любовь в заданиях</h1>
+          <p class="onboard-sub">Выполняй тёплые задания каждый день, копи монеты, выводи в тенге и выбирай подарки 💞</p>
+        </div>
+
+        <!-- Step 1: Nickname (only if outside Telegram) & Role -->
+        <div id="onboard-step-role" class="glass-card" style="padding:16px; display:flex; flex-direction:column; gap:14px;">
+          <div id="manual-nick-wrap" style="display:none;">
+            <label style="font-size:13px; color:var(--text-secondary); display:block; margin-bottom:6px;">Твой никнейм</label>
+            <input id="manual-nick-input" class="glass-input" type="text" placeholder="Например: Алина или NVR" autocomplete="off">
+          </div>
+
+          <div class="role-grid">
+            <button type="button" class="glass-card role-card" id="pick-girlfriend" data-role="girlfriend">
+              <div class="role-emoji">💕</div>
+              <div class="role-name">Я девушка</div>
+              <div class="role-desc">Выполняю задания, коплю монеты и выбираю подарки</div>
+            </button>
+            <button type="button" class="glass-card role-card" id="pick-boyfriend" data-role="boyfriend">
+              <div class="role-emoji">🛡️</div>
+              <div class="role-name">Я парень</div>
+              <div class="role-desc">Подтверждаю задания, одобряю выводы и дарю подарки</div>
+            </button>
+          </div>
+
+          <div id="boyfriend-tg-wrap" style="display:none;">
+            <label style="font-size:13px; color:var(--text-secondary); display:block; margin-bottom:6px;">Твой Telegram (@username или ссылка)</label>
+            <input id="boyfriend-tg-input" class="glass-input" type="text" placeholder="@username или https://t.me/..." autocomplete="off">
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:2px;">
+            <button type="button" class="glass-btn primary" id="btn-create-pair">Создать код</button>
+            <button type="button" class="glass-btn" id="btn-join-pair-mode">Ввести код</button>
+          </div>
+        </div>
+
+        <!-- Step 2A: Created 6-digit code -->
+        <div id="onboard-step-created" class="glass-card" style="padding:18px; display:none; flex-direction:column; gap:14px; text-align:center;">
+          <div style="font-size:14px; color:var(--text-secondary);">Передай этот 6-значный код своей половинке:</div>
+          <div class="big-pair-code" id="created-code-display">000000</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+            <button type="button" class="glass-btn" id="btn-copy-code">📋 Скопировать</button>
+            <button type="button" class="glass-btn primary" id="btn-share-tg-code">✈️ В Telegram</button>
+          </div>
+          <button type="button" class="glass-btn success" id="btn-enter-after-create">Перейти в игру →</button>
+          <button type="button" style="font-size:13px; color:var(--text-secondary); padding:4px;" id="btn-back-from-create">← Назад</button>
+        </div>
+
+        <!-- Step 2B: Enter Partner 6-digit code -->
+        <div id="onboard-step-join" class="glass-card" style="padding:18px; display:none; flex-direction:column; gap:14px; text-align:center;">
+          <div style="font-size:14px; color:var(--text-secondary);">Введи 6-значный код пары от партнёра:</div>
+          <div class="code-cells" id="code-cells">
+            <input class="code-cell" type="text" inputmode="numeric" maxlength="1" autocomplete="one-time-code">
+            <input class="code-cell" type="text" inputmode="numeric" maxlength="1">
+            <input class="code-cell" type="text" inputmode="numeric" maxlength="1">
+            <input class="code-cell" type="text" inputmode="numeric" maxlength="1">
+            <input class="code-cell" type="text" inputmode="numeric" maxlength="1">
+            <input class="code-cell" type="text" inputmode="numeric" maxlength="1">
+          </div>
+          <button type="button" class="glass-btn primary" id="btn-confirm-join">Подключиться 💞</button>
+          <button type="button" style="font-size:13px; color:var(--text-secondary); padding:4px;" id="btn-back-from-join">← Назад</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- MAIN 3-TAB INTERFACE -->
+    <main id="main-view">
+
+      <!-- ==================== TAB 1: ГЛАВНАЯ ==================== -->
+      <section id="tab-home" class="tab-page active">
+        <!-- Static Top Zone (Avatar + Name + Status/Balance) -->
+        <header class="home-static-header">
+          <div class="avatar-ring">
+            <div class="avatar-inner" id="home-avatar">💞</div>
+            <div class="avatar-status-dot" title="Онлайн"></div>
+          </div>
+          <h2 class="user-name-title">
+            <span id="home-user-name">Пользователь</span>
+            <span class="nvr-pill" id="home-role-badge" style="display:none;">NVR • Парень</span>
+          </h2>
+          <div class="status-balance-row">
+            <div class="mini-pill" id="home-pair-status">Подключено 💞</div>
+            <div class="mini-pill coin-pill">🪙 <span id="home-coin-balance">0</span></div>
+            <button type="button" class="withdraw-quick-btn" id="btn-open-withdraw">Вывести 💸</button>
+          </div>
+        </header>
+
+        <!-- Compact 24h Cycle Timer & Swaps Strip -->
+        <div class="glass-card cycle-strip">
+          <div class="cycle-strip-top">
+            <span>Обновление: <strong id="cycle-countdown">24:00:00</strong></span>
+            <span id="cycle-swaps-label">Замены: <strong>2/2</strong></span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill" id="cycle-progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Local Scrollable Quests / Approvals Area -->
+        <div class="scroll-area" id="home-scroll-list"></div>
+      </section>
+
+      <!-- ==================== TAB 2: МАГАЗИН ==================== -->
+      <section id="tab-shop" class="tab-page">
+        <header class="page-static-header">
+          <h2 class="page-title">Магазин</h2>
+          <div class="mini-pill coin-pill">🪙 <span id="shop-coin-balance">0</span></div>
+        </header>
+        <div class="scroll-area" id="shop-scroll-area">
+          <!-- Boyfriend Purchased Gifts Queue -->
+          <div id="bf-gifts-queue" style="display:none; flex-direction:column; gap:10px;"></div>
+          <!-- 2-Column Gift Showcase -->
+          <div class="shop-grid" id="shop-grid"></div>
+        </div>
+      </section>
+
+      <!-- ==================== TAB 3: НАСТРОЙКИ ==================== -->
+      <section id="tab-settings" class="tab-page">
+        <header class="page-static-header">
+          <h2 class="page-title">Настройки</h2>
+          <div class="mini-pill" id="sync-mode-badge">☁️ Облако</div>
+        </header>
+        <div class="scroll-area" id="settings-scroll-area">
+
+          <!-- Audio & Music Block -->
+          <div class="glass-card settings-group">
+            <div class="settings-group-title">🎵 Звук и музыка</div>
+
+            <div class="setting-row">
+              <div>
+                <div class="setting-row-label">Фоновая музыка</div>
+                <div class="setting-row-sub">Локальные треки 1.mp3 – 6.mp3</div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="toggle-music">
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span style="font-size:14px;">🔈</span>
+              <input type="range" min="0" max="100" value="45" class="volume-slider" id="music-volume-slider">
+              <span style="font-size:12px; color:var(--text-secondary); width:34px; text-align:right;" id="music-volume-val">45%</span>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="setting-row">
+              <div>
+                <div class="setting-row-label">Звуки касания (SFX)</div>
+                <div class="setting-row-sub">Отклик кнопок, монет и наград</div>
+              </div>
+              <label class="ios-switch">
+                <input type="checkbox" id="toggle-sfx" checked>
+                <span class="ios-slider"></span>
+              </label>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="mood-header">☀️ Весёлые</div>
+            <div class="track-list" id="tracks-happy"></div>
+
+            <div class="mood-header">🌙 Грустные</div>
+            <div class="track-list" id="tracks-sad"></div>
+          </div>
+
+          <!-- Pair Info Block -->
+          <div class="glass-card settings-group">
+            <div class="settings-group-title">💞 Информация о паре</div>
+            <div class="setting-row">
+              <span class="setting-row-label">Код пары</span>
+              <button type="button" class="mini-pill" id="settings-copy-pair-code">000000 📋</button>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">Ваша роль</span>
+              <span style="font-weight:700; color:#ffd0e5;" id="settings-role-text">—</span>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">Стрик дней</span>
+              <span style="font-weight:700; color:var(--accent-gold);" id="settings-streak-text">🔥 0 дн.</span>
+            </div>
+            <div class="setting-row">
+              <span class="setting-row-label">Выполнено заданий</span>
+              <span style="font-weight:700;" id="settings-completed-text">0</span>
+            </div>
+            <div class="divider"></div>
+            <div>
+              <label style="font-size:13px; color:var(--text-secondary); display:block; margin-bottom:6px;">Telegram-ссылка парня (для кнопки «Выполнить»)</label>
+              <div style="display:flex; gap:8px;">
+                <input id="settings-bf-tg-input" class="glass-input" type="text" placeholder="https://t.me/..." style="height:42px;">
+                <button type="button" class="glass-btn primary" id="btn-save-bf-tg" style="min-height:42px; padding:0 14px;">Ок</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Block -->
+          <div class="glass-card settings-group">
+            <div class="settings-group-title">📜 История выводов и покупок</div>
+            <div id="settings-history-list">
+              <div class="empty-state" style="padding:10px 0;">Пока нет операций</div>
+            </div>
+          </div>
+
+          <!-- Demo Switch & Unpair -->
+          <div class="glass-card settings-group">
+            <div id="demo-role-switch-wrap" style="display:none;">
+              <button type="button" class="glass-btn" id="btn-demo-switch-role" style="width:100%;">🔄 Тест-смена роли (Демо)</button>
+            </div>
+            <button type="button" class="glass-btn danger" id="btn-unpair-open" style="width:100%;">💔 Разорвать пару</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== FLOATING iOS 27 LIQUID GLASS TAB BAR ==================== -->
+      <nav class="tabbar-dock" aria-label="Навигация">
+        <div class="tabbar-pill">
+          <div class="tab-active-slider" id="tab-active-slider"></div>
+
+          <button type="button" class="tab-btn active" data-tab="home" data-index="0">
+            <span class="tab-badge" id="badge-home">0</span>
+            <svg viewBox="0 0 24 24">
+              <path d="M3 10.5L12 3l9 7.5"/>
+              <path d="M5.5 9.5V19a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5V9.5"/>
+              <path d="M12 16.2s-2.8-1.7-2.8-3.5a1.65 1.65 0 0 1 2.8-1.15 1.65 1.65 0 0 1 2.8 1.15c0 1.8-2.8 3.5-2.8 3.5z"/>
+            </svg>
+            <span>Главная</span>
+          </button>
+
+          <button type="button" class="tab-btn" data-tab="shop" data-index="1">
+            <span class="tab-badge" id="badge-shop">0</span>
+            <svg viewBox="0 0 24 24">
+              <path d="M6 8h12l1 12.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 20.5L6 8z"/>
+              <path d="M9 8V6a3 3 0 0 1 6 0v2"/>
+            </svg>
+            <span>Магазин</span>
+          </button>
+
+          <button type="button" class="tab-btn" data-tab="settings" data-index="2">
+            <svg viewBox="0 0 24 24">
+              <circle cx="12" cy="12" r="3"/>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+            </svg>
+            <span>Настройки</span>
+          </button>
+        </div>
+      </nav>
+    </main>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: WITHDRAW COINS TO TENGE (₸)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modal-withdraw">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0; font-size:20px; font-weight:800;">Вывод в тенге 💸</h3>
+        <span class="mini-pill coin-pill">🪙 <span id="withdraw-avail-coins">0</span></span>
+      </div>
+      <div style="font-size:13px; color:var(--text-secondary);">
+        Курс: <strong style="color:#fff;">100 монет = 10 000 ₸</strong> (минимум 100 монет)
+      </div>
+
+      <div class="preset-row" id="withdraw-presets">
+        <button type="button" class="preset-chip" data-val="100">100</button>
+        <button type="button" class="preset-chip" data-val="200">200</button>
+        <button type="button" class="preset-chip" data-val="300">300</button>
+        <button type="button" class="preset-chip" data-val="500">500</button>
+      </div>
+
+      <input type="number" inputmode="numeric" min="100" step="10" id="withdraw-coins-input" class="glass-input" placeholder="Сумма в монетах (от 100)">
+
+      <div class="glass-card" style="padding:12px 14px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13.5px; color:var(--text-secondary);">К получению:</span>
+        <strong style="font-size:20px; color:var(--accent-green);" id="withdraw-tenge-preview">0 ₸</strong>
+      </div>
+
+      <div style="display:grid; grid-template-columns:1fr 1.4fr; gap:10px;">
+        <button type="button" class="glass-btn" id="btn-withdraw-cancel">Отмена</button>
+        <button type="button" class="glass-btn primary" id="btn-withdraw-submit">Отправить заявку</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL: GENERIC CONFIRMATION (BUY GIFT / UNPAIR)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="modal-confirm">
+    <div class="bottom-sheet">
+      <div class="sheet-handle"></div>
+      <h3 style="margin:0; font-size:19px; font-weight:800;" id="confirm-title">Подтверждение</h3>
+      <p style="margin:0; font-size:14px; color:var(--text-secondary); line-height:1.45;" id="confirm-desc"></p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:4px;">
+        <button type="button" class="glass-btn" id="btn-confirm-no">Отмена</button>
+        <button type="button" class="glass-btn primary" id="btn-confirm-yes">Подтвердить</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      'use strict';
+
+      /* ========================================================================
+         1. FIREBASE REALTIME DATABASE CONFIGURATION
+         ------------------------------------------------------------------------
+         Как подключить облачную синхронизацию между 2 телефонами за 3 шага:
+         1) Откройте https://console.firebase.google.com → Создайте бесплатный проект.
+         2) В меню Build → Realtime Database → Create Database (режим test mode).
+         3) Скопируйте ваш databaseURL и ключи проекта ниже.
+         Пока поля пустые — приложение работает в автоматическом локальном
+         демо-режиме (localStorage + BroadcastChannel) с кнопкой смены роли!
+         ======================================================================== */
+      const FIREBASE_CONFIG = {
+        apiKey: "",
+        authDomain: "",
+        databaseURL: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: ""
+      };
+
+      const NVR_DEFAULT_TG_URL = 'https://t.me/IIlllIIlIIIIllllIIl';
+      const DAY_MS = 24 * 60 * 60 * 1000;
+      const WEEK_MS = 7 * DAY_MS;
+      const MAX_SWAPS_PER_DAY = 2;
+      const TENGE_PER_COIN = 100; // 100 монет = 10 000 ₸
+
+      /* ========================================================================
+         2. TELEGRAM WEBAPP SDK & ANTI-ZOOM / GESTURE PROTECTION
+         ======================================================================== */
+      const tg = (window.Telegram && window.Telegram.WebApp) ? window.Telegram.WebApp : null;
+
+      function initTelegramSDK() {
+        if (!tg) return;
+        try {
+          tg.ready();
+          tg.expand();
+          if (typeof tg.disableVerticalSwipes === 'function') tg.disableVerticalSwipes();
+          if (typeof tg.setHeaderColor === 'function') tg.setHeaderColor('#160a18');
+          if (typeof tg.setBackgroundColor === 'function') tg.setBackgroundColor('#130916');
+        } catch (_) {}
+      }
+
+      const Haptic = {
+        impact(style = 'light') {
+          try { tg?.HapticFeedback?.impactOccurred?.(style); } catch (_) {}
+        },
+        notify(type = 'success') {
+          try { tg?.HapticFeedback?.notificationOccurred?.(type); } catch (_) {}
+        },
+        select() {
+          try { tg?.HapticFeedback?.selectionChanged?.(); } catch (_) {}
+        }
+      };
+
+      // Блокировка зума жестами, щипком и двойным тапом
+      ['gesturestart', 'gesturechange', 'gestureend'].forEach(evt => {
+        document.addEventListener(evt, e => e.preventDefault(), { passive: false });
+      });
+      document.addEventListener('touchmove', e => {
+        if (e.touches && e.touches.length > 1) e.preventDefault();
+      }, { passive: false });
+      let lastTapTs = 0;
+      document.addEventListener('touchend', e => {
+        const now = Date.now();
+        if (now - lastTapTs <= 280) {
+          const tag = (e.target && e.target.tagName) || '';
+          if (tag !== 'INPUT' && tag !== 'TEXTAREA') e.preventDefault();
+        }
+        lastTapTs = now;
+      }, { passive: false });
+
+      /* ========================================================================
+         3. QUEST DATABASE (48 UNIQUE WARM QUESTS)
+         ======================================================================== */
+      const QUEST_POOL = [
+        // --- MESSAGE (+15 монет) ---
+        { id: 'm1', type: 'message', reward: 15, title: 'Написать парню «доброе утро ❤️🥹»', prefillText: 'Доброе утро, любимый ❤️🥹 Как спалось?' },
+        { id: 'm2', type: 'message', reward: 15, title: 'Написать 3 причины, почему ты его сегодня особенно любишь', prefillText: '3 причины, почему я тебя сегодня особенно люблю:\n1. \n2. \n3. ❤️' },
+        { id: 'm3', type: 'message', reward: 15, title: 'Отправить неожиданный тёплый комплимент', prefillText: 'Просто хотела напомнить, какой ты у меня самый лучший и красивый ✨❤️' },
+        { id: 'm4', type: 'message', reward: 15, title: 'Спросить, как проходит его день и пожелать удачи ❤️', prefillText: 'Привет, родной! Как проходит твой день? Желаю тебе самой лёгкой и классной удачи сегодня ❤️' },
+        { id: 'm5', type: 'message', reward: 15, title: 'Написать, по какой его привычке ты сейчас скучаешь', prefillText: 'Знаешь, я сейчас поймала себя на мысли, что очень скучаю по тому, как ты… 🥰' },
+        { id: 'm6', type: 'message', reward: 15, title: 'Отправить ему милое напоминание попить воды и улыбнуться', prefillText: 'Маленькое напоминание: попей водички и улыбнись, потому что я о тебе думаю 💧💕' },
+        { id: 'm7', type: 'message', reward: 15, title: 'Написать ему самое нежное пожелание спокойной ночи или уютного вечера', prefillText: 'Пусть твой вечер будет самым тёплым и спокойным, обнимаю тебя мысленно 🌙❤️' },
+        { id: 'm8', type: 'message', reward: 15, title: 'Признаться, какая песня сегодня напомнила тебе о нём', prefillText: 'Слушала сегодня музыку и подумала о тебе — вот этот трек прямо про нас 🎶💞' },
+        { id: 'm9', type: 'message', reward: 15, title: 'Написать короткое «Я тобой горжусь» и добавить почему', prefillText: 'Хочу просто сказать: я очень тобой горжусь, потому что ты всегда… 🥹❤️' },
+        { id: 'm10', type: 'message', reward: 15, title: 'Придумать ему новое ласковое прозвище на сегодня', prefillText: 'Официально объявляю: сегодня твоё секретное прозвище — … 🐻💕' },
+        { id: 'm11', type: 'message', reward: 15, title: 'Описать одним предложением, куда хочешь поехать с ним вдвоём', prefillText: 'Мечта дня: однажды мы с тобой вдвоём обязательно поедем в… ✈️❤️' },
+        { id: 'm12', type: 'message', reward: 15, title: 'Написать, что первое сделаешь, когда вы увидитесь', prefillText: 'Когда мы увидимся, первым делом я тебя крепко-крепко обниму и… 🫂💗' },
+        { id: 'm13', type: 'message', reward: 15, title: 'Отправить ему 5 любимых эмодзи, описывающих твои чувства сейчас', prefillText: 'Мои чувства к тебе прямо сейчас в 5 эмодзи: 🥹❤️✨🫂💋' },
+        { id: 'm14', type: 'message', reward: 15, title: 'Поблагодарить его за одну маленькую мелочь из недавнего времени', prefillText: 'Спасибо тебе за то, что недавно ты… Это правда сделало мой день теплее 💕' },
+        { id: 'm15', type: 'message', reward: 15, title: 'Написать ему мини-предсказание на завтрашний день', prefillText: 'Твоё личное предсказание на завтра: тебя ждёт классная новость и море моей любви ✨❤️' },
+        { id: 'm16', type: 'message', reward: 15, title: 'Рассказать ему о самой приятной мелочи, которая случилась с тобой сегодня', prefillText: 'Делюсь маленькой радостью дня: сегодня случилось кое-что приятное — … 🌸' },
+
+        // --- CALL (+35 монет) ---
+        { id: 'c1', type: 'call', reward: 35, title: 'Позвонить ему и рассказать, что снилось (или как спалось в целом)' },
+        { id: 'c2', type: 'call', reward: 35, title: 'Позвонить и рассказать любую интересную или смешную историю' },
+        { id: 'c3', type: 'call', reward: 35, title: 'Позвонить на 5 минут просто услышать его голос и поболтать' },
+        { id: 'c4', type: 'call', reward: 35, title: 'Позвонить и вместе выбрать фильм или сериал на ближайший вечер' },
+        { id: 'c5', type: 'call', reward: 35, title: 'Позвонить ему и сыграть в короткий блиц «5 вопросов обо мне и тебе»' },
+        { id: 'c6', type: 'call', reward: 35, title: 'Позвонить и рассказать, как прошёл твой день в трёх главных моментах' },
+        { id: 'c7', type: 'call', reward: 35, title: 'Позвонить и сказать ему 3 искренних комплимента голосом' },
+        { id: 'c8', type: 'call', reward: 35, title: 'Позвонить по видеосвязи на пару минут и просто улыбнуться друг другу' },
+        { id: 'c9', type: 'call', reward: 35, title: 'Позвонить и помечтать вместе о вашем идеальном выходном' },
+        { id: 'c10', type: 'call', reward: 35, title: 'Позвонить ему перед сном и пожелать сладких снов голосом' },
+        { id: 'c11', type: 'call', reward: 35, title: 'Позвонить и обсудить, какую вкусную еду вы закажете в следующий раз' },
+        { id: 'c12', type: 'call', reward: 35, title: 'Позвонить и задать ему самый неожиданный вопрос из твоего воображения' },
+        { id: 'c13', type: 'call', reward: 35, title: 'Позвонить во время прогулки и описать, что красивого ты видишь вокруг' },
+        { id: 'c14', type: 'call', reward: 35, title: 'Позвонить и вспомнить ваш самый смешной общий случай' },
+        { id: 'c15', type: 'call', reward: 35, title: 'Позвонить и вместе составить мини-список дел на эту неделю' },
+
+        // --- SPECIAL / CREATIVE (+45 to +60 монет) ---
+        { id: 's1', type: 'special', reward: 45, title: 'Записать тёплое голосовое или кружочек с признанием в любви' },
+        { id: 's2', type: 'special', reward: 50, title: 'Составить мини-фотоотчёт своего дня из 3 кадров специально для него' },
+        { id: 's3', type: 'special', reward: 55, title: 'Придумать и расписать план идеального свидания на выходные' },
+        { id: 's4', type: 'special', reward: 60, title: 'Написать мини-письмо о вашем самом любимом совместном моменте' },
+        { id: 's5', type: 'special', reward: 45, title: 'Собрать мини-плейлист из 3 песен, которые ассоциируются у тебя с ним' },
+        { id: 's6', type: 'special', reward: 50, title: 'Отправить ему милое селфи с сердечком из пальцев и тёплой подписью' },
+        { id: 's7', type: 'special', reward: 50, title: 'Нарисовать на бумаге или в заметках мини-открытку для него и скинуть фото' },
+        { id: 's8', type: 'special', reward: 55, title: 'Записать кружочек с рассказом, за что ты благодарна ему в этом месяце' },
+        { id: 's9', type: 'special', reward: 45, title: 'Найти вашу старую совместную фотку, отправить ему и рассказать, что ты тогда чувствовала' },
+        { id: 's10', type: 'special', reward: 55, title: 'Придумать «купон на желание» для него и красиво оформить в сообщении' },
+        { id: 's11', type: 'special', reward: 60, title: 'Написать 10 коротких фактов о том, почему с ним так хорошо и спокойно' },
+        { id: 's12', type: 'special', reward: 50, title: 'Записать уютное голосовое на 1 минуту, будто вы сидите рядом за чаем' },
+        { id: 's13', type: 'special', reward: 45, title: 'Сделать фото красивого неба или детали вокруг и посвятить его ему' },
+        { id: 's14', type: 'special', reward: 55, title: 'Придумать 3 новые традиции для вашей пары и обсудить их с ним' },
+        { id: 's15', type: 'special', reward: 60, title: 'Сделать мини-коллаж или подборку из 4 ваших лучших воспоминаний' },
+        { id: 's16', type: 'special', reward: 50, title: 'Написать ему короткое стихотворение или рифму из 4 строк про вас' },
+        { id: 's17', type: 'special', reward: 55, title: 'Подготовить список из 5 мест в городе, куда вы обязательно сходите вместе' }
+      ];
+
+      /* ========================================================================
+         4. GIFT SHOP CATALOG (12 ITEMS + UNIQUE INLINE SVG ILLUSTRATIONS)
+         ======================================================================== */
+      const SHOP_ITEMS = [
+        {
+          id: 'ga_20k',
+          title: 'Сертификат в Золотое Яблоко — 20 000 ₸',
+          price: 250,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <defs><linearGradient id="g1" x1="8" y1="14" x2="72" y2="66" gradientUnits="userSpaceOnUse"><stop stop-color="#c9ff3b"/><stop offset="1" stop-color="#76d900"/></linearGradient></defs>
+            <rect x="6" y="16" width="68" height="48" rx="12" fill="url(#g1)" stroke="#ffffff" stroke-opacity=".55" stroke-width="2"/>
+            <circle cx="28" cy="40" r="11" fill="#182208" fill-opacity=".2"/>
+            <path d="M28 31c-4.5 0-8 3.6-8 8.2 0 5.1 3.8 8.8 8 8.8s8-3.7 8-8.8c0-4.6-3.5-8.2-8-8.2z" fill="#182208"/>
+            <path d="M28 30c.6-3 2.8-5 5.4-5.2-.2 2.7-2 4.8-5.4 5.2z" fill="#182208"/>
+            <text x="42" y="38" fill="#131c05" font-size="11" font-weight="800" font-family="-apple-system,sans-serif">20K ₸</text>
+            <text x="42" y="50" fill="#1c2a08" font-size="7.5" font-weight="700" font-family="-apple-system,sans-serif">GOLD APPLE</text>
+          </svg>`
+        },
+        {
+          id: 'ga_30k',
+          title: 'Сертификат в Золотое Яблоко — 30 000 ₸',
+          price: 400,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <defs><linearGradient id="g2" x1="6" y1="14" x2="74" y2="66" gradientUnits="userSpaceOnUse"><stop stop-color="#e3ff54"/><stop offset=".55" stop-color="#a8f000"/><stop offset="1" stop-color="#ffd166"/></linearGradient></defs>
+            <rect x="6" y="16" width="68" height="48" rx="12" fill="url(#g2)" stroke="#fff" stroke-opacity=".65" stroke-width="2"/>
+            <path d="M26 31c-4.5 0-8 3.6-8 8.2 0 5.1 3.8 8.8 8 8.8s8-3.7 8-8.8c0-4.6-3.5-8.2-8-8.2z" fill="#1a1f07"/>
+            <path d="M26 30c.6-3 2.8-5 5.4-5.2-.2 2.7-2 4.8-5.4 5.2z" fill="#1a1f07"/>
+            <text x="40" y="38" fill="#161b04" font-size="11.5" font-weight="800" font-family="-apple-system,sans-serif">30K ₸</text>
+            <text x="40" y="50" fill="#232c08" font-size="7.5" font-weight="700" font-family="-apple-system,sans-serif">GOLD APPLE</text>
+            <path d="M65 21l1.5 3.5 3.5 1.5-3.5 1.5-1.5 3.5-1.5-3.5-3.5-1.5 3.5-1.5z" fill="#fff"/>
+          </svg>`
+        },
+        {
+          id: 'ga_50k',
+          title: 'Сертификат в Золотое Яблоко — 50 000 ₸',
+          price: 650,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <defs><linearGradient id="g3" x1="6" y1="16" x2="74" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#1f1c26"/><stop offset=".5" stop-color="#2e2a18"/><stop offset="1" stop-color="#191620"/></linearGradient>
+            <linearGradient id="g3b" x1="12" y1="16" x2="68" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#ffe07d"/><stop offset="1" stop-color="#c6ff3d"/></linearGradient></defs>
+            <rect x="6" y="16" width="68" height="48" rx="12" fill="url(#g3)" stroke="url(#g3b)" stroke-width="2.4"/>
+            <path d="M26 31c-4.5 0-8 3.6-8 8.2 0 5.1 3.8 8.8 8 8.8s8-3.7 8-8.8c0-4.6-3.5-8.2-8-8.2z" fill="url(#g3b)"/>
+            <path d="M26 30c.6-3 2.8-5 5.4-5.2-.2 2.7-2 4.8-5.4 5.2z" fill="#c6ff3d"/>
+            <text x="39" y="38" fill="#ffe285" font-size="11.5" font-weight="800" font-family="-apple-system,sans-serif">50K ₸</text>
+            <text x="39" y="50" fill="#c6ff3d" font-size="7.2" font-weight="700" font-family="-apple-system,sans-serif">VIP EDITION</text>
+          </svg>`
+        },
+        {
+          id: 'coffee_dessert',
+          title: 'Кофе и любимый десерт',
+          price: 60,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <path d="M18 34h28v18a14 14 0 0 1-14 14h0a14 14 0 0 1-14-14V34z" fill="#fff3e6" stroke="#ffd2a6" stroke-width="2"/>
+            <path d="M46 38h5a6 6 0 0 1 0 12h-5" stroke="#fff3e6" stroke-width="3" stroke-linecap="round"/>
+            <path d="M26 26c0-3 3-4 3-7M35 26c0-3 3-4 3-7" stroke="#ffd6e7" stroke-width="2.2" stroke-linecap="round"/>
+            <ellipse cx="32" cy="34" rx="14" ry="4" fill="#6b3e26"/>
+            <path d="M51 58h18l-2 8H53l-2-8z" fill="#ff8fb8"/>
+            <path d="M50 58c0-6 4.5-10 10-10s10 4 10 10H50z" fill="#fff6fa"/>
+            <circle cx="60" cy="46" r="3.5" fill="#ff3366"/>
+          </svg>`
+        },
+        {
+          id: 'massage_30',
+          title: 'Расслабляющий массаж от парня (30 мин)',
+          price: 80,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <ellipse cx="40" cy="58" rx="22" ry="8" fill="#7c5cbf" fill-opacity=".55"/>
+            <ellipse cx="40" cy="47" rx="17" ry="7" fill="#b48cff" fill-opacity=".75"/>
+            <ellipse cx="40" cy="37" rx="12" ry="5.5" fill="#e0c7ff"/>
+            <path d="M54 24c4-6 11-7 13-3-1 6-7 10-13 9 0-2 0-4 0-6z" fill="#63e6be"/>
+            <path d="M22 25c2-4 6-6 9-4-1 4-4 7-9 7v-3z" fill="#ff9ec8"/>
+            <circle cx="40" cy="22" r="4" fill="#ffd166"/>
+          </svg>`
+        },
+        {
+          id: 'movie_night',
+          title: 'Уютный киновечер с любыми снеками',
+          price: 100,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <path d="M22 34h36l-5 32H27l-5-32z" fill="#ff5478" stroke="#fff" stroke-opacity=".45" stroke-width="2"/>
+            <path d="M32 34l2 32M48 34l-2 32" stroke="#fff" stroke-width="4" stroke-opacity=".85"/>
+            <circle cx="29" cy="28" r="7" fill="#fff2b2"/>
+            <circle cx="40" cy="24" r="8" fill="#ffe285"/>
+            <circle cx="51" cy="28" r="7" fill="#fff2b2"/>
+            <circle cx="35" cy="31" r="6" fill="#ffd166"/>
+            <circle cx="46" cy="31" r="6" fill="#ffd166"/>
+          </svg>`
+        },
+        {
+          id: 'dinner_sushi',
+          title: 'Доставка любимого ужина / суши',
+          price: 140,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <rect x="12" y="48" width="56" height="12" rx="6" fill="#3a233d" stroke="#ff9ec8" stroke-opacity=".45" stroke-width="1.8"/>
+            <rect x="18" y="34" width="18" height="15" rx="6" fill="#fff8f0"/>
+            <rect x="18" y="34" width="18" height="7" rx="4" fill="#ff7b54"/>
+            <rect x="44" y="34" width="18" height="15" rx="6" fill="#fff8f0"/>
+            <rect x="44" y="34" width="18" height="7" rx="4" fill="#ff5e78"/>
+            <path d="M20 22l44 6M20 28l44-2" stroke="#ffd166" stroke-width="2.6" stroke-linecap="round"/>
+          </svg>`
+        },
+        {
+          id: 'flowers_bouquet',
+          title: 'Букет любимых цветов',
+          price: 180,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <path d="M26 42l14 26 14-26H26z" fill="#ffb3d1" stroke="#fff" stroke-opacity=".55" stroke-width="1.8"/>
+            <circle cx="40" cy="28" r="9" fill="#ff4785"/>
+            <circle cx="28" cy="34" r="8" fill="#ff7eb3"/>
+            <circle cx="52" cy="34" r="8" fill="#ff7eb3"/>
+            <circle cx="34" cy="23" r="6" fill="#ff9ec8"/>
+            <circle cx="46" cy="23" r="6" fill="#ff9ec8"/>
+            <circle cx="40" cy="28" r="3.5" fill="#ffe082"/>
+            <path d="M35 55h10" stroke="#ff3377" stroke-width="3" stroke-linecap="round"/>
+          </svg>`
+        },
+        {
+          id: 'surprise_box',
+          title: 'Сюрприз-бокс от парня',
+          price: 320,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <rect x="16" y="34" width="48" height="32" rx="8" fill="#ff5f9e" stroke="#fff" stroke-opacity=".45" stroke-width="2"/>
+            <rect x="13" y="26" width="54" height="12" rx="5" fill="#ff82b6" stroke="#fff" stroke-opacity=".55" stroke-width="2"/>
+            <rect x="36" y="26" width="8" height="40" fill="#ffd166"/>
+            <path d="M40 26c-7-10-16-8-14-1 1.5 5 9 3 14 1zm0 0c7-10 16-8 14-1-1.5 5-9 3-14 1z" fill="#ffe285"/>
+          </svg>`
+        },
+        {
+          id: 'romantic_dinner',
+          title: 'Романтический ужин в ресторане',
+          price: 450,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <path d="M22 20h14l-2 16a5 5 0 0 1-10 0l-2-16z" fill="#ff477e" fill-opacity=".85" stroke="#fff" stroke-width="1.8"/>
+            <path d="M29 41v19M23 60h12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M44 20h14l-2 16a5 5 0 0 1-10 0l-2-16z" fill="#ff7aa8" fill-opacity=".85" stroke="#fff" stroke-width="1.8"/>
+            <path d="M51 41v19M45 60h12" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+            <path d="M40 16c-1.5-2.5-5-2-5 1 0 3 5 5.5 5 5.5s5-2.5 5-5.5c0-3-3.5-3.5-5-1z" fill="#ffd166"/>
+          </svg>`
+        },
+        {
+          id: 'spa_beauty',
+          title: 'SPA-процедура или бьюти-день',
+          price: 500,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <path d="M40 18c8 10 10 22 0 34-10-12-8-24 0-34z" fill="#ff8ec7"/>
+            <path d="M40 52c-14-4-22-12-22-24 11 2 19 10 22 24z" fill="#ff5f9e" fill-opacity=".85"/>
+            <path d="M40 52c14-4 22-12 22-24-11 2-19 10-22 24z" fill="#ff5f9e" fill-opacity=".85"/>
+            <ellipse cx="40" cy="58" rx="22" ry="6" fill="#5ae2ff" fill-opacity=".45"/>
+            <circle cx="40" cy="36" r="4" fill="#fff2b2"/>
+          </svg>`
+        },
+        {
+          id: 'dream_wish',
+          title: 'Исполнение одного заветного желания',
+          price: 750,
+          svg: `<svg viewBox="0 0 80 80" fill="none">
+            <defs><linearGradient id="g12" x1="16" y1="14" x2="64" y2="66" gradientUnits="userSpaceOnUse"><stop stop-color="#ffe985"/><stop offset="1" stop-color="#ff6ba9"/></linearGradient></defs>
+            <path d="M40 12l7.5 18.5L67 33l-15 13 4.5 19.5L40 55l-16.5 10.5L28 46 13 33l19.5-2.5L40 12z" fill="url(#g12)" stroke="#fff" stroke-opacity=".6" stroke-width="2" stroke-linejoin="round"/>
+            <circle cx="62" cy="18" r="3" fill="#5ae2ff"/>
+            <circle cx="18" cy="58" r="2.5" fill="#fff"/>
+          </svg>`
+        }
+      ];
+
+      /* ========================================================================
+         5. AUDIO MANAGER (6 LOCAL MP3 TRACKS + PROCEDURAL WEB AUDIO SFX)
+         ======================================================================== */
+      const TRACKS = [
+        { id: 1, mood: 'happy', title: 'Весёлая 1', file: './1.mp3' },
+        { id: 2, mood: 'happy', title: 'Весёлая 2', file: './2.mp3' },
+        { id: 3, mood: 'happy', title: 'Весёлая 3', file: './3.mp3' },
+        { id: 4, mood: 'sad',   title: 'Грустная 1', file: './4.mp3' },
+        { id: 5, mood: 'sad',   title: 'Грустная 2', file: './5.mp3' },
+        { id: 6, mood: 'sad',   title: 'Грустная 3', file: './6.mp3' }
+      ];
+
+      const AudioEngine = {
+        bgAudio: new Audio(),
+        audioCtx: null,
+        fadeTimer: null,
+        missingTracks: new Set(),
+        unlocked: false,
+        prefs: {
+          musicEnabled: false,
+          sfxEnabled: true,
+          volume: 0.45,
+          trackId: 1
+        },
+
+        init(savedPrefs) {
+          if (savedPrefs) {
+            this.prefs = { ...this.prefs, ...savedPrefs };
+          }
+          this.bgAudio.loop = true;
+          this.bgAudio.preload = 'none';
+          this.bgAudio.volume = 0;
+
+          this.bgAudio.addEventListener('error', () => {
+            // Тихая обработка отсутствующего mp3 файла — без всплывающих ошибок
+            this.missingTracks.add(this.prefs.trackId);
+            this.bgAudio.pause();
+            renderTrackLists();
+          });
+
+          const unlockHandler = () => {
+            if (this.unlocked) return;
+            this.unlocked = true;
+            if (this.prefs.musicEnabled) {
+              this.playTrack(this.prefs.trackId, false);
+            }
+          };
+          document.addEventListener('pointerdown', unlockHandler, { once: true, passive: true });
+          document.addEventListener('touchstart', unlockHandler, { once: true, passive: true });
+        },
+
+        getCtx() {
+          if (!this.audioCtx) {
+            const Ctx = window.AudioContext || window.webkitAudioContext;
+            if (Ctx) this.audioCtx = new Ctx();
+          }
+          if (this.audioCtx && this.audioCtx.state === 'suspended') {
+            this.audioCtx.resume().catch(() => {});
+          }
+          return this.audioCtx;
+        },
+
+        sfx(kind = 'tap') {
+          if (!this.prefs.sfxEnabled) return;
+          try {
+            const ctx = this.getCtx();
+            if (!ctx) return;
+            const now = ctx.currentTime;
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+
+            if (kind === 'tap') {
+              osc.type = 'sine';
+              osc.frequency.setValueAtTime(520, now);
+              osc.frequency.exponentialRampToValueAtTime(340, now + 0.045);
+              gain.gain.setValueAtTime(0.06, now);
+              gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+              osc.start(now);
+              osc.stop(now + 0.055);
+            } else if (kind === 'tab') {
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(420, now);
+              osc.frequency.exponentialRampToValueAtTime(640, now + 0.06);
+              gain.gain.setValueAtTime(0.05, now);
+              gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+              osc.start(now);
+              osc.stop(now + 0.075);
+            } else if (kind === 'coin' || kind === 'success') {
+              const notes = kind === 'coin' ? [880, 1318.5] : [523.25, 659.25, 783.99, 1046.5];
+              osc.disconnect();
+              notes.forEach((freq, i) => {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.setValueAtTime(freq, now + i * 0.075);
+                g.gain.setValueAtTime(0.07, now + i * 0.075);
+                g.gain.exponentialRampToValueAtTime(0.001, now + i * 0.075 + 0.22);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start(now + i * 0.075);
+                o.stop(now + i * 0.075 + 0.24);
+              });
+            }
+          } catch (_) {}
+        },
+
+        fadeVolume(target, duration = 350, onDone) {
+          clearInterval(this.fadeTimer);
+          const steps = 14;
+          const stepTime = duration / steps;
+          const start = this.bgAudio.volume;
+          const delta = (target - start) / steps;
+          let count = 0;
+          this.fadeTimer = setInterval(() => {
+            count++;
+            const next = Math.max(0, Math.min(1, start + delta * count));
+            this.bgAudio.volume = next;
+            if (count >= steps) {
+              clearInterval(this.fadeTimer);
+              this.bgAudio.volume = Math.max(0, Math.min(1, target));
+              if (onDone) onDone();
+            }
+          }, stepTime);
+        },
+
+        playTrack(trackId, save = true) {
+          const track = TRACKS.find(t => t.id === trackId) || TRACKS[0];
+          this.prefs.trackId = track.id;
+          if (save) SessionStore.saveAudioPrefs(this.prefs);
+          renderTrackLists();
+
+          if (!this.prefs.musicEnabled) return;
+
+          const startNew = () => {
+            this.bgAudio.src = track.file;
+            this.bgAudio.volume = 0;
+            const p = this.bgAudio.play();
+            if (p && typeof p.then === 'function') {
+              p.then(() => {
+                this.missingTracks.delete(track.id);
+                renderTrackLists();
+                this.fadeVolume(this.prefs.volume, 420);
+              }).catch(() => {
+                // Ошибка автовоспроизведения или отсутствующий файл — молчим
+              });
+            }
+          };
+
+          if (!this.bgAudio.paused && this.bgAudio.src) {
+            this.fadeVolume(0, 220, () => {
+              this.bgAudio.pause();
+              startNew();
+            });
+          } else {
+            startNew();
+          }
+        },
+
+        setMusicEnabled(enabled) {
+          this.prefs.musicEnabled = enabled;
+          SessionStore.saveAudioPrefs(this.prefs);
+          if (enabled) {
+            this.playTrack(this.prefs.trackId, false);
+          } else {
+            this.fadeVolume(0, 260, () => this.bgAudio.pause());
+          }
+        },
+
+        setSfxEnabled(enabled) {
+          this.prefs.sfxEnabled = enabled;
+          SessionStore.saveAudioPrefs(this.prefs);
+          if (enabled) this.sfx('tap');
+        },
+
+        setVolume(vol01) {
+          this.prefs.volume = Math.max(0, Math.min(1, vol01));
+          if (this.prefs.musicEnabled && !this.bgAudio.paused) {
+            this.bgAudio.volume = this.prefs.volume;
+          }
+          SessionStore.saveAudioPrefs(this.prefs);
+        }
+      };
+
+      /* ========================================================================
+         6. LEVEL 2 PERSISTENCE: TRIPLE-LAYER SESSION STORE
+            (Telegram CloudStorage + localStorage + IndexedDB)
+         ======================================================================== */
+      const SESSION_KEY = 'nvr_couple_session_v1';
+      const IDB_NAME = 'nvr_couple_idb';
+      const IDB_STORE = 'kv';
+
+      const SessionStore = {
+        openIDB() {
+          return new Promise((resolve, reject) => {
+            try {
+              const req = indexedDB.open(IDB_NAME, 1);
+              req.onupgradeneeded = () => {
+                if (!req.result.objectStoreNames.contains(IDB_STORE)) {
+                  req.result.createObjectStore(IDB_STORE);
+                }
+              };
+              req.onsuccess = () => resolve(req.result);
+              req.onerror = () => reject(req.error);
+            } catch (e) { reject(e); }
+          });
+        },
+
+        async idbSet(key, val) {
+          try {
+            const db = await this.openIDB();
+            await new Promise((res, rej) => {
+              const tx = db.transaction(IDB_STORE, 'readwrite');
+              tx.objectStore(IDB_STORE).put(val, key);
+              tx.oncomplete = res;
+              tx.onerror = rej;
+            });
+          } catch (_) {}
+        },
+
+        async idbGet(key) {
+          try {
+            const db = await this.openIDB();
+            return await new Promise((res) => {
+              const tx = db.transaction(IDB_STORE, 'readonly');
+              const req = tx.objectStore(IDB_STORE).get(key);
+              req.onsuccess = () => res(req.result || null);
+              req.onerror = () => res(null);
+            });
+          } catch (_) { return null; }
+        },
+
+        tgCloudGet(key) {
+          return new Promise((resolve) => {
+            try {
+              if (tg?.CloudStorage?.getItem) {
+                tg.CloudStorage.getItem(key, (err, value) => {
+                  if (!err && value) {
+                    try { resolve(JSON.parse(value)); return; } catch (_) {}
+                  }
+                  resolve(null);
+                });
+              } else {
+                resolve(null);
+              }
+            } catch (_) { resolve(null); }
+          });
+        },
+
+        tgCloudSet(key, obj) {
+          try {
+            if (tg?.CloudStorage?.setItem) {
+              tg.CloudStorage.setItem(key, JSON.stringify(obj), () => {});
+            }
+          } catch (_) {}
+        },
+
+        async load() {
+          // 1. localStorage (мгновенно)
+          let data = null;
+          try {
+            const raw = localStorage.getItem(SESSION_KEY);
+            if (raw) data = JSON.parse(raw);
+          } catch (_) {}
+
+          // 2. Telegram CloudStorage (приоритетный источник при очистке кэша)
+          const cloudData = await this.tgCloudGet(SESSION_KEY);
+          if (cloudData && cloudData.pairCode) {
+            data = { ...(data || {}), ...cloudData };
+          }
+
+          // 3. IndexedDB (резервная копия)
+          if (!data || !data.pairCode) {
+            const idbData = await this.idbGet(SESSION_KEY);
+            if (idbData && idbData.pairCode) {
+              data = { ...(data || {}), ...idbData };
+            }
+          }
+          return data || {};
+        },
+
+        async save(sessionObj) {
+          const payload = { ...sessionObj, updatedAt: Date.now() };
+          try { localStorage.setItem(SESSION_KEY, JSON.stringify(payload)); } catch (_) {}
+          this.tgCloudSet(SESSION_KEY, payload);
+          await this.idbSet(SESSION_KEY, payload);
+        },
+
+        async saveAudioPrefs(audioPrefs) {
+          const cur = await this.load();
+          await this.save({ ...cur, audioPrefs });
+        },
+
+        async clearPair() {
+          const cur = await this.load();
+          const cleaned = { audioPrefs: cur.audioPrefs || AudioEngine.prefs };
+          await this.save(cleaned);
+        }
+      };
+
+      /* ========================================================================
+         7. LEVEL 1 REALTIME DATABASE ENGINE (FIREBASE + LOCAL DEMO FALLBACK)
+         ======================================================================== */
+      const DB = {
+        mode: 'local', // 'firebase' | 'local'
+        fbDb: null,
+        unsubscribeFn: null,
+        bc: null,
+
+        init() {
+          const hasConfig = Boolean(FIREBASE_CONFIG.databaseURL && FIREBASE_CONFIG.apiKey);
+          if (hasConfig && typeof window.firebase !== 'undefined') {
+            try {
+              if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+              this.fbDb = firebase.database();
+              this.mode = 'firebase';
+            } catch (err) {
+              console.warn('Firebase init fallback to local:', err);
+              this.mode = 'local';
+            }
+          } else {
+            this.mode = 'local';
+          }
+
+          if (this.mode === 'local' && typeof BroadcastChannel !== 'undefined') {
+            this.bc = new BroadcastChannel('nvr_couple_sync_channel');
+          }
+        },
+
+        localKey(pairCode) {
+          return `nvr_pair_room_${pairCode}`;
+        },
+
+        async getPair(pairCode) {
+          if (this.mode === 'firebase') {
+            const snap = await this.fbDb.ref(`pairs/${pairCode}`).once('value');
+            return snap.val();
+          }
+          try {
+            const raw = localStorage.getItem(this.localKey(pairCode));
+            return raw ? JSON.parse(raw) : null;
+          } catch (_) { return null; }
+        },
+
+        async setPair(pairCode, data) {
+          if (this.mode === 'firebase') {
+            await this.fbDb.ref(`pairs/${pairCode}`).set(data);
+            return data;
+          }
+          localStorage.setItem(this.localKey(pairCode), JSON.stringify(data));
+          if (this.bc) this.bc.postMessage({ pairCode, data });
+          return data;
+        },
+
+        async transact(pairCode, mutatorFn) {
+          if (this.mode === 'firebase') {
+            const ref = this.fbDb.ref(`pairs/${pairCode}`);
+            const res = await ref.transaction(current => {
+              if (!current) return current;
+              const copy = JSON.parse(JSON.stringify(current));
+              return mutatorFn(copy);
+            });
+            return res.snapshot ? res.snapshot.val() : null;
+          }
+          const current = await this.getPair(pairCode);
+          if (!current) return null;
+          const updated = mutatorFn(JSON.parse(JSON.stringify(current)));
+          if (updated) {
+            await this.setPair(pairCode, updated);
+          }
+          return updated;
+        },
+
+        subscribe(pairCode, callback) {
+          this.unsubscribe();
+          if (this.mode === 'firebase') {
+            const ref = this.fbDb.ref(`pairs/${pairCode}`);
+            const handler = snap => {
+              const val = snap.val();
+              if (val) callback(val);
+            };
+            ref.on('value', handler);
+            this.unsubscribeFn = () => ref.off('value', handler);
+          } else {
+            const onStorage = e => {
+              if (e.key === this.localKey(pairCode) && e.newValue) {
+                try { callback(JSON.parse(e.newValue)); } catch (_) {}
+              }
+            };
+            const onBc = e => {
+              if (e.data && e.data.pairCode === pairCode && e.data.data) {
+                callback(e.data.data);
+              }
+            };
+            window.addEventListener('storage', onStorage);
+            if (this.bc) this.bc.addEventListener('message', onBc);
+            this.unsubscribeFn = () => {
+              window.removeEventListener('storage', onStorage);
+              if (this.bc) this.bc.removeEventListener('message', onBc);
+            };
+            // Immediate initial emit
+            this.getPair(pairCode).then(d => { if (d) callback(d); });
+          }
+        },
+
+        unsubscribe() {
+          if (this.unsubscribeFn) {
+            this.unsubscribeFn();
+            this.unsubscribeFn = null;
+          }
+        }
+      };
+
+      /* ========================================================================
+         8. APPLICATION STATE & DAILY QUEST GENERATOR
+         ======================================================================== */
+      const State = {
+        user: {
+          name: 'Гость',
+          username: '',
+          photoUrl: '',
+          isNVR: false
+        },
+        session: {
+          pairCode: null,
+          role: null, // 'girlfriend' | 'boyfriend'
+          partnerTgUrl: NVR_DEFAULT_TG_URL
+        },
+        pairData: null,
+        activeTab: 'home',
+        prevCompletedCount: 0,
+        startedQuestIds: new Set() // локальная отметка: девушка нажала «Выполнить»
+      };
+
+      function detectUser() {
+        const tgUser = tg?.initDataUnsafe?.user;
+        if (tgUser) {
+          State.user.name = tgUser.first_name || tgUser.username || 'Пользователь';
+          State.user.username = tgUser.username || '';
+          State.user.photoUrl = tgUser.photo_url || '';
+        } else {
+          State.user.name = 'Любимая';
+          State.user.username = '';
+          State.user.photoUrl = '';
+        }
+        checkNVRIdentity(State.user.name, State.user.username);
+      }
+
+      function checkNVRIdentity(name, username) {
+        const n = (name || '').trim().toLowerCase();
+        const u = (username || '').trim().toLowerCase();
+        State.user.isNVR = (n === 'nvr' || u === 'nvr');
+        return State.user.isNVR;
+      }
+
+      function normalizeTgUrl(input) {
+        const val = (input || '').trim();
+        if (!val) return NVR_DEFAULT_TG_URL;
+        if (val.startsWith('https://t.me/') || val.startsWith('http://t.me/')) return val;
+        if (val.startsWith('t.me/')) return 'https://' + val;
+        const clean = val.replace(/^@+/, '').replace(/\s+/g, '');
+        return clean ? `https://t.me/${clean}` : NVR_DEFAULT_TG_URL;
+      }
+
+      function shuffle(arr) {
+        const a = [...arr];
+        for (let i = a.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [a[i], a[j]] = [a[j], a[i]];
+        }
+        return a;
+      }
+
+      function generateDailyCycle(prevUsedIds = []) {
+        let used = Array.isArray(prevUsedIds) ? [...prevUsedIds] : [];
+        if (used.length > QUEST_POOL.length - 6) used = [];
+
+        const pickOne = (type, currentIds) => {
+          let pool = QUEST_POOL.filter(q => q.type === type && !used.includes(q.id) && !currentIds.includes(q.id));
+          if (!pool.length) pool = QUEST_POOL.filter(q => q.type === type && !currentIds.includes(q.id));
+          const picked = shuffle(pool)[0];
+          return picked;
+        };
+
+        const chosen = [];
+        const chosenIds = [];
+        // Минимум 1 сообщение, 1 звонок, 2 сложных (итого 4 сбалансированных задания; от 3 до 5)
+        const targetCount = 4;
+        const blueprint = ['message', 'call', 'special', Math.random() > 0.45 ? 'special' : 'message'];
+
+        blueprint.slice(0, targetCount).forEach(cat => {
+          const q = pickOne(cat, chosenIds);
+          if (q) {
+            chosenIds.push(q.id);
+            used.push(q.id);
+            chosen.push({
+              ...q,
+              status: 'active', // 'active' | 'pending_review' | 'completed'
+              sentAt: null,
+              completedAt: null
+            });
+          }
+        });
+
+        const now = Date.now();
+        return {
+          cycleId: `cycle_${now}`,
+          cycleStartTs: now,
+          nextResetTs: now + DAY_MS,
+          quests: chosen,
+          replacementsUsed: 0,
+          usedQuestIds: used
+        };
+      }
+
+      function createInitialPairData(pairCode, role, bfTgUrl) {
+        const now = Date.now();
+        const daily = generateDailyCycle([]);
+        return {
+          meta: {
+            pairCode,
+            createdAt: now,
+            boyfriendTgUrl: normalizeTgUrl(bfTgUrl),
+            boyfriendName: role === 'boyfriend' ? State.user.name : 'Парень',
+            girlfriendName: role === 'girlfriend' ? State.user.name : 'Девушка',
+            boyfriendLastSeen: role === 'boyfriend' ? now : 0,
+            girlfriendLastSeen: role === 'girlfriend' ? now : 0
+          },
+          daily,
+          wallet: {
+            coins: 0,
+            totalEarned: 0,
+            totalWithdrawn: 0,
+            completedQuestsCount: 0,
+            streakDays: 1
+          },
+          withdrawals: [],
+          shop: {
+            cooldowns: {},
+            purchases: []
+          }
+        };
+      }
+
+      /* ========================================================================
+         9. UI HELPERS: TOASTS, MODALS, CONFETTI, FORMATTERS
+         ======================================================================== */
+      function showToast(message) {
+        const container = document.getElementById('toast-container');
+        const el = document.createElement('div');
+        el.className = 'toast-pill';
+        el.textContent = message;
+        container.appendChild(el);
+        setTimeout(() => {
+          el.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+          el.style.opacity = '0';
+          el.style.transform = 'translateY(-10px)';
+          setTimeout(() => el.remove(), 260);
+        }, 2600);
+      }
+
+      let confirmCallback = null;
+      function openConfirmModal(title, desc, yesText, onYes, isDanger = false) {
+        document.getElementById('confirm-title').textContent = title;
+        document.getElementById('confirm-desc').textContent = desc;
+        const yesBtn = document.getElementById('btn-confirm-yes');
+        yesBtn.textContent = yesText || 'Подтвердить';
+        yesBtn.className = `glass-btn ${isDanger ? 'danger' : 'primary'}`;
+        confirmCallback = onYes;
+        document.getElementById('modal-confirm').classList.add('open');
+      }
+      function closeConfirmModal() {
+        document.getElementById('modal-confirm').classList.remove('open');
+        confirmCallback = null;
+      }
+
+      function launchConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const colors = ['#ff5f9e', '#ffd166', '#5ae2ff', '#38e59b', '#ffffff', '#c882ff'];
+        const particles = Array.from({ length: 65 }, () => ({
+          x: canvas.width * (0.2 + Math.random() * 0.6),
+          y: canvas.height * 0.35,
+          vx: (Math.random() - 0.5) * 9,
+          vy: -Math.random() * 10 - 3,
+          size: 5 + Math.random() * 5,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rot: Math.random() * 360,
+          vrot: (Math.random() - 0.5) * 12,
+          life: 1
+        }));
+
+        function frame() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          let alive = false;
+          particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vy += 0.32;
+            p.rot += p.vrot;
+            p.life -= 0.016;
+            if (p.life > 0) {
+              alive = true;
+              ctx.save();
+              ctx.globalAlpha = Math.max(0, p.life);
+              ctx.translate(p.x, p.y);
+              ctx.rotate((p.rot * Math.PI) / 180);
+              ctx.fillStyle = p.color;
+              ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.65);
+              ctx.restore();
+            }
+          });
+          if (alive) requestAnimationFrame(frame);
+          else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        requestAnimationFrame(frame);
+      }
+
+      function formatTenge(num) {
+        return Number(num || 0).toLocaleString('ru-RU') + ' ₸';
+      }
+
+      function formatCountdown(ms) {
+        const totalSec = Math.max(0, Math.floor(ms / 1000));
+        const h = String(Math.floor(totalSec / 3600)).padStart(2, '0');
+        const m = String(Math.floor((totalSec % 3600) / 60)).padStart(2, '0');
+        const s = String(totalSec % 60).padStart(2, '0');
+        return `${h}:${m}:${s}`;
+      }
+
+      function formatCooldownLeft(ms) {
+        const totalHours = Math.max(1, Math.ceil(ms / (3600 * 1000)));
+        const d = Math.floor(totalHours / 24);
+        const h = totalHours % 24;
+        if (d > 0) return `Доступно через ${d} д. ${h} ч.`;
+        return `Доступно через ${h} ч.`;
+      }
+
+      function formatTimeShort(ts) {
+        if (!ts) return '';
+        const d = new Date(ts);
+        return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+      }
+
+      function catMeta(type) {
+        if (type === 'message') return { label: '💬 Сообщение', cls: 'message' };
+        if (type === 'call') return { label: '📞 Звонок', cls: 'call' };
+        return { label: '✨ Творческое', cls: 'special' };
+      }
+
+      /* ========================================================================
+         10. RENDERING FUNCTIONS (HOME, SHOP, SETTINGS)
+         ======================================================================== */
+      function renderAll() {
+        if (!State.pairData) return;
+        renderHeaderAndBadges();
+        renderHomeTab();
+        renderShopTab();
+        renderSettingsTab();
+      }
+
+      function renderHeaderAndBadges() {
+        const data = State.pairData;
+        const wallet = data.wallet || { coins: 0 };
+        const role = State.session.role;
+
+        // Avatar
+        const avatarEl = document.getElementById('home-avatar');
+        if (State.user.photoUrl) {
+          avatarEl.innerHTML = `<img src="${State.user.photoUrl}" alt="avatar">`;
+        } else {
+          const initials = (State.user.name || '💞').slice(0, 1).toUpperCase();
+          avatarEl.textContent = initials || '💞';
+        }
+
+        document.getElementById('home-user-name').textContent = State.user.name;
+
+        const roleBadge = document.getElementById('home-role-badge');
+        if (State.user.isNVR) {
+          roleBadge.style.display = 'inline-flex';
+          roleBadge.textContent = 'NVR • Парень';
+        } else {
+          roleBadge.style.display = 'inline-flex';
+          roleBadge.textContent = role === 'boyfriend' ? 'Парень 🛡️' : 'Девушка 💕';
+        }
+
+        document.getElementById('home-coin-balance').textContent = wallet.coins || 0;
+        document.getElementById('shop-coin-balance').textContent = wallet.coins || 0;
+
+        // Withdraw quick button visible for Girlfriend
+        document.getElementById('btn-open-withdraw').style.display = role === 'girlfriend' ? 'inline-flex' : 'none';
+
+        // Progress & swaps
+        const quests = Array.isArray(data.daily?.quests) ? data.daily.quests : [];
+        const doneCount = quests.filter(q => q.status === 'completed').length;
+        const pct = quests.length ? Math.round((doneCount / quests.length) * 100) : 0;
+        document.getElementById('cycle-progress-fill').style.width = `${pct}%`;
+
+        const swapsLeft = Math.max(0, MAX_SWAPS_PER_DAY - (data.daily?.replacementsUsed || 0));
+        const swapsLabel = document.getElementById('cycle-swaps-label');
+        if (role === 'girlfriend') {
+          swapsLabel.innerHTML = `Замены: <strong>${swapsLeft}/${MAX_SWAPS_PER_DAY}</strong>`;
+        } else {
+          swapsLabel.innerHTML = `Выполнено: <strong>${doneCount}/${quests.length}</strong>`;
+        }
+
+        // Tab badges for Boyfriend
+        const pendingQuests = quests.filter(q => q.status === 'pending_review').length;
+        const pendingWithdraws = (data.withdrawals || []).filter(w => w.status === 'pending').length;
+        const unackGifts = (data.shop?.purchases || []).filter(p => !p.acknowledgedByBoyfriend).length;
+
+        const homeBadge = document.getElementById('badge-home');
+        const shopBadge = document.getElementById('badge-shop');
+        if (role === 'boyfriend') {
+          const totalHome = pendingQuests + pendingWithdraws;
+          homeBadge.textContent = totalHome;
+          homeBadge.classList.toggle('show', totalHome > 0);
+          shopBadge.textContent = unackGifts;
+          shopBadge.classList.toggle('show', unackGifts > 0);
+        } else {
+          homeBadge.classList.remove('show');
+          shopBadge.classList.remove('show');
+        }
+      }
+
+      function renderHomeTab() {
+        const listEl = document.getElementById('home-scroll-list');
+        const data = State.pairData;
+        const quests = Array.isArray(data.daily?.quests) ? data.daily.quests : [];
+        const withdrawals = Array.isArray(data.withdrawals) ? data.withdrawals : [];
+        const swapsLeft = Math.max(0, MAX_SWAPS_PER_DAY - (data.daily?.replacementsUsed || 0));
+        const role = State.session.role;
+
+        let html = '';
+
+        if (role === 'girlfriend') {
+          // Pending withdrawal notice for girlfriend
+          const myPendingWithdraws = withdrawals.filter(w => w.status === 'pending');
+          myPendingWithdraws.forEach(w => {
+            html += `
+              <div class="glass-card" style="padding:13px 15px; border-color:rgba(255,209,102,0.45); display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                  <div style="font-size:13.5px; font-weight:700; color:#ffe59e;">⏳ Заявка на вывод</div>
+                  <div style="font-size:12.5px; color:var(--text-secondary); margin-top:2px;">${w.coins} монет → ${formatTenge(w.tenge)}</div>
+                </div>
+                <span class="mini-pill" style="font-size:11.5px;">Ждёт парня</span>
+              </div>
+            `;
+          });
+
+          html += `<div class="section-label"><span>Задания на сегодня</span><span>${quests.filter(q => q.status === 'completed').length}/${quests.length}</span></div>`;
+
+          quests.forEach(q => {
+            const cat = catMeta(q.type);
+            const cardCls = q.status === 'completed' ? 'completed' : (q.status === 'pending_review' ? 'pending' : '');
+            const isStarted = State.startedQuestIds.has(q.id);
+
+            let actionHtml = '';
+            if (q.status === 'completed') {
+              actionHtml = `<div class="status-banner done">✅ Выполнено • +${q.reward} монет</div>`;
+            } else if (q.status === 'pending_review') {
+              actionHtml = `<div class="status-banner pending">⏳ На проверке у парня</div>`;
+            } else {
+              actionHtml = `
+                <div class="quest-actions">
+                  ${isStarted
+                    ? `<button type="button" class="glass-btn success" data-action="submit-review" data-qid="${q.id}">Отправить на проверку 💌</button>`
+                    : `<button type="button" class="glass-btn primary" data-action="execute-quest" data-qid="${q.id}">Выполнить ✈️</button>`
+                  }
+                  <button type="button" class="glass-btn swap-btn" data-action="swap-quest" data-qid="${q.id}" ${swapsLeft <= 0 ? 'disabled' : ''}>🔄 Заменить</button>
+                </div>
+              `;
+            }
+
+            html += `
+              <article class="glass-card quest-card ${cardCls}">
+                <div class="quest-top">
+                  <span class="quest-cat-badge ${cat.cls}">${cat.label}</span>
+                  <span class="quest-reward">+${q.reward} 🪙</span>
+                </div>
+                <div class="quest-title">${q.title}</div>
+                ${actionHtml}
+              </article>
+            `;
+          });
+        } else {
+          // ==================== BOYFRIEND HOME VIEW ====================
+          const pendingWithdraws = withdrawals.filter(w => w.status === 'pending');
+          if (pendingWithdraws.length) {
+            html += `<div class="section-label"><span>Запросы на вывод</span><span>${pendingWithdraws.length}</span></div>`;
+            pendingWithdraws.forEach(w => {
+              html += `
+                <div class="withdraw-alert-card">
+                  <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:14px; font-weight:800; color:#ffd7e8;">Запрос на вывод 💸</span>
+                    <span style="font-size:12px; color:var(--text-secondary);">${formatTimeShort(w.createdAt)}</span>
+                  </div>
+                  <div style="font-size:14px; line-height:1.4;">
+                    Девушка хочет вывести <strong>${w.coins} монет</strong> → к переводу
+                  </div>
+                  <div class="withdraw-amount-big">${formatTenge(w.tenge)}</div>
+                  <div style="display:grid; grid-template-columns:1.3fr 1fr; gap:8px;">
+                    <button type="button" class="glass-btn success" data-action="approve-withdraw" data-wid="${w.id}">Выплачено ✅</button>
+                    <button type="button" class="glass-btn danger" data-action="reject-withdraw" data-wid="${w.id}">Отклонить</button>
+                  </div>
+                </div>
+              `;
+            });
+          }
+
+          const pendingQuests = quests.filter(q => q.status === 'pending_review');
+          html += `<div class="section-label"><span>На проверке</span><span>${pendingQuests.length}</span></div>`;
+
+          if (!pendingQuests.length) {
+            html += `<div class="glass-card empty-state">Сейчас нет заданий на проверке ✨<br>Как только девушка отправит задание, оно мгновенно появится здесь.</div>`;
+          } else {
+            pendingQuests.forEach(q => {
+              const cat = catMeta(q.type);
+              html += `
+                <article class="glass-card quest-card pending">
+                  <div class="quest-top">
+                    <span class="quest-cat-badge ${cat.cls}">${cat.label}</span>
+                    <span class="quest-reward">+${q.reward} 🪙</span>
+                  </div>
+                  <div class="quest-title">${q.title}</div>
+                  <div style="font-size:12px; color:var(--text-secondary);">Отправлено в ${formatTimeShort(q.sentAt)}</div>
+                  <div class="quest-actions">
+                    <button type="button" class="glass-btn success" data-action="approve-quest" data-qid="${q.id}">Подтвердить ✅</button>
+                    <button type="button" class="glass-btn danger" data-action="reject-quest" data-qid="${q.id}" style="flex:0.65;">Отклонить ❌</button>
+                  </div>
+                </article>
+              `;
+            });
+          }
+
+          html += `<div class="section-label" style="margin-top:6px;"><span>Сегодняшние задания девушки</span><span>${quests.filter(q => q.status === 'completed').length}/${quests.length}</span></div>`;
+          quests.forEach(q => {
+            const cat = catMeta(q.type);
+            const statusText = q.status === 'completed' ? '✅ Выполнено' : (q.status === 'pending_review' ? '⏳ На проверке' : '🕒 В процессе');
+            html += `
+              <article class="glass-card quest-card ${q.status === 'completed' ? 'completed' : ''}" style="padding:12px 14px; gap:7px;">
+                <div class="quest-top">
+                  <span class="quest-cat-badge ${cat.cls}">${cat.label}</span>
+                  <span style="font-size:12px; font-weight:700; color:var(--text-secondary);">${statusText}</span>
+                </div>
+                <div class="quest-title" style="font-size:14px;">${q.title}</div>
+              </article>
+            `;
+          });
+        }
+
+        listEl.innerHTML = html;
+      }
+
+      function renderShopTab() {
+        const data = State.pairData;
+        const role = State.session.role;
+        const coins = data.wallet?.coins || 0;
+        const cooldowns = data.shop?.cooldowns || {};
+        const purchases = Array.isArray(data.shop?.purchases) ? data.shop.purchases : [];
+        const now = Date.now();
+
+        // Boyfriend unacknowledged gifts block
+        const bfQueue = document.getElementById('bf-gifts-queue');
+        const unack = purchases.filter(p => !p.acknowledgedByBoyfriend);
+        if (role === 'boyfriend' && unack.length) {
+          bfQueue.style.display = 'flex';
+          bfQueue.innerHTML = `<div class="section-label"><span>Купленные подарки девушки</span><span>${unack.length}</span></div>` +
+            unack.map(p => `
+              <div class="withdraw-alert-card">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:13.5px; font-weight:800; color:#ffd7e8;">🎁 Девушка купила подарок!</span>
+                  <span style="font-size:12px; color:var(--text-secondary);">${formatTimeShort(p.createdAt)}</span>
+                </div>
+                <div style="font-size:15px; font-weight:700;">${p.title}</div>
+                <button type="button" class="glass-btn success" data-action="ack-gift" data-pid="${p.id}">Подарено 🎁</button>
+              </div>
+            `).join('');
+        } else {
+          bfQueue.style.display = 'none';
+          bfQueue.innerHTML = '';
+        }
+
+        const grid = document.getElementById('shop-grid');
+        grid.innerHTML = SHOP_ITEMS.map(item => {
+          const unlockTs = cooldowns[item.id] || 0;
+          const locked = unlockTs > now;
+          const canAfford = coins >= item.price;
+
+          return `
+            <article class="glass-card gift-card">
+              <div class="gift-art">${item.svg}</div>
+              <div class="gift-title">${item.title}</div>
+              <div class="gift-footer">
+                <div class="gift-price">🪙 ${item.price} монет</div>
+                ${role === 'girlfriend'
+                  ? `<button type="button" class="glass-btn ${canAfford ? 'primary' : ''} gift-buy-btn" data-action="buy-gift" data-gid="${item.id}" ${locked ? 'disabled' : ''}>${canAfford ? 'Купить 🎁' : 'Копить ✨'}</button>`
+                  : `<div style="font-size:11.5px; color:var(--text-muted); text-align:center;">Витрина для девушки</div>`
+                }
+              </div>
+              ${locked ? `
+                <div class="gift-lock-overlay">
+                  <div class="gift-lock-icon">🔒</div>
+                  <div class="gift-lock-title">Нет в наличии</div>
+                  <div class="gift-lock-timer">${formatCooldownLeft(unlockTs - now)}</div>
+                </div>
+              ` : ''}
+            </article>
+          `;
+        }).join('');
+      }
+
+      function renderTrackLists() {
+        const happyWrap = document.getElementById('tracks-happy');
+        const sadWrap = document.getElementById('tracks-sad');
+        if (!happyWrap || !sadWrap) return;
+
+        const renderGroup = (mood) => TRACKS.filter(t => t.mood === mood).map(t => {
+          const isActive = AudioEngine.prefs.trackId === t.id;
+          const isMissing = AudioEngine.missingTracks.has(t.id);
+          return `
+            <button type="button" class="track-item ${isActive ? 'active' : ''}" data-track-id="${t.id}">
+              <div class="track-left">
+                <div class="track-icon">${isActive && AudioEngine.prefs.musicEnabled && !isMissing ? '🔊' : '🎵'}</div>
+                <div>
+                  <div class="track-name">${t.title}</div>
+                  <div class="track-file">${t.file.replace('./', '')}</div>
+                </div>
+              </div>
+              ${isMissing ? `<span class="track-missing">Файл не найден</span>` : (isActive ? `<span style="color:var(--accent-cyan); font-size:13px; font-weight:700;">Выбран</span>` : '')}
+            </button>
+          `;
+        }).join('');
+
+        happyWrap.innerHTML = renderGroup('happy');
+        sadWrap.innerHTML = renderGroup('sad');
+      }
+
+      function renderSettingsTab() {
+        const data = State.pairData;
+        document.getElementById('sync-mode-badge').textContent = DB.mode === 'firebase' ? '☁️ Облако' : '⚡ Демо-режим';
+        document.getElementById('demo-role-switch-wrap').style.display = DB.mode === 'local' ? 'block' : 'none';
+
+        document.getElementById('settings-copy-pair-code').textContent = `${State.session.pairCode || '------'} 📋`;
+        document.getElementById('settings-role-text').textContent = State.session.role === 'boyfriend'
+          ? (State.user.isNVR ? 'NVR • Парень 🛡️' : 'Парень 🛡️')
+          : 'Девушка 💕';
+        document.getElementById('settings-streak-text').textContent = `🔥 ${data.wallet?.streakDays || 1} дн.`;
+        document.getElementById('settings-completed-text').textContent = data.wallet?.completedQuestsCount || 0;
+
+        const tgInput = document.getElementById('settings-bf-tg-input');
+        if (document.activeElement !== tgInput) {
+          tgInput.value = data.meta?.boyfriendTgUrl || NVR_DEFAULT_TG_URL;
+        }
+
+        // Audio controls sync
+        document.getElementById('toggle-music').checked = AudioEngine.prefs.musicEnabled;
+        document.getElementById('toggle-sfx').checked = AudioEngine.prefs.sfxEnabled;
+        const pct = Math.round(AudioEngine.prefs.volume * 100);
+        document.getElementById('music-volume-slider').value = pct;
+        document.getElementById('music-volume-val').textContent = `${pct}%`;
+        renderTrackLists();
+
+        // History (withdrawals + purchases)
+        const historyItems = [
+          ...(data.withdrawals || []).map(w => ({
+            ts: w.createdAt || 0,
+            title: `💸 Вывод ${w.coins} монет (${formatTenge(w.tenge)})`,
+            status: w.status === 'approved' ? '✅ Выплачено' : (w.status === 'rejected' ? '❌ Отклонено' : '⏳ В ожидании')
+          })),
+          ...(data.shop?.purchases || []).map(p => ({
+            ts: p.createdAt || 0,
+            title: `🎁 ${p.title}`,
+            status: p.acknowledgedByBoyfriend ? '✅ Подарено' : `-${p.price} 🪙`
+          }))
+        ].sort((a, b) => b.ts - a.ts).slice(0, 15);
+
+        const histEl = document.getElementById('settings-history-list');
+        if (!historyItems.length) {
+          histEl.innerHTML = `<div class="empty-state" style="padding:10px 0;">Пока нет выводов или покупок</div>`;
+        } else {
+          histEl.innerHTML = historyItems.map(h => `
+            <div class="history-item">
+              <span style="padding-right:8px;">${h.title}</span>
+              <span style="font-size:12px; color:var(--text-secondary); white-space:nowrap;">${h.status}</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      /* ========================================================================
+         11. GAME ACTIONS (QUESTS, APPROVALS, WITHDRAWALS, SHOP)
+         ======================================================================== */
+      async function checkAndResetDailyCycle() {
+        if (!State.pairData || !State.session.pairCode) return;
+        const nextReset = State.pairData.daily?.nextResetTs || 0;
+        if (Date.now() >= nextReset) {
+          await DB.transact(State.session.pairCode, data => {
+            if (!data.daily || Date.now() >= data.daily.nextResetTs) {
+              const hadDone = (data.daily?.quests || []).some(q => q.status === 'completed');
+              if (hadDone) {
+                data.wallet.streakDays = (data.wallet.streakDays || 1) + 1;
+              }
+              data.daily = generateDailyCycle(data.daily?.usedQuestIds || []);
+            }
+            return data;
+          });
+          State.startedQuestIds.clear();
+        }
+      }
+
+      function executeQuest(questId) {
+        const q = (State.pairData?.daily?.quests || []).find(item => item.id === questId);
+        if (!q) return;
+        Haptic.impact('medium');
+        AudioEngine.sfx('tap');
+
+        const baseUrl = normalizeTgUrl(State.pairData.meta?.boyfriendTgUrl || NVR_DEFAULT_TG_URL);
+        let url = baseUrl;
+        if (q.type === 'message' && q.prefillText) {
+          const sep = baseUrl.includes('?') ? '&' : '?';
+          url = `${baseUrl}${sep}text=${encodeURIComponent(q.prefillText)}`;
+        }
+
+        State.startedQuestIds.add(questId);
+        renderHomeTab();
+
+        try {
+          if (tg && typeof tg.openTelegramLink === 'function' && url.startsWith('https://t.me/')) {
+            tg.openTelegramLink(url);
+          } else {
+            window.open(url, '_blank', 'noopener');
+          }
+        } catch (_) {
+          window.open(url, '_blank', 'noopener');
+        }
+      }
+
+      async function submitQuestForReview(questId) {
+        Haptic.notify('success');
+        AudioEngine.sfx('tap');
+        await DB.transact(State.session.pairCode, data => {
+          const q = (data.daily?.quests || []).find(x => x.id === questId);
+          if (q && q.status === 'active') {
+            q.status = 'pending_review';
+            q.sentAt = Date.now();
+          }
+          return data;
+        });
+        State.startedQuestIds.delete(questId);
+        showToast('Отправлено парню на проверку 💌');
+      }
+
+      async function swapQuest(questId) {
+        Haptic.impact('light');
+        AudioEngine.sfx('tap');
+        let swapped = false;
+        await DB.transact(State.session.pairCode, data => {
+          if ((data.daily.replacementsUsed || 0) >= MAX_SWAPS_PER_DAY) return data;
+          const idx = data.daily.quests.findIndex(x => x.id === questId);
+          if (idx === -1 || data.daily.quests[idx].status !== 'active') return data;
+
+          const currentIds = data.daily.quests.map(x => x.id);
+          const used = data.daily.usedQuestIds || [];
+          const sameType = data.daily.quests[idx].type;
+
+          let candidates = QUEST_POOL.filter(q => q.type === sameType && !used.includes(q.id) && !currentIds.includes(q.id));
+          if (!candidates.length) candidates = QUEST_POOL.filter(q => !currentIds.includes(q.id));
+          const replacement = shuffle(candidates)[0];
+          if (replacement) {
+            data.daily.quests[idx] = { ...replacement, status: 'active', sentAt: null, completedAt: null };
+            data.daily.usedQuestIds = [...used, replacement.id];
+            data.daily.replacementsUsed = (data.daily.replacementsUsed || 0) + 1;
+            swapped = true;
+          }
+          return data;
+        });
+        if (swapped) {
+          State.startedQuestIds.delete(questId);
+          showToast('Задание заменено 🔄');
+        } else {
+          showToast('Лимит замен на сегодня исчерпан');
+        }
+      }
+
+      async function approveQuest(questId) {
+        Haptic.notify('success');
+        AudioEngine.sfx('coin');
+        await DB.transact(State.session.pairCode, data => {
+          const q = (data.daily?.quests || []).find(x => x.id === questId);
+          if (q && q.status === 'pending_review') {
+            q.status = 'completed';
+            q.completedAt = Date.now();
+            data.wallet.coins = (data.wallet.coins || 0) + q.reward;
+            data.wallet.totalEarned = (data.wallet.totalEarned || 0) + q.reward;
+            data.wallet.completedQuestsCount = (data.wallet.completedQuestsCount || 0) + 1;
+          }
+          return data;
+        });
+        launchConfetti();
+        showToast('Задание подтверждено! Монеты начислены ✅');
+      }
+
+      async function rejectQuest(questId) {
+        Haptic.notify('warning');
+        AudioEngine.sfx('tap');
+        await DB.transact(State.session.pairCode, data => {
+          const q = (data.daily?.quests || []).find(x => x.id === questId);
+          if (q && q.status === 'pending_review') {
+            q.status = 'active';
+            q.sentAt = null;
+          }
+          return data;
+        });
+        showToast('Задание возвращено девушке');
+      }
+
+      async function submitWithdrawal(coinsAmount) {
+        const amount = Math.floor(Number(coinsAmount));
+        const avail = State.pairData?.wallet?.coins || 0;
+        if (!amount || amount < 100) {
+          showToast('Минимальная сумма вывода — 100 монет');
+          return;
+        }
+        if (amount > avail) {
+          showToast('Недостаточно монет на балансе');
+          return;
+        }
+        Haptic.notify('success');
+        AudioEngine.sfx('coin');
+        await DB.transact(State.session.pairCode, data => {
+          if ((data.wallet.coins || 0) < amount) return data;
+          data.wallet.coins -= amount;
+          if (!Array.isArray(data.withdrawals)) data.withdrawals = [];
+          data.withdrawals.unshift({
+            id: `wd_${Date.now()}`,
+            coins: amount,
+            tenge: amount * TENGE_PER_COIN,
+            status: 'pending',
+            createdAt: Date.now(),
+            resolvedAt: null
+          });
+          return data;
+        });
+        document.getElementById('modal-withdraw').classList.remove('open');
+        showToast(`Заявка на ${formatTenge(amount * TENGE_PER_COIN)} отправлена 💸`);
+      }
+
+      async function resolveWithdrawal(wid, approve) {
+        Haptic.notify(approve ? 'success' : 'warning');
+        AudioEngine.sfx(approve ? 'success' : 'tap');
+        await DB.transact(State.session.pairCode, data => {
+          const w = (data.withdrawals || []).find(x => x.id === wid);
+          if (w && w.status === 'pending') {
+            w.status = approve ? 'approved' : 'rejected';
+            w.resolvedAt = Date.now();
+            if (approve) {
+              data.wallet.totalWithdrawn = (data.wallet.totalWithdrawn || 0) + w.coins;
+            } else {
+              data.wallet.coins = (data.wallet.coins || 0) + w.coins;
+            }
+          }
+          return data;
+        });
+        showToast(approve ? 'Выплата отмечена как выполненная ✅' : 'Заявка отклонена, монеты возвращены');
+      }
+
+      function requestBuyGift(giftId) {
+        const item = SHOP_ITEMS.find(g => g.id === giftId);
+        if (!item) return;
+        const coins = State.pairData?.wallet?.coins || 0;
+        if (coins < item.price) {
+          Haptic.notify('error');
+          showToast(`Нужно ещё ${item.price - coins} монет ✨`);
+          return;
+        }
+        openConfirmModal(
+          'Купить подарок? 🎁',
+          `«${item.title}» за ${item.price} монет. Повторная покупка этого подарка станет доступна через 7 дней.`,
+          `Купить за ${item.price} 🪙`,
+          async () => {
+            Haptic.notify('success');
+            AudioEngine.sfx('success');
+            await DB.transact(State.session.pairCode, data => {
+              const now = Date.now();
+              if ((data.wallet.coins || 0) < item.price) return data;
+              if (!data.shop) data.shop = { cooldowns: {}, purchases: [] };
+              if (!data.shop.cooldowns) data.shop.cooldowns = {};
+              if ((data.shop.cooldowns[item.id] || 0) > now) return data;
+              data.wallet.coins -= item.price;
+              data.shop.cooldowns[item.id] = now + WEEK_MS;
+              if (!Array.isArray(data.shop.purchases)) data.shop.purchases = [];
+              data.shop.purchases.unshift({
+                id: `gift_${now}`,
+                giftId: item.id,
+                title: item.title,
+                price: item.price,
+                createdAt: now,
+                acknowledgedByBoyfriend: false
+              });
+              return data;
+            });
+            launchConfetti();
+            showToast('Подарок куплен! Парень получил уведомление 🎁');
+          }
+        );
+      }
+
+      async function acknowledgeGift(purchaseId) {
+        Haptic.notify('success');
+        AudioEngine.sfx('success');
+        await DB.transact(State.session.pairCode, data => {
+          const p = (data.shop?.purchases || []).find(x => x.id === purchaseId);
+          if (p) p.acknowledgedByBoyfriend = true;
+          return data;
+        });
+        showToast('Отмечено как «Подарено 🎁»');
+      }
+
+      /* ========================================================================
+         12. PAIR CONNECTION & ONBOARDING FLOW
+         ======================================================================== */
+      let selectedOnboardRole = null;
+      let pendingCreatedCode = null;
+
+      function openOnboarding() {
+        document.getElementById('main-view').classList.remove('active');
+        document.getElementById('onboarding-view').classList.add('active');
+
+        const badge = document.getElementById('onboard-user-badge');
+        if (!tg?.initDataUnsafe?.user) {
+          document.getElementById('manual-nick-wrap').style.display = 'block';
+          document.getElementById('manual-nick-input').value = State.user.name;
+        }
+
+        if (State.user.isNVR) {
+          badge.textContent = '✨ Обнаружен NVR • Автонастройка парня';
+          selectOnboardRole('boyfriend');
+          document.getElementById('boyfriend-tg-input').value = NVR_DEFAULT_TG_URL;
+        } else {
+          badge.textContent = `✨ Привет, ${State.user.name}!`;
+        }
+      }
+
+      function selectOnboardRole(role) {
+        selectedOnboardRole = role;
+        document.querySelectorAll('.role-card').forEach(c => {
+          c.classList.toggle('selected', c.dataset.role === role);
+        });
+        const bfWrap = document.getElementById('boyfriend-tg-wrap');
+        bfWrap.style.display = (role === 'boyfriend' && !State.user.isNVR) ? 'block' : 'none';
+      }
+
+      async function connectToPair(pairCode, role) {
+        State.session.pairCode = pairCode;
+        State.session.role = role;
+
+        await SessionStore.save({
+          pairCode,
+          role,
+          userNickname: State.user.name,
+          audioPrefs: AudioEngine.prefs
+        });
+
+        document.getElementById('onboarding-view').classList.remove('active');
+        document.getElementById('main-view').classList.add('active');
+
+        DB.subscribe(pairCode, async (data) => {
+          const prevDone = State.prevCompletedCount;
+          const newDone = data.wallet?.completedQuestsCount || 0;
+          const isFirst = !State.pairData;
+
+          State.pairData = data;
+          State.prevCompletedCount = newDone;
+
+          if (!isFirst && State.session.role === 'girlfriend' && newDone > prevDone) {
+            Haptic.notify('success');
+            AudioEngine.sfx('coin');
+            launchConfetti();
+            showToast('Парень подтвердил задание! Монеты зачислены 🎉');
+          }
+
+          renderAll();
+          await checkAndResetDailyCycle();
+        });
+      }
+
+      /* ========================================================================
+         13. EVENT LISTENERS WIRING
+         ======================================================================== */
+      function wireEvents() {
+        // Manual nickname input (outside Telegram) — checks NVR live
+        document.getElementById('manual-nick-input').addEventListener('input', e => {
+          State.user.name = e.target.value.trim() || 'Гость';
+          if (checkNVRIdentity(State.user.name, '')) {
+            document.getElementById('onboard-user-badge').textContent = '✨ Обнаружен NVR • Автонастройка парня';
+            selectOnboardRole('boyfriend');
+            document.getElementById('boyfriend-tg-input').value = NVR_DEFAULT_TG_URL;
+          }
+        });
+
+        // Role selection cards
+        document.querySelectorAll('.role-card').forEach(card => {
+          card.addEventListener('click', () => {
+            Haptic.select();
+            AudioEngine.sfx('tap');
+            selectOnboardRole(card.dataset.role);
+          });
+        });
+
+        // Create pair code
+        document.getElementById('btn-create-pair').addEventListener('click', async () => {
+          if (!selectedOnboardRole) {
+            showToast('Сначала выбери свою роль 💕');
+            return;
+          }
+          Haptic.impact('medium');
+          AudioEngine.sfx('tap');
+
+          const code = String(Math.floor(100000 + Math.random() * 900000));
+          pendingCreatedCode = code;
+          const bfUrl = State.user.isNVR
+            ? NVR_DEFAULT_TG_URL
+            : normalizeTgUrl(document.getElementById('boyfriend-tg-input').value);
+
+          const initialData = createInitialPairData(code, selectedOnboardRole, bfUrl);
+          await DB.setPair(code, initialData);
+
+          document.getElementById('created-code-display').textContent = code;
+          document.getElementById('onboard-step-role').style.display = 'none';
+          document.getElementById('onboard-step-created').style.display = 'flex';
+        });
+
+        document.getElementById('btn-copy-code').addEventListener('click', () => {
+          if (!pendingCreatedCode) return;
+          navigator.clipboard?.writeText(pendingCreatedCode).catch(() => {});
+          Haptic.notify('success');
+          AudioEngine.sfx('tap');
+          showToast(`Код ${pendingCreatedCode} скопирован 📋`);
+        });
+
+        document.getElementById('btn-share-tg-code').addEventListener('click', () => {
+          if (!pendingCreatedCode) return;
+          const text = `Подключайся ко мне в нашу игру для парочек 💞 Наш код пары: ${pendingCreatedCode}`;
+          const shareUrl = `https://t.me/share/url?text=${encodeURIComponent(text)}`;
+          if (tg?.openTelegramLink) tg.openTelegramLink(shareUrl);
+          else window.open(shareUrl, '_blank');
+        });
+
+        document.getElementById('btn-enter-after-create').addEventListener('click', async () => {
+          Haptic.notify('success');
+          AudioEngine.sfx('success');
+          await connectToPair(pendingCreatedCode, selectedOnboardRole);
+          launchConfetti();
+          showToast('Пара создана 💞');
+        });
+
+        document.getElementById('btn-back-from-create').addEventListener('click', () => {
+          document.getElementById('onboard-step-created').style.display = 'none';
+          document.getElementById('onboard-step-role').style.display = 'flex';
+        });
+
+        // Join pair mode
+        document.getElementById('btn-join-pair-mode').addEventListener('click', () => {
+          if (!selectedOnboardRole) {
+            showToast('Сначала выбери свою роль 💕');
+            return;
+          }
+          Haptic.impact('light');
+          AudioEngine.sfx('tap');
+          document.getElementById('onboard-step-role').style.display = 'none';
+          document.getElementById('onboard-step-join').style.display = 'flex';
+          document.querySelector('#code-cells .code-cell')?.focus();
+        });
+
+        document.getElementById('btn-back-from-join').addEventListener('click', () => {
+          document.getElementById('onboard-step-join').style.display = 'none';
+          document.getElementById('onboard-step-role').style.display = 'flex';
+        });
+
+        // 6-digit code cells UX (auto-advance + paste)
+        const cells = Array.from(document.querySelectorAll('#code-cells .code-cell'));
+        cells.forEach((cell, idx) => {
+          cell.addEventListener('input', e => {
+            const val = e.target.value.replace(/\D/g, '');
+            e.target.value = val.slice(-1);
+            if (val && idx < cells.length - 1) cells[idx + 1].focus();
+          });
+          cell.addEventListener('keydown', e => {
+            if (e.key === 'Backspace' && !cell.value && idx > 0) {
+              cells[idx - 1].focus();
+            }
+          });
+          cell.addEventListener('paste', e => {
+            e.preventDefault();
+            const pasted = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+            pasted.split('').forEach((ch, i) => { if (cells[i]) cells[i].value = ch; });
+            cells[Math.min(pasted.length, 5)].focus();
+          });
+        });
+
+        document.getElementById('btn-confirm-join').addEventListener('click', async () => {
+          const code = cells.map(c => c.value).join('');
+          if (code.length !== 6) {
+            showToast('Введи все 6 цифр кода');
+            return;
+          }
+          let existing = await DB.getPair(code);
+          if (!existing) {
+            if (DB.mode === 'local') {
+              // В локальном демо-режиме создаём комнату автоматически
+              existing = createInitialPairData(code, selectedOnboardRole, NVR_DEFAULT_TG_URL);
+              await DB.setPair(code, existing);
+            } else {
+              Haptic.notify('error');
+              showToast('Код пары не найден. Проверь цифры 🔍');
+              return;
+            }
+          } else if (selectedOnboardRole === 'boyfriend') {
+            const bfUrl = State.user.isNVR
+              ? NVR_DEFAULT_TG_URL
+              : normalizeTgUrl(document.getElementById('boyfriend-tg-input').value || existing.meta?.boyfriendTgUrl);
+            await DB.transact(code, data => {
+              data.meta.boyfriendName = State.user.name;
+              data.meta.boyfriendTgUrl = bfUrl;
+              return data;
+            });
+          } else {
+            await DB.transact(code, data => {
+              data.meta.girlfriendName = State.user.name;
+              return data;
+            });
+          }
+
+          Haptic.notify('success');
+          AudioEngine.sfx('success');
+          await connectToPair(code, selectedOnboardRole);
+          launchConfetti();
+          showToast('Вы подключены 💞');
+        });
+
+        // Floating iOS 27 Tab Bar Navigation
+        const slider = document.getElementById('tab-active-slider');
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            const idx = Number(btn.dataset.index);
+            if (State.activeTab === targetTab) return;
+
+            Haptic.select();
+            AudioEngine.sfx('tab');
+            State.activeTab = targetTab;
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+            slider.style.transform = `translateX(${idx * 100}%)`;
+
+            document.querySelectorAll('.tab-page').forEach(p => p.classList.toggle('active', p.id === `tab-${targetTab}`));
+          });
+        });
+
+        // Delegated clicks inside Home & Shop lists
+        document.getElementById('home-scroll-list').addEventListener('click', e => {
+          const btn = e.target.closest('[data-action]');
+          if (!btn) return;
+          const act = btn.dataset.action;
+          if (act === 'execute-quest') executeQuest(btn.dataset.qid);
+          else if (act === 'submit-review') submitQuestForReview(btn.dataset.qid);
+          else if (act === 'swap-quest') swapQuest(btn.dataset.qid);
+          else if (act === 'approve-quest') approveQuest(btn.dataset.qid);
+          else if (act === 'reject-quest') rejectQuest(btn.dataset.qid);
+          else if (act === 'approve-withdraw') resolveWithdrawal(btn.dataset.wid, true);
+          else if (act === 'reject-withdraw') resolveWithdrawal(btn.dataset.wid, false);
+        });
+
+        document.getElementById('shop-scroll-area').addEventListener('click', e => {
+          const btn = e.target.closest('[data-action]');
+          if (!btn) return;
+          if (btn.dataset.action === 'buy-gift') requestBuyGift(btn.dataset.gid);
+          else if (btn.dataset.action === 'ack-gift') acknowledgeGift(btn.dataset.pid);
+        });
+
+        // Withdraw Bottom Sheet
+        const wdModal = document.getElementById('modal-withdraw');
+        const wdInput = document.getElementById('withdraw-coins-input');
+        const wdPreview = document.getElementById('withdraw-tenge-preview');
+
+        function updateWdPreview() {
+          const val = Math.max(0, Math.floor(Number(wdInput.value) || 0));
+          wdPreview.textContent = formatTenge(val * TENGE_PER_COIN);
+          document.querySelectorAll('.preset-chip').forEach(ch => {
+            ch.classList.toggle('active', Number(ch.dataset.val) === val);
+          });
+        }
+
+        document.getElementById('btn-open-withdraw').addEventListener('click', () => {
+          Haptic.impact('light');
+          AudioEngine.sfx('tap');
+          document.getElementById('withdraw-avail-coins').textContent = State.pairData?.wallet?.coins || 0;
+          wdInput.value = '100';
+          updateWdPreview();
+          wdModal.classList.add('open');
+        });
+
+        document.getElementById('withdraw-presets').addEventListener('click', e => {
+          const chip = e.target.closest('.preset-chip');
+          if (!chip) return;
+          Haptic.select();
+          AudioEngine.sfx('tap');
+          wdInput.value = chip.dataset.val;
+          updateWdPreview();
+        });
+        wdInput.addEventListener('input', updateWdPreview);
+
+        document.getElementById('btn-withdraw-cancel').addEventListener('click', () => wdModal.classList.remove('open'));
+        wdModal.addEventListener('click', e => { if (e.target === wdModal) wdModal.classList.remove('open'); });
+        document.getElementById('btn-withdraw-submit').addEventListener('click', () => submitWithdrawal(wdInput.value));
+
+        // Confirm Modal
+        document.getElementById('btn-confirm-no').addEventListener('click', closeConfirmModal);
+        document.getElementById('modal-confirm').addEventListener('click', e => {
+          if (e.target.id === 'modal-confirm') closeConfirmModal();
+        });
+        document.getElementById('btn-confirm-yes').addEventListener('click', async () => {
+          const fn = confirmCallback;
+          closeConfirmModal();
+          if (fn) await fn();
+        });
+
+        // Settings: Audio Controls
+        document.getElementById('toggle-music').addEventListener('change', e => {
+          Haptic.select();
+          AudioEngine.setMusicEnabled(e.target.checked);
+        });
+        document.getElementById('toggle-sfx').addEventListener('change', e => {
+          Haptic.select();
+          AudioEngine.setSfxEnabled(e.target.checked);
+        });
+        document.getElementById('music-volume-slider').addEventListener('input', e => {
+          const pct = Number(e.target.value);
+          document.getElementById('music-volume-val').textContent = `${pct}%`;
+          AudioEngine.setVolume(pct / 100);
+        });
+
+        document.getElementById('settings-scroll-area').addEventListener('click', e => {
+          const trackBtn = e.target.closest('.track-item');
+          if (trackBtn) {
+            Haptic.select();
+            AudioEngine.sfx('tap');
+            const id = Number(trackBtn.dataset.trackId);
+            if (!AudioEngine.prefs.musicEnabled) {
+              AudioEngine.prefs.musicEnabled = true;
+              document.getElementById('toggle-music').checked = true;
+            }
+            AudioEngine.playTrack(id, true);
+          }
+        });
+
+        // Settings: Copy Pair Code, Save BF Telegram URL, Demo Role Switch, Unpair
+        document.getElementById('settings-copy-pair-code').addEventListener('click', () => {
+          const code = State.session.pairCode;
+          if (!code) return;
+          navigator.clipboard?.writeText(code).catch(() => {});
+          Haptic.notify('success');
+          AudioEngine.sfx('tap');
+          showToast(`Код пары ${code} скопирован 📋`);
+        });
+
+        document.getElementById('btn-save-bf-tg').addEventListener('click', async () => {
+          const url = normalizeTgUrl(document.getElementById('settings-bf-tg-input').value);
+          Haptic.notify('success');
+          AudioEngine.sfx('tap');
+          await DB.transact(State.session.pairCode, data => {
+            data.meta.boyfriendTgUrl = url;
+            return data;
+          });
+          showToast('Ссылка Telegram обновлена ✅');
+        });
+
+        document.getElementById('btn-demo-switch-role').addEventListener('click', async () => {
+          Haptic.impact('medium');
+          AudioEngine.sfx('tab');
+          const nextRole = State.session.role === 'girlfriend' ? 'boyfriend' : 'girlfriend';
+          State.session.role = nextRole;
+          await SessionStore.save({
+            pairCode: State.session.pairCode,
+            role: nextRole,
+            userNickname: State.user.name,
+            audioPrefs: AudioEngine.prefs
+          });
+          renderAll();
+          showToast(`Роль переключена: ${nextRole === 'boyfriend' ? 'Парень 🛡️' : 'Девушка 💕'}`);
+        });
+
+        document.getElementById('btn-unpair-open').addEventListener('click', () => {
+          openConfirmModal(
+            'Разорвать пару? 💔',
+            'Текущее устройство будет отключено от кода пары. Позже вы сможете снова ввести код пары или создать новый.',
+            'Отключиться',
+            async () => {
+              DB.unsubscribe();
+              await SessionStore.clearPair();
+              State.session.pairCode = null;
+              State.session.role = null;
+              State.pairData = null;
+              document.getElementById('onboard-step-created').style.display = 'none';
+              document.getElementById('onboard-step-join').style.display = 'none';
+              document.getElementById('onboard-step-role').style.display = 'flex';
+              openOnboarding();
+              showToast('Вы отключились от пары');
+            },
+            true
+          );
+        });
+      }
+
+      /* ========================================================================
+         14. LIVE 1-SECOND TIMER LOOP (24H QUEST RESET + SHOP COOLDOWNS)
+         ======================================================================== */
+      setInterval(() => {
+        if (!State.pairData) return;
+        const nextReset = State.pairData.daily?.nextResetTs || (Date.now() + DAY_MS);
+        const left = nextReset - Date.now();
+        document.getElementById('cycle-countdown').textContent = formatCountdown(left);
+        if (left <= 0) {
+          checkAndResetDailyCycle();
+        }
+      }, 1000);
+
+      /* ========================================================================
+         15. BOOTSTRAP SEQUENCE
+         ======================================================================== */
+      async function bootstrap() {
+        initTelegramSDK();
+        detectUser();
+        DB.init();
+        wireEvents();
+
+        const saved = await SessionStore.load();
+        AudioEngine.init(saved.audioPrefs);
+
+        if (saved.userNickname && !tg?.initDataUnsafe?.user) {
+          State.user.name = saved.userNickname;
+          checkNVRIdentity(State.user.name, '');
+        }
+
+        const splashText = document.getElementById('splash-status-text');
+        if (saved.pairCode && saved.role) {
+          splashText.textContent = `Подключение к паре ${saved.pairCode}…`;
+          const exists = await DB.getPair(saved.pairCode);
+          if (exists) {
+            await connectToPair(saved.pairCode, saved.role);
+          } else if (DB.mode === 'local') {
+            await DB.setPair(saved.pairCode, createInitialPairData(saved.pairCode, saved.role, NVR_DEFAULT_TG_URL));
+            await connectToPair(saved.pairCode, saved.role);
+          } else {
+            openOnboarding();
+          }
+        } else {
+          splashText.textContent = 'Готово к запуску 💞';
+          openOnboarding();
+        }
+
+        setTimeout(() => {
+          document.getElementById('splash-screen').classList.add('hidden');
+        }, 650);
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bootstrap);
+      } else {
+        bootstrap();
+      }
+    })();
+  </script>
+</body>
+</html>

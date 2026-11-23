@@ -462,12 +462,12 @@
     }
 
     .avatar-ring {
-      width: 78px;
-      height: 78px;
+      width: 94px;
+      height: 94px;
       border-radius: 50%;
       padding: 3px;
       background: linear-gradient(135deg, #ff7ab8, #5ae2ff, #ff4593);
-      box-shadow: 0 10px 28px rgba(255, 69, 147, 0.34);
+      box-shadow: 0 12px 30px rgba(255, 69, 147, 0.38);
     }
     .avatar-inner {
       width: 100%;
@@ -478,7 +478,7 @@
       align-items: center;
       justify-content: center;
       background: linear-gradient(145deg, #3b1540, #200a26);
-      font-size: 30px;
+      font-size: 36px;
       font-weight: 800;
       color: #ffd3e8;
       border: 2px solid rgba(20, 8, 23, 0.8);
@@ -1411,6 +1411,13 @@
             </div>
             <div class="divider"></div>
             <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; color:var(--text-secondary);">Твоё имя (обновляется у тебя и у пары)</label>
+              <div style="display:flex; gap:8px;">
+                <input id="settings-my-name-input" class="glass-input" type="text" placeholder="Введи своё имя" autocomplete="off">
+                <button type="button" class="glass-btn primary sm" id="btn-save-my-name" style="min-height:46px;">Ок</button>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
               <label style="font-size:13px; color:var(--text-secondary);">Ссылка на Telegram парня (для кнопки «Выполнить»)</label>
               <div style="display:flex; gap:8px;">
                 <input id="settings-bf-tg-input" class="glass-input" type="text" placeholder="@username или https://t.me/..." autocomplete="off">
@@ -1613,6 +1620,7 @@
               tg.onEvent('activated', () => {
                 ensureTelegramFullscreen();
                 syncTelegramSafeAreas();
+                refreshTelegramProfile();
               });
             }
           }
@@ -2190,6 +2198,8 @@
             boyfriendTgUrl: meta.boyfriendTgUrl || '',
             boyfriendName: meta.boyfriendName || 'Парень',
             girlfriendName: meta.girlfriendName || 'Девушка',
+            boyfriendPhotoUrl: meta.boyfriendPhotoUrl || '',
+            girlfriendPhotoUrl: meta.girlfriendPhotoUrl || '',
             boyfriendJoined: Boolean(meta.boyfriendJoined),
             girlfriendJoined: Boolean(meta.girlfriendJoined),
             boyfriendLastSeen: meta.boyfriendLastSeen || 0,
@@ -2368,7 +2378,8 @@
         user: {
           name: 'Гость',
           username: '',
-          photoUrl: ''
+          photoUrl: '',
+          lastTgName: ''
         },
         session: {
           pairCode: null,
@@ -2388,8 +2399,9 @@
         if (!cycleId) return new Set();
         try {
           const raw = localStorage.getItem(`lovequest_started_${cycleId}`);
-          return new Set(raw ? JSON.parse(raw) : []);
-        } catch (_) { return new Set(); }
+          if (raw) return new Set(JSON.parse(raw));
+        } catch (_) {}
+        return new Set();
       }
 
       function saveStartedQuests(cycleId, set) {
@@ -2400,23 +2412,91 @@
       }
 
       function escapeHtml(str) {
-        return String(str || '')
+        return String(str ?? '')
           .replace(/&/g, '&amp;')
           .replace(/</g, '&lt;')
           .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
       }
 
-      function detectUser() {
+      function detectUser(savedSession = null) {
         const tgUser = tg?.initDataUnsafe?.user;
         if (tgUser) {
-          State.user.name = tgUser.first_name || tgUser.username || 'Пользователь';
+          const tgName = (tgUser.first_name || tgUser.username || 'Пользователь').trim();
+          const tgPhoto = tgUser.photo_url || '';
+          const prevTgName = savedSession?.lastTgName || '';
+          const savedNick = (savedSession?.userNickname || '').trim();
+
+          // Если имя в Telegram изменилось с прошлого входа — автоматически подтягиваем новое
+          if (savedNick && prevTgName && tgName === prevTgName) {
+            State.user.name = savedNick;
+          } else {
+            State.user.name = tgName;
+          }
+          State.user.lastTgName = tgName;
           State.user.username = tgUser.username || '';
-          State.user.photoUrl = tgUser.photo_url || '';
+          State.user.photoUrl = tgPhoto;
         } else {
-          State.user.name = 'Любимая';
+          State.user.name = (savedSession?.userNickname || 'Любимая').trim();
           State.user.username = '';
           State.user.photoUrl = '';
+        }
+      }
+
+      async function syncUserProfileToDB() {
+        if (!State.session.pairCode || !State.session.role || !State.pairData?.meta?.createdAt) return;
+        const isBf = State.session.role === 'boyfriend';
+        const nameField = isBf ? 'boyfriendName' : 'girlfriendName';
+        const photoField = isBf ? 'boyfriendPhotoUrl' : 'girlfriendPhotoUrl';
+        const meta = State.pairData.meta || {};
+
+        const nextName = (State.user.name || '').trim() || (isBf ? 'Парень' : 'Девушка');
+        const nextPhoto = State.user.photoUrl || '';
+
+        const updates = {};
+        if (meta[nameField] !== nextName) updates[nameField] = nextName;
+        if ((meta[photoField] || '') !== nextPhoto) updates[photoField] = nextPhoto;
+
+        if (!Object.keys(updates).length) return;
+
+        await SessionStore.save({
+          userNickname: nextName,
+          lastTgName: State.user.lastTgName || ''
+        });
+
+        if (DB.mode === 'firebase' && DB.fbDb && DB.isOnline) {
+          DB.fbDb.ref(`pairs/${State.session.pairCode}/meta`).update(updates).catch(() => {});
+        } else {
+          await DB.transact(State.session.pairCode, data => {
+            Object.assign(data.meta, updates);
+            return data;
+          });
+        }
+      }
+
+      async function refreshTelegramProfile() {
+        const tgUser = tg?.initDataUnsafe?.user;
+        if (!tgUser) return;
+        const tgName = (tgUser.first_name || tgUser.username || '').trim();
+        const tgPhoto = tgUser.photo_url || '';
+        let changed = false;
+
+        if (tgName && tgName !== State.user.lastTgName) {
+          State.user.lastTgName = tgName;
+          State.user.name = tgName;
+          changed = true;
+        }
+        if (tgPhoto !== State.user.photoUrl) {
+          State.user.photoUrl = tgPhoto;
+          changed = true;
+        }
+        if (changed) {
+          if (State.pairData) {
+            renderHomeTab();
+            renderSettingsTab();
+          }
+          await syncUserProfileToDB();
         }
       }
 
@@ -2496,6 +2576,8 @@
             boyfriendTgUrl: normalizeTgUrl(bfTgUrl),
             boyfriendName: role === 'boyfriend' ? State.user.name : 'Парень',
             girlfriendName: role === 'girlfriend' ? State.user.name : 'Девушка',
+            boyfriendPhotoUrl: role === 'boyfriend' ? State.user.photoUrl : '',
+            girlfriendPhotoUrl: role === 'girlfriend' ? State.user.photoUrl : '',
             boyfriendJoined: role === 'boyfriend',
             girlfriendJoined: role === 'girlfriend',
             boyfriendLastSeen: role === 'boyfriend' ? now : 0,
@@ -2737,19 +2819,30 @@
       }
 
       function renderHomeTab() {
+        if (!State.pairData) return;
         const data = State.pairData;
         const role = State.session.role;
         const wallet = data.wallet || {};
         const daily = data.daily || {};
         const quests = daily.quests || [];
 
-        // Avatar
+        // Avatar (updates automatically when photoUrl changes, with safe fallback)
         const avatarEl = document.getElementById('home-avatar');
-        if (State.user.photoUrl) {
-          avatarEl.innerHTML = `<img src="${escapeHtml(State.user.photoUrl)}" alt="avatar">`;
+        const initials = (State.user.name || '💞').slice(0, 1).toUpperCase() || '💞';
+        const currentPhotoUrl = State.user.photoUrl || '';
+        if (currentPhotoUrl) {
+          const existingImg = avatarEl.querySelector('img');
+          if (!existingImg || existingImg.dataset.srcUrl !== currentPhotoUrl) {
+            avatarEl.innerHTML = '';
+            const img = document.createElement('img');
+            img.alt = 'avatar';
+            img.dataset.srcUrl = currentPhotoUrl;
+            img.src = currentPhotoUrl;
+            img.onerror = () => { avatarEl.textContent = initials; };
+            avatarEl.appendChild(img);
+          }
         } else {
-          const initials = (State.user.name || '💞').slice(0, 1).toUpperCase();
-          avatarEl.textContent = initials || '💞';
+          avatarEl.textContent = initials;
         }
 
         document.getElementById('home-user-name').textContent = State.user.name;
@@ -2995,6 +3088,7 @@
       }
 
       function renderSettingsTab() {
+        if (!State.pairData) return;
         const data = State.pairData;
         updateConnectionBadge();
         document.getElementById('demo-role-switch-wrap').style.display = DB.mode === 'local' ? 'block' : 'none';
@@ -3010,6 +3104,11 @@
           : 'Девушка 💕';
         document.getElementById('settings-streak-text').textContent = `🔥 ${data.wallet?.streakDays || 1} дн.`;
         document.getElementById('settings-completed-text').textContent = data.wallet?.completedQuestsCount || 0;
+
+        const myNameInput = document.getElementById('settings-my-name-input');
+        if (myNameInput && document.activeElement !== myNameInput) {
+          myNameInput.value = State.user.name || '';
+        }
 
         const tgInput = document.getElementById('settings-bf-tg-input');
         if (document.activeElement !== tgInput) {
@@ -3299,6 +3398,7 @@
           }
 
           renderAll();
+          await syncUserProfileToDB();
           await checkAndResetDailyCycle();
         });
 
@@ -3500,6 +3600,7 @@
               );
               existing = await DB.transact(code, data => {
                 data.meta.boyfriendName = State.user.name;
+                data.meta.boyfriendPhotoUrl = State.user.photoUrl || '';
                 data.meta.boyfriendJoined = true;
                 data.meta.boyfriendLastSeen = Date.now();
                 if (bfUrl) data.meta.boyfriendTgUrl = bfUrl;
@@ -3508,6 +3609,7 @@
             } else {
               existing = await DB.transact(code, data => {
                 data.meta.girlfriendName = State.user.name;
+                data.meta.girlfriendPhotoUrl = State.user.photoUrl || '';
                 data.meta.girlfriendJoined = true;
                 data.meta.girlfriendLastSeen = Date.now();
                 return data;
@@ -3646,6 +3748,29 @@
           if (State.session.pairCode) copyToClipboard(State.session.pairCode);
         });
 
+        document.getElementById('btn-save-my-name').addEventListener('click', async () => {
+          const raw = document.getElementById('settings-my-name-input').value.trim();
+          if (!raw) {
+            Haptic.notify('error');
+            showToast('Введи имя ✨');
+            return;
+          }
+          State.user.name = raw;
+          Haptic.notify('success');
+          AudioEngine.sfx('tap');
+          await SessionStore.save({
+            userNickname: raw,
+            lastTgName: State.user.lastTgName || ''
+          });
+          const field = State.session.role === 'boyfriend' ? 'boyfriendName' : 'girlfriendName';
+          await DB.transact(State.session.pairCode, data => {
+            data.meta[field] = raw;
+            return data;
+          });
+          renderAll();
+          showToast('Имя обновлено у тебя и у пары ✅');
+        });
+
         document.getElementById('btn-save-bf-tg').addEventListener('click', async () => {
           const url = normalizeTgUrl(document.getElementById('settings-bf-tg-input').value);
           Haptic.notify('success');
@@ -3697,13 +3822,17 @@
 
         // Resync on app resume
         document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible' && State.session.pairCode) {
-            touchLastSeen();
-            checkAndResetDailyCycle();
+          if (document.visibilityState === 'visible') {
+            refreshTelegramProfile();
+            if (State.session.pairCode) {
+              touchLastSeen();
+              checkAndResetDailyCycle();
+            }
           }
         });
         window.addEventListener('online', () => {
           if (State.session.pairCode) {
+            syncUserProfileToDB();
             touchLastSeen();
             checkAndResetDailyCycle();
           }
@@ -3741,16 +3870,12 @@
       async function bootstrap() {
         try {
           initTelegramSDK();
-          detectUser();
           await DB.init();
           wireEvents();
 
           const saved = await SessionStore.load();
+          detectUser(saved);
           AudioEngine.init(saved.audioPrefs);
-
-          if (saved.userNickname && !tg?.initDataUnsafe?.user) {
-            State.user.name = saved.userNickname;
-          }
 
           const splashText = document.getElementById('splash-status-text');
           if (saved.pairCode && saved.role) {

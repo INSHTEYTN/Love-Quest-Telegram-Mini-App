@@ -925,7 +925,7 @@
     .gift-lock-timer { font-size: 11.5px; color: var(--text-secondary); }
 
     /* ========================================================================
-       9. SETTINGS TAB — iOS SWITCHES, MUSIC & PAIR INFO
+       9. SETTINGS TAB — iOS SWITCHES, AUTO-DISCOVERED MUSIC & PAIR INFO
        ======================================================================== */
     .settings-group {
       padding: 14px;
@@ -991,29 +991,87 @@
       accent-color: var(--accent-pink);
     }
 
-    .track-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .track-item {
+    .now-playing-bar {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
       padding: 10px 12px;
       border-radius: 14px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.055);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+    }
+    .now-playing-meta {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .now-playing-title {
+      font-size: 13.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .now-playing-sub {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+    }
+
+    .music-picker-list {
+      max-height: 52dvh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding-right: 2px;
+      scrollbar-width: none;
+    }
+    .music-picker-list::-webkit-scrollbar { display: none; }
+
+    .track-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 11px 13px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.13);
       text-align: left;
       width: 100%;
+      flex-shrink: 0;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.16s var(--spring);
     }
+    .track-item:active { transform: scale(0.98); }
     .track-item.active {
       border-color: var(--accent-cyan);
-      background: rgba(90, 226, 255, 0.12);
+      background: rgba(90, 226, 255, 0.13);
     }
-    .track-name { font-size: 13.5px; font-weight: 700; }
-    .track-status { font-size: 11.5px; color: var(--text-secondary); }
+    .track-item-info {
+      min-width: 0;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .track-name {
+      font-size: 13.5px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .track-status {
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     .history-item {
       display: flex;
@@ -1243,7 +1301,7 @@
 
   <!-- Splash Screen -->
   <div id="splash-screen">
-    <div class="splash-heart">💞</div>
+    <div class="splash-heart">❤️</div>
     <div class="splash-title">LoveQuest</div>
     <div class="splash-sub" id="splash-status">Синхронизация пары…</div>
   </div>
@@ -1327,8 +1385,8 @@
             </div>
 
             <div class="couple-heart-bridge">
-              <span class="bridge-heart">💞</span>
-              <button type="button" class="status-pill" id="couple-days-pill" style="padding:4px 9px; font-size:11.5px;">💞 Задать дату</button>
+              <span class="bridge-heart">❤️</span>
+              <button type="button" class="status-pill" id="couple-days-pill" style="padding:4px 9px; font-size:11.5px;">Задать дату</button>
             </div>
 
             <div class="avatar-col">
@@ -1420,19 +1478,29 @@
         <span class="status-pill" id="sync-mode-badge">☁️ Онлайн</span>
       </header>
       <div class="scroll-area" id="settings-scroll-list">
-        <!-- Sound & Music -->
+        <!-- Sound & Auto-Discovered Music -->
         <div class="section-label"><span>Звук и музыка</span></div>
         <div class="glass-card settings-group">
           <div class="setting-row">
             <div class="setting-info">
               <span class="setting-title">Фоновая музыка</span>
-              <span class="setting-sub">Треки 1.mp3 – 6.mp3 из папки игры</span>
+              <span class="setting-sub">Играет по очереди из папки репозитория</span>
             </div>
             <label class="ios-switch">
-              <input type="checkbox" id="toggle-music">
+              <input type="checkbox" id="toggle-music" checked>
               <span class="ios-slider"></span>
             </label>
           </div>
+
+          <div class="now-playing-bar">
+            <div class="now-playing-meta">
+              <span class="now-playing-title" id="music-now-title">Поиск треков…</span>
+              <span class="now-playing-sub" id="music-now-sub">Загрузка плейлиста из репозитория</span>
+            </div>
+            <button type="button" class="glass-btn sm" id="btn-next-track" title="Следующий трек" style="display:none;">⏭</button>
+          </div>
+
+          <button type="button" class="glass-btn primary" id="btn-open-music-picker">🎵 Выбрать музыку</button>
 
           <div style="display:flex; flex-direction:column; gap:5px;">
             <div style="display:flex; justify-content:space-between; font-size:12.5px; color:var(--text-secondary);">
@@ -1452,16 +1520,6 @@
               <span class="ios-slider"></span>
             </label>
           </div>
-        </div>
-
-        <div class="section-label"><span>Весёлые треки</span></div>
-        <div class="glass-card settings-group">
-          <div class="track-list" id="happy-tracks-list"></div>
-        </div>
-
-        <div class="section-label"><span>Грустные треки</span></div>
-        <div class="glass-card settings-group">
-          <div class="track-list" id="sad-tracks-list"></div>
         </div>
 
         <!-- Custom Background -->
@@ -1576,6 +1634,23 @@
     </nav>
   </div>
 
+  <!-- Music Picker Bottom Sheet (Scrollable Auto-Discovered Playlist) -->
+  <div class="modal-backdrop" id="music-modal">
+    <div class="modal-sheet">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+        <h3 class="modal-title">Выбрать музыку 🎵</h3>
+        <div style="display:flex; gap:6px;">
+          <button type="button" class="glass-btn sm" id="btn-rescan-music" title="Обновить список">🔄</button>
+          <button type="button" class="glass-btn sm" id="btn-close-music">✕</button>
+        </div>
+      </div>
+      <div style="font-size:12.5px; color:var(--text-secondary);" id="music-modal-subtitle">
+        Песни играют по очереди и по кругу
+      </div>
+      <div class="music-picker-list" id="music-picker-list"></div>
+    </div>
+  </div>
+
   <!-- Withdraw Bottom Sheet -->
   <div class="modal-backdrop" id="withdraw-modal">
     <div class="modal-sheet">
@@ -1638,6 +1713,7 @@
       const STORAGE_SNAPSHOT_KEY = 'lovequest_last_snapshot_v2';
       const STORAGE_STARTED_KEY = 'lovequest_started_quests_v1';
       const CUSTOM_BG_KEY = 'lovequest_custom_bg_v1';
+      const AUDIO_EXT_RE = /\.(mp3|m4a|ogg|wav|aac|flac|webm)$/i;
 
       /* ======================================================================
          2. QUESTS POOL (48 UNIQUE QUESTS) & SHOP ITEMS (12 GIFTS + SVG)
@@ -1773,15 +1849,6 @@
         }
       ];
 
-      const TRACKS = [
-        { id: 1, mood: 'happy', title: 'Весёлая 1', file: './1.mp3' },
-        { id: 2, mood: 'happy', title: 'Весёлая 2', file: './2.mp3' },
-        { id: 3, mood: 'happy', title: 'Весёлая 3', file: './3.mp3' },
-        { id: 4, mood: 'sad', title: 'Грустная 1', file: './4.mp3' },
-        { id: 5, mood: 'sad', title: 'Грустная 2', file: './5.mp3' },
-        { id: 6, mood: 'sad', title: 'Грустная 3', file: './6.mp3' }
-      ];
-
       /* ======================================================================
          3. GLOBAL STATE & UTILITIES
          ====================================================================== */
@@ -1793,13 +1860,12 @@
           partnerTgUrl: '',
           userNickname: '',
           unpairedAt: 0,
-          audioPrefs: { musicOn: false, sfxOn: true, volume: 45, trackId: 1 }
+          audioPrefs: { musicOn: true, sfxOn: true, volume: 45, trackFile: '', v: 2 }
         },
         pairData: null,
         activeTab: 'home',
         isOnlineDb: false,
-        startedQuestIds: new Set(),
-        missingTracks: new Set()
+        startedQuestIds: new Set()
       };
 
       let selectedOnboardRole = null;
@@ -1999,61 +2065,281 @@
       }
 
       /* ======================================================================
-         5. AUDIO ENGINE (6 LOCAL MP3 TRACKS + WEB AUDIO SFX)
+         5. AUTO-DISCOVERED MUSIC PLAYER (SEQUENTIAL LOOP + AUTO-PLAY) & SFX
          ====================================================================== */
       const AudioEngine = {
         audio: new Audio(),
         ctx: null,
-        unlocked: false,
+        tracks: [], // [{ file, url, title }]
+        currentIndex: 0,
+        isScanning: false,
+        isPlaying: false,
+        waitingUnlock: false,
+        consecutiveErrors: 0,
+
+        formatTrackTitle(filename) {
+          let clean = filename;
+          try { clean = decodeURIComponent(filename); } catch (_) {}
+          clean = clean.split('/').pop() || clean;
+          clean = clean.replace(AUDIO_EXT_RE, '');
+          clean = clean.replace(/[_]+/g, ' ').replace(/\s+/g, ' ').trim();
+          return clean || filename;
+        },
 
         init() {
-          this.audio.loop = true;
-          this.audio.preload = 'none';
+          this.audio.preload = 'metadata';
+          this.audio.loop = false;
+
+          // Sequential playlist: when track ends, advance to next; after last, loop to first
+          this.audio.addEventListener('ended', () => {
+            if (!State.session.audioPrefs.musicOn || !this.tracks.length) return;
+            const nextIdx = (this.currentIndex + 1) % this.tracks.length;
+            this.playIndex(nextIdx, false);
+          });
+
+          this.audio.addEventListener('playing', () => {
+            this.isPlaying = true;
+            this.waitingUnlock = false;
+            this.consecutiveErrors = 0;
+            renderMusicUI();
+          });
+
+          this.audio.addEventListener('pause', () => {
+            this.isPlaying = false;
+            renderMusicUI();
+          });
+
           this.audio.addEventListener('error', () => {
-            const cur = State.session.audioPrefs.trackId;
-            if (this.audio.src) {
-              State.missingTracks.add(cur);
-              renderTrackLists();
+            this.isPlaying = false;
+            if (!State.session.audioPrefs.musicOn || !this.tracks.length) {
+              renderMusicUI();
+              return;
+            }
+            this.consecutiveErrors++;
+            if (this.tracks.length > 1 && this.consecutiveErrors < this.tracks.length) {
+              const nextIdx = (this.currentIndex + 1) % this.tracks.length;
+              setTimeout(() => this.playIndex(nextIdx, false), 250);
+            } else {
+              renderMusicUI();
             }
           });
 
-          const unlock = () => {
-            if (this.unlocked) return;
-            this.unlocked = true;
-            if (State.session.audioPrefs.musicOn) {
-              this.playCurrent(true);
+          // If mobile WebView blocks immediate autoplay, resume on the very first touch
+          const unlockPlayback = () => {
+            if (State.session.audioPrefs.musicOn && this.tracks.length && !this.isPlaying) {
+              this.playIndex(this.currentIndex, false);
             }
           };
-          window.addEventListener('pointerdown', unlock, { once: true, passive: true });
+          window.addEventListener('pointerdown', unlockPlayback, { passive: true });
+          window.addEventListener('touchstart', unlockPlayback, { passive: true });
+        },
+
+        async discoverFromGitHub() {
+          const host = (location.hostname || '').toLowerCase();
+          if (!host.endsWith('.github.io')) return [];
+          const owner = host.slice(0, -'.github.io'.length);
+          if (!owner) return [];
+
+          const segments = (location.pathname || '/').split('/').filter(Boolean);
+          // Drop trailing file like index.html
+          if (segments.length && /\.html?$/i.test(segments[segments.length - 1])) {
+            segments.pop();
+          }
+
+          const candidates = [];
+          if (segments.length >= 1) {
+            candidates.push({ repo: segments[0], subpath: segments.slice(1).join('/') });
+          }
+          candidates.push({ repo: `${owner}.github.io`, subpath: segments.join('/') });
+
+          for (const c of candidates) {
+            try {
+              const apiUrl = `https://api.github.com/repos/${encodeURIComponent(owner)}/${encodeURIComponent(c.repo)}/contents/${c.subpath}`;
+              const res = await fetch(apiUrl, { headers: { Accept: 'application/vnd.github.v3+json' } });
+              if (!res.ok) continue;
+              const items = await res.json();
+              if (!Array.isArray(items)) continue;
+              const found = items
+                .filter(it => it && it.type === 'file' && AUDIO_EXT_RE.test(it.name))
+                .map(it => ({
+                  file: it.name,
+                  url: `./${encodeURIComponent(it.name)}`,
+                  title: this.formatTrackTitle(it.name)
+                }));
+              if (found.length) return found;
+            } catch (_) {}
+          }
+          return [];
+        },
+
+        async discoverFromManifest() {
+          try {
+            const res = await fetch('./tracks.json', { cache: 'no-store' });
+            if (!res.ok) return [];
+            const ct = (res.headers.get('content-type') || '').toLowerCase();
+            if (ct.includes('text/html')) return [];
+            const list = await res.json();
+            if (!Array.isArray(list)) return [];
+            return list
+              .map(item => {
+                const name = typeof item === 'string' ? item : (item && (item.file || item.name));
+                if (!name || !AUDIO_EXT_RE.test(name)) return null;
+                const cleanFile = name.replace(/^\.\//, '');
+                return {
+                  file: cleanFile,
+                  url: cleanFile.startsWith('http') ? cleanFile : `./${encodeURIComponent(cleanFile)}`,
+                  title: (typeof item === 'object' && item.title) ? item.title : this.formatTrackTitle(cleanFile)
+                };
+              })
+              .filter(Boolean);
+          } catch (_) {
+            return [];
+          }
+        },
+
+        async discoverFromDirectoryListing() {
+          try {
+            const res = await fetch('./', { cache: 'no-store' });
+            if (!res.ok) return [];
+            const ct = (res.headers.get('content-type') || '').toLowerCase();
+            if (!ct.includes('text/html')) return [];
+            const html = await res.text();
+            const doc = new DOMParser().parseFromString(html, 'text/html');
+            const links = Array.from(doc.querySelectorAll('a[href]'));
+            const found = [];
+            for (const a of links) {
+              const rawHref = (a.getAttribute('href') || '').trim();
+              if (!rawHref || rawHref.startsWith('#') || rawHref.startsWith('?')) continue;
+              if (/^https?:\/\//i.test(rawHref)) continue;
+              const cleanHref = rawHref.replace(/^\.\//, '');
+              if (cleanHref.includes('/')) continue;
+              if (!AUDIO_EXT_RE.test(cleanHref)) continue;
+              found.push({
+                file: cleanHref,
+                url: `./${cleanHref}`,
+                title: this.formatTrackTitle(cleanHref)
+              });
+            }
+            return found;
+          } catch (_) {
+            return [];
+          }
+        },
+
+        async discoverByProbing() {
+          const found = [];
+          let misses = 0;
+          for (let i = 1; i <= 20; i++) {
+            const name = `${i}.mp3`;
+            try {
+              const res = await fetch(`./${name}`, { method: 'HEAD', cache: 'no-store' });
+              const ct = (res.headers.get('content-type') || '').toLowerCase();
+              if (res.ok && !ct.includes('text/html')) {
+                found.push({ file: name, url: `./${name}`, title: this.formatTrackTitle(name) });
+                misses = 0;
+              } else {
+                misses++;
+                if (i >= 6 && misses >= 3) break;
+              }
+            } catch (_) {
+              misses++;
+              if (i >= 6 && misses >= 3) break;
+            }
+          }
+          return found;
+        },
+
+        async discoverTracks(autoStart = true) {
+          this.isScanning = true;
+          renderMusicUI();
+
+          let discovered = await this.discoverFromGitHub();
+          if (!discovered.length) discovered = await this.discoverFromManifest();
+          if (!discovered.length) discovered = await this.discoverFromDirectoryListing();
+          if (!discovered.length) discovered = await this.discoverByProbing();
+
+          // Deduplicate & sort naturally
+          const seen = new Set();
+          const unique = [];
+          for (const t of discovered) {
+            const key = t.file.toLowerCase();
+            if (seen.has(key)) continue;
+            seen.add(key);
+            unique.push(t);
+          }
+          unique.sort((a, b) => a.title.localeCompare(b.title, 'ru', { numeric: true, sensitivity: 'base' }));
+
+          this.tracks = unique;
+          this.isScanning = false;
+
+          if (this.tracks.length) {
+            const savedFile = State.session.audioPrefs.trackFile || '';
+            const savedIdx = savedFile ? this.tracks.findIndex(t => t.file === savedFile) : -1;
+            this.currentIndex = savedIdx >= 0 ? savedIdx : 0;
+
+            if (autoStart && State.session.audioPrefs.musicOn) {
+              this.playIndex(this.currentIndex, false);
+            }
+          } else {
+            this.currentIndex = 0;
+            this.audio.pause();
+          }
+
+          renderMusicUI();
+          return this.tracks;
         },
 
         applyPrefs() {
           const p = State.session.audioPrefs;
-          this.audio.volume = Math.max(0, Math.min(1, (p.volume || 45) / 100));
+          this.audio.volume = Math.max(0, Math.min(1, (p.volume ?? 45) / 100));
           if (p.musicOn) {
-            this.playCurrent(true);
+            if (this.tracks.length) {
+              this.playIndex(this.currentIndex, false);
+            }
           } else {
             this.audio.pause();
+            this.waitingUnlock = false;
+            renderMusicUI();
           }
         },
 
-        playCurrent(silentFail = true) {
-          const p = State.session.audioPrefs;
-          const tr = TRACKS.find(t => t.id === p.trackId) || TRACKS[0];
-          const targetSrc = tr.file;
-          if (!this.audio.src || !this.audio.src.endsWith(targetSrc.replace('./', '/'))) {
-            this.audio.src = targetSrc;
+        playIndex(idx, savePref = true) {
+          if (!this.tracks.length) return;
+          const safeIdx = ((idx % this.tracks.length) + this.tracks.length) % this.tracks.length;
+          this.currentIndex = safeIdx;
+          const tr = this.tracks[safeIdx];
+          this.audio.loop = this.tracks.length === 1;
+          this.audio.volume = Math.max(0, Math.min(1, (State.session.audioPrefs.volume ?? 45) / 100));
+
+          if (State.session.audioPrefs.trackFile !== tr.file) {
+            State.session.audioPrefs.trackFile = tr.file;
+            if (savePref) SessionStore.save(State.session);
           }
-          this.audio.volume = Math.max(0, Math.min(1, (p.volume || 45) / 100));
+
+          const currentAttr = this.audio.getAttribute('data-track-file');
+          if (currentAttr !== tr.file) {
+            this.audio.setAttribute('data-track-file', tr.file);
+            this.audio.src = tr.url;
+          }
+
           const prom = this.audio.play();
           if (prom && typeof prom.catch === 'function') {
             prom.catch(() => {
-              if (!silentFail) {
-                State.missingTracks.add(tr.id);
-                renderTrackLists();
-              }
+              this.waitingUnlock = true;
+              this.isPlaying = false;
+              renderMusicUI();
             });
           }
+          renderMusicUI();
+        },
+
+        nextTrack() {
+          if (!this.tracks.length) return;
+          State.session.audioPrefs.musicOn = true;
+          const toggle = document.getElementById('toggle-music');
+          if (toggle) toggle.checked = true;
+          const nextIdx = (this.currentIndex + 1) % this.tracks.length;
+          this.playIndex(nextIdx, true);
         },
 
         sfx(type = 'tap') {
@@ -2625,6 +2911,109 @@
       };
 
       /* ======================================================================
+         9. IMAGE COMPRESSION (AVATAR & CUSTOM BACKGROUND)
+         ====================================================================== */
+      function compressAvatarFile(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error('read_error'));
+          reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('img_error'));
+            img.onload = () => {
+              try {
+                const size = 200;
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                const minSide = Math.min(img.width, img.height);
+                const sx = Math.floor((img.width - minSide) / 2);
+                const sy = Math.floor((img.height - minSide) / 2);
+                ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+                resolve(canvas.toDataURL('image/jpeg', 0.78));
+              } catch (e) {
+                reject(e);
+              }
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+
+      const BackgroundManager = {
+        async load() {
+          let bg = '';
+          try { bg = localStorage.getItem(CUSTOM_BG_KEY) || ''; } catch (_) {}
+          if (!bg) {
+            const idbBg = await SessionStore.idbGet(CUSTOM_BG_KEY);
+            if (typeof idbBg === 'string') bg = idbBg;
+          }
+          this.apply(bg, false);
+        },
+
+        async apply(src, save = true) {
+          const clean = (src || '').trim();
+          const layer = document.getElementById('custom-bg-layer');
+          if (layer) {
+            if (clean) {
+              const safeUrl = clean.replace(/["\\\n\r]/g, encodeURIComponent);
+              layer.style.backgroundImage = `url("${safeUrl}")`;
+              layer.classList.add('active');
+            } else {
+              layer.style.backgroundImage = '';
+              layer.classList.remove('active');
+            }
+          }
+          const urlInput = document.getElementById('settings-bg-url-input');
+          if (urlInput && document.activeElement !== urlInput) {
+            urlInput.value = clean.startsWith('http') ? clean : '';
+          }
+          if (save) {
+            try {
+              if (clean) localStorage.setItem(CUSTOM_BG_KEY, clean);
+              else localStorage.removeItem(CUSTOM_BG_KEY);
+            } catch (_) {}
+            await SessionStore.idbSet(CUSTOM_BG_KEY, clean || null);
+          }
+        },
+
+        compressBackgroundFile(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error('read_error'));
+            reader.onload = () => {
+              const img = new Image();
+              img.onerror = () => reject(new Error('img_error'));
+              img.onload = () => {
+                try {
+                  const maxSide = 1080;
+                  let w = img.width;
+                  let h = img.height;
+                  if (w > maxSide || h > maxSide) {
+                    const ratio = Math.min(maxSide / w, maxSide / h);
+                    w = Math.round(w * ratio);
+                    h = Math.round(h * ratio);
+                  }
+                  const canvas = document.createElement('canvas');
+                  canvas.width = w;
+                  canvas.height = h;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, w, h);
+                  resolve(canvas.toDataURL('image/jpeg', 0.76));
+                } catch (e) {
+                  reject(e);
+                }
+              };
+              img.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+      };
+
+      /* ======================================================================
          10. FLAPPY LOVE MINI-GAME (60FPS OPTIMIZED — PRE-RENDERED SPRITES)
          ====================================================================== */
       const FlappyGame = {
@@ -2653,7 +3042,6 @@
         avatarImg: null,
         avatarSrc: '',
         avatarReady: false,
-        // Cached GPU-friendly resources (zero per-frame allocation)
         skyGrad: null,
         pipeGrad: null,
         birdSprite: null,
@@ -2710,7 +3098,6 @@
           return { url, initial: name.slice(0, 1).toUpperCase() || '💞' };
         },
 
-        // Pre-render glowing golden coin once to avoid costly ctx.shadowBlur per frame
         buildCoinSprite() {
           const dpr = Math.min(window.devicePixelRatio || 1, 2);
           const r = 13;
@@ -2724,7 +3111,6 @@
           const cx = logicalSize / 2;
           const cy = logicalSize / 2;
 
-          // Soft baked glow halo
           const halo = g.createRadialGradient(cx, cy, r * 0.5, cx, cy, r + pad);
           halo.addColorStop(0, 'rgba(255, 209, 102, 0.55)');
           halo.addColorStop(0.6, 'rgba(255, 209, 102, 0.18)');
@@ -2734,7 +3120,6 @@
           g.arc(cx, cy, r + pad, 0, Math.PI * 2);
           g.fill();
 
-          // Coin body
           const cg = g.createRadialGradient(cx - 3, cy - 3, 2, cx, cy, r);
           cg.addColorStop(0, '#fff7b2');
           cg.addColorStop(0.6, '#ffd166');
@@ -2757,7 +3142,6 @@
           this.coinSpriteSize = logicalSize;
         },
 
-        // Pre-render circular clipped avatar once to eliminate per-frame ctx.clip()
         buildBirdSprite() {
           const dpr = Math.min(window.devicePixelRatio || 1, 2);
           const r = this.bird.r;
@@ -2771,13 +3155,11 @@
           const cx = logicalSize / 2;
           const cy = logicalSize / 2;
 
-          // Outer cyan ring
           g.beginPath();
           g.arc(cx, cy, r + 2.5, 0, Math.PI * 2);
           g.fillStyle = 'rgba(90, 226, 255, 0.92)';
           g.fill();
 
-          // Circular clipped avatar
           g.save();
           g.beginPath();
           g.arc(cx, cy, r, 0, Math.PI * 2);
@@ -3034,7 +3416,6 @@
           if (isGf && coins > 0) showToast(`+${formatNumber(coins)} 🪙 за игру Flappy Love!`);
         },
 
-        // Fixed-timestep physics accumulator for jitter-free 60Hz / 120Hz motion
         loop(ts) {
           if (this.state !== 'playing') return;
           if (!this.lastTs) {
@@ -3171,11 +3552,9 @@
 
           ctx.clearRect(0, 0, w, h);
 
-          // Cached background gradient
           ctx.fillStyle = this.skyGrad || 'rgba(34, 14, 48, 0.38)';
           ctx.fillRect(0, 0, w, h);
 
-          // Pipes using cached gradient via translate (zero per-frame gradient allocation)
           ctx.fillStyle = this.pipeGrad || 'rgba(255, 107, 169, 0.8)';
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.48)';
           ctx.lineWidth = 1.5;
@@ -3190,7 +3569,6 @@
             ctx.save();
             ctx.translate(px, 0);
 
-            // Top pipe + cap
             this.drawRoundedRect(ctx, 0, -6, p.w, p.topH + 6, 8);
             ctx.fill();
             ctx.stroke();
@@ -3198,7 +3576,6 @@
             ctx.fill();
             ctx.stroke();
 
-            // Bottom pipe + cap
             this.drawRoundedRect(ctx, 0, botY, p.w, botH, 8);
             ctx.fill();
             ctx.stroke();
@@ -3209,7 +3586,6 @@
             ctx.restore();
           }
 
-          // Floating coins using pre-rendered sprite (zero shadowBlur cost)
           if (this.coinSprite && this.coins.length) {
             const half = this.coinSpriteSize / 2;
             for (let i = 0; i < this.coins.length; i++) {
@@ -3218,7 +3594,6 @@
             }
           }
 
-          // Ground bar
           ctx.fillStyle = 'rgba(22, 10, 30, 0.78)';
           ctx.fillRect(0, h - groundH, w, groundH);
           ctx.strokeStyle = 'rgba(255, 255, 255, 0.28)';
@@ -3237,7 +3612,6 @@
           }
           ctx.stroke();
 
-          // Avatar bird using pre-rendered sprite (zero clip() cost)
           const b = this.bird;
           const bobY = this.state === 'idle' ? Math.sin((ts || 0) / 260) * 5.5 : 0;
           if (this.birdSprite) {
@@ -3249,7 +3623,6 @@
             ctx.restore();
           }
 
-          // Floating score popups
           if (this.popups.length) {
             ctx.font = '800 15px -apple-system, sans-serif';
             ctx.textAlign = 'center';
@@ -3265,110 +3638,7 @@
       };
 
       /* ======================================================================
-         9. IMAGE COMPRESSION (AVATAR & CUSTOM BACKGROUND)
-         ====================================================================== */
-      function compressAvatarFile(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onerror = () => reject(new Error('read_error'));
-          reader.onload = () => {
-            const img = new Image();
-            img.onerror = () => reject(new Error('img_error'));
-            img.onload = () => {
-              try {
-                const size = 200;
-                const canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-                const minSide = Math.min(img.width, img.height);
-                const sx = Math.floor((img.width - minSide) / 2);
-                const sy = Math.floor((img.height - minSide) / 2);
-                ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
-                resolve(canvas.toDataURL('image/jpeg', 0.78));
-              } catch (e) {
-                reject(e);
-              }
-            };
-            img.src = reader.result;
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      const BackgroundManager = {
-        async load() {
-          let bg = '';
-          try { bg = localStorage.getItem(CUSTOM_BG_KEY) || ''; } catch (_) {}
-          if (!bg) {
-            const idbBg = await SessionStore.idbGet(CUSTOM_BG_KEY);
-            if (typeof idbBg === 'string') bg = idbBg;
-          }
-          this.apply(bg, false);
-        },
-
-        async apply(src, save = true) {
-          const clean = (src || '').trim();
-          const layer = document.getElementById('custom-bg-layer');
-          if (layer) {
-            if (clean) {
-              const safeUrl = clean.replace(/["\\\n\r]/g, encodeURIComponent);
-              layer.style.backgroundImage = `url("${safeUrl}")`;
-              layer.classList.add('active');
-            } else {
-              layer.style.backgroundImage = '';
-              layer.classList.remove('active');
-            }
-          }
-          const urlInput = document.getElementById('settings-bg-url-input');
-          if (urlInput && document.activeElement !== urlInput) {
-            urlInput.value = clean.startsWith('http') ? clean : '';
-          }
-          if (save) {
-            try {
-              if (clean) localStorage.setItem(CUSTOM_BG_KEY, clean);
-              else localStorage.removeItem(CUSTOM_BG_KEY);
-            } catch (_) {}
-            await SessionStore.idbSet(CUSTOM_BG_KEY, clean || null);
-          }
-        },
-
-        compressBackgroundFile(file) {
-          return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onerror = () => reject(new Error('read_error'));
-            reader.onload = () => {
-              const img = new Image();
-              img.onerror = () => reject(new Error('img_error'));
-              img.onload = () => {
-                try {
-                  const maxSide = 1080;
-                  let w = img.width;
-                  let h = img.height;
-                  if (w > maxSide || h > maxSide) {
-                    const ratio = Math.min(maxSide / w, maxSide / h);
-                    w = Math.round(w * ratio);
-                    h = Math.round(h * ratio);
-                  }
-                  const canvas = document.createElement('canvas');
-                  canvas.width = w;
-                  canvas.height = h;
-                  const ctx = canvas.getContext('2d');
-                  ctx.drawImage(img, 0, 0, w, h);
-                  resolve(canvas.toDataURL('image/jpeg', 0.76));
-                } catch (e) {
-                  reject(e);
-                }
-              };
-              img.src = reader.result;
-            };
-            reader.readAsDataURL(file);
-          });
-        }
-      };
-
-      /* ======================================================================
-         11. RENDERING ENGINE (HOME, GAMES, SHOP, SETTINGS)
+         11. RENDERING ENGINE (HOME, GAMES, SHOP, SETTINGS, MUSIC PICKER)
          ====================================================================== */
       function renderAvatarBox(el, photoUrl, fallbackName) {
         if (!el) return;
@@ -3408,17 +3678,91 @@
       }
 
       function formatDaysTogether(dateStr) {
-        if (!dateStr) return '💞 Задать дату';
+        if (!dateStr) return 'Задать дату';
         const start = new Date(`${dateStr}T00:00:00`);
-        if (isNaN(start.getTime())) return '💞 Задать дату';
+        if (isNaN(start.getTime())) return 'Задать дату';
         const days = Math.max(1, Math.floor((Date.now() - start.getTime()) / DAY_MS) + 1);
-        return `💞 Вместе ${formatNumber(days)} дн.`;
+        return `Вместе ${formatNumber(days)} дн.`;
       }
 
       function categoryMeta(type) {
         if (type === 'message') return { icon: '💌', label: 'Сообщение' };
         if (type === 'call') return { icon: '📞', label: 'Звонок' };
         return { icon: '✨', label: 'Творческое' };
+      }
+
+      function renderMusicUI() {
+        const nowTitle = document.getElementById('music-now-title');
+        const nowSub = document.getElementById('music-now-sub');
+        const nextBtn = document.getElementById('btn-next-track');
+        const openBtn = document.getElementById('btn-open-music-picker');
+        const modalSub = document.getElementById('music-modal-subtitle');
+        const listEl = document.getElementById('music-picker-list');
+
+        const tracks = AudioEngine.tracks;
+        const count = tracks.length;
+        const musicOn = Boolean(State.session.audioPrefs.musicOn);
+
+        if (AudioEngine.isScanning) {
+          if (nowTitle) nowTitle.textContent = 'Поиск треков…';
+          if (nowSub) nowSub.textContent = 'Сканируем папку репозитория';
+          if (openBtn) openBtn.textContent = '🎵 Выбрать музыку';
+          if (nextBtn) nextBtn.style.display = 'none';
+          if (listEl) listEl.innerHTML = `<div class="empty-box">Ищем аудиофайлы в репозитории… 🎧</div>`;
+          return;
+        }
+
+        if (!count) {
+          if (nowTitle) nowTitle.textContent = 'Треки не найдены';
+          if (nowSub) nowSub.textContent = 'Загрузи .mp3 файлы рядом с index.html';
+          if (openBtn) openBtn.textContent = '🎵 Выбрать музыку (0)';
+          if (nextBtn) nextBtn.style.display = 'none';
+          if (modalSub) modalSub.textContent = 'Загрузи любые .mp3 / .m4a / .ogg файлы в ту же папку, где лежит index.html';
+          if (listEl) {
+            listEl.innerHTML = `<div class="empty-box">В репозитории пока нет аудиофайлов 🎧<br>Просто загрузи любые песни (.mp3) рядом с <strong>index.html</strong> и нажми 🔄.</div>`;
+          }
+          return;
+        }
+
+        const cur = tracks[AudioEngine.currentIndex] || tracks[0];
+        if (nowTitle) nowTitle.textContent = `${AudioEngine.isPlaying ? '🎵 ' : '🎧 '}${cur.title}`;
+        if (nowSub) {
+          if (!musicOn) {
+            nowSub.textContent = `Выключено • ${AudioEngine.currentIndex + 1} из ${count}`;
+          } else if (AudioEngine.waitingUnlock) {
+            nowSub.textContent = `Коснись экрана для старта • ${AudioEngine.currentIndex + 1} из ${count}`;
+          } else {
+            nowSub.textContent = count > 1
+              ? `Играет по очереди • ${AudioEngine.currentIndex + 1} из ${count}`
+              : 'Повтор трека • 1 из 1';
+          }
+        }
+        if (openBtn) openBtn.textContent = `🎵 Выбрать музыку (${count})`;
+        if (nextBtn) nextBtn.style.display = count > 1 ? 'inline-flex' : 'none';
+        if (modalSub) {
+          modalSub.textContent = count > 1
+            ? `Найдено песен: ${count} • Играют по очереди и по кругу`
+            : 'Найдена 1 песня • Повторяется по кругу';
+        }
+
+        if (listEl) {
+          listEl.innerHTML = tracks.map((t, idx) => {
+            const active = idx === AudioEngine.currentIndex;
+            const icon = active ? (AudioEngine.isPlaying ? '🔊' : '▶') : `${idx + 1}.`;
+            const statusText = active
+              ? (musicOn ? (AudioEngine.isPlaying ? 'Сейчас играет' : 'Выбрана') : 'На паузе')
+              : t.file;
+            return `
+              <button type="button" class="track-item ${active ? 'active' : ''}" data-action="pick-track" data-index="${idx}">
+                <div class="track-item-info">
+                  <div class="track-name">${escapeHtml(t.title)}</div>
+                  <div class="track-status">${escapeHtml(statusText)}</div>
+                </div>
+                <span style="font-size:14px; font-weight:700; flex-shrink:0;">${icon}</span>
+              </button>
+            `;
+          }).join('');
+        }
       }
 
       function renderAll() {
@@ -3509,7 +3853,6 @@
             `;
           }
         } else {
-          // Boyfriend Home: Pending Withdrawals -> Pending Quests -> Today's Overview
           const pendW = (data.withdrawals || []).filter(w => w.status === 'pending');
           if (pendW.length) {
             html += `<div class="section-label"><span>Запросы на вывод 💸</span><span>${pendW.length}</span></div>`;
@@ -3664,26 +4007,6 @@
         list.innerHTML = html;
       }
 
-      function renderTrackLists() {
-        const curId = State.session.audioPrefs.trackId;
-        const makeHtml = mood => TRACKS.filter(t => t.mood === mood).map(t => {
-          const active = t.id === curId;
-          const missing = State.missingTracks.has(t.id);
-          return `
-            <button type="button" class="track-item ${active ? 'active' : ''}" data-action="select-track" data-id="${t.id}">
-              <div>
-                <div class="track-name">${active ? '🎵 ' : ''}${escapeHtml(t.title)}</div>
-                <div class="track-status">${missing ? 'Файл не найден' : (active ? 'Выбран' : t.file.replace('./', ''))}</div>
-              </div>
-              <span>${active ? '✓' : '▶'}</span>
-            </button>
-          `;
-        }).join('');
-
-        document.getElementById('happy-tracks-list').innerHTML = makeHtml('happy');
-        document.getElementById('sad-tracks-list').innerHTML = makeHtml('sad');
-      }
-
       function renderSettingsTab() {
         if (!State.pairData) return;
         const data = State.pairData;
@@ -3698,7 +4021,7 @@
         document.getElementById('toggle-sfx').checked = Boolean(prefs.sfxOn);
         document.getElementById('music-volume-slider').value = prefs.volume;
         document.getElementById('volume-percent-label').textContent = `${prefs.volume}%`;
-        renderTrackLists();
+        renderMusicUI();
 
         document.getElementById('settings-pair-code').textContent = State.session.pairCode || '------';
         document.getElementById('settings-streak-label').textContent = `🔥 ${data.wallet.streakDays || 1} дн.`;
@@ -3717,7 +4040,6 @@
           tgInp.value = meta.boyfriendTgUrl || '';
         }
 
-        // History
         const hist = [
           ...(data.withdrawals || []).map(w => ({
             ts: w.createdAt || 0,
@@ -3841,7 +4163,6 @@
           onPairSnapshot(normalizePairData(cached, code));
         }
 
-        // Link Telegram username & ID to this pair in DB for seamless future auto-login
         DB.bindAccount(State.user, code, role);
 
         DB.subscribe(code, data => {
@@ -4270,7 +4591,41 @@
           if (cb) cb();
         });
 
-        // Audio controls
+        // Music Picker modal & Audio controls
+        const mModal = document.getElementById('music-modal');
+        document.getElementById('btn-open-music-picker').addEventListener('click', () => {
+          Haptic.select();
+          AudioEngine.sfx('tap');
+          renderMusicUI();
+          mModal.classList.add('open');
+        });
+        document.getElementById('btn-close-music').addEventListener('click', () => mModal.classList.remove('open'));
+        mModal.addEventListener('click', e => { if (e.target === mModal) mModal.classList.remove('open'); });
+
+        document.getElementById('btn-rescan-music').addEventListener('click', async () => {
+          Haptic.select();
+          AudioEngine.sfx('tap');
+          const found = await AudioEngine.discoverTracks(State.session.audioPrefs.musicOn);
+          showToast(found.length ? `Найдено песен: ${found.length} 🎵` : 'Аудиофайлы в папке не найдены');
+        });
+
+        document.getElementById('btn-next-track').addEventListener('click', () => {
+          Haptic.select();
+          AudioEngine.nextTrack();
+        });
+
+        document.getElementById('music-picker-list').addEventListener('click', async e => {
+          const btn = e.target.closest('[data-action="pick-track"]');
+          if (!btn) return;
+          const idx = Number(btn.dataset.index);
+          State.session.audioPrefs.musicOn = true;
+          document.getElementById('toggle-music').checked = true;
+          AudioEngine.playIndex(idx, true);
+          await SessionStore.save(State.session);
+          Haptic.select();
+          AudioEngine.sfx('switch');
+        });
+
         document.getElementById('toggle-music').addEventListener('change', async e => {
           State.session.audioPrefs.musicOn = e.target.checked;
           AudioEngine.applyPrefs();
@@ -4287,18 +4642,6 @@
           document.getElementById('volume-percent-label').textContent = `${val}%`;
           AudioEngine.audio.volume = val / 100;
           await SessionStore.save(State.session);
-        });
-        document.getElementById('settings-scroll-list').addEventListener('click', async e => {
-          const btn = e.target.closest('[data-action="select-track"]');
-          if (!btn) return;
-          const id = Number(btn.dataset.id);
-          State.session.audioPrefs.trackId = id;
-          State.session.audioPrefs.musicOn = true;
-          document.getElementById('toggle-music').checked = true;
-          AudioEngine.playCurrent(false);
-          renderTrackLists();
-          await SessionStore.save(State.session);
-          Haptic.select();
         });
 
         // Custom Background controls
@@ -4465,13 +4808,22 @@
 
           const saved = await SessionStore.load();
           if (saved?.audioPrefs) {
-            State.session.audioPrefs = { ...State.session.audioPrefs, ...saved.audioPrefs };
+            // Migrate old v1 prefs so music defaults to ON once after this update
+            const isNewPrefs = saved.audioPrefs.v === 2;
+            State.session.audioPrefs = {
+              ...State.session.audioPrefs,
+              ...saved.audioPrefs,
+              musicOn: isNewPrefs ? Boolean(saved.audioPrefs.musicOn) : true,
+              v: 2
+            };
           }
+
+          // Start discovering songs from the repository right away & auto-play
+          AudioEngine.discoverTracks(State.session.audioPrefs.musicOn);
 
           if (saved && saved.pairCode && saved.role) {
             await connectToPair(saved.pairCode, saved.role);
           } else {
-            // Check if this Telegram username (or ID) is already bound to a pair in Firebase
             const binding = await DB.findAccountBinding(State.user);
             if (binding && binding.pairCode && binding.role) {
               const pairExists = await DB.get(binding.pairCode);

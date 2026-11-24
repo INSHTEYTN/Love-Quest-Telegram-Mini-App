@@ -498,6 +498,12 @@
       position: relative;
       display: inline-flex;
     }
+    .avatar-ring-wrap.clickable {
+      cursor: pointer;
+    }
+    .avatar-ring-wrap.clickable:active {
+      transform: scale(0.95);
+    }
 
     .avatar-ring {
       width: 76px;
@@ -1452,7 +1458,7 @@
           <div class="couple-widget-card">
             <div class="couple-avatars-row">
               <div class="couple-member">
-                <div class="avatar-ring-wrap">
+                <div class="avatar-ring-wrap clickable" id="couple-my-avatar-trigger" title="Нажми, чтобы сменить аватарку">
                   <div class="avatar-ring">
                     <div class="avatar-inner" id="couple-my-avatar">💞</div>
                   </div>
@@ -1606,6 +1612,14 @@
               </div>
             </div>
             <div style="display:flex; flex-direction:column; gap:8px;">
+              <label style="font-size:13px; color:var(--text-secondary);">Твоя аватарка (мгновенно видна партнёру)</label>
+              <input type="file" id="avatar-file-input" accept="image/*" style="display:none;">
+              <div style="display:grid; grid-template-columns:1.4fr 1fr; gap:8px;">
+                <button type="button" class="glass-btn sm" id="btn-change-avatar" style="min-height:42px;">📷 Сменить фото</button>
+                <button type="button" class="glass-btn sm" id="btn-reset-avatar" style="min-height:42px;">Из Telegram</button>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
               <label style="font-size:13px; color:var(--text-secondary);">Дата начала отношений (счётчик «Вместе X дней»)</label>
               <div style="display:flex; gap:8px;">
                 <input id="settings-rel-date-input" class="glass-input" type="date">
@@ -1742,6 +1756,7 @@
       const TENGE_PER_COIN = 10; // 100 монет = 1 000 ₸
       const STORAGE_TIMEOUT_MS = 1500;
       const NETWORK_TIMEOUT_MS = 7000;
+      const SESSION_CACHE_BUST = Date.now();
 
       /* ========================================================================
          2. TELEGRAM MINI APP SDK, FULLSCREEN, HAPTICS & ANTI-ZOOM GUARDS
@@ -2396,6 +2411,8 @@
             girlfriendName: meta.girlfriendName || 'Девушка',
             boyfriendPhotoUrl: meta.boyfriendPhotoUrl || '',
             girlfriendPhotoUrl: meta.girlfriendPhotoUrl || '',
+            boyfriendCustomAvatar: meta.boyfriendCustomAvatar || '',
+            girlfriendCustomAvatar: meta.girlfriendCustomAvatar || '',
             boyfriendJoined: Boolean(meta.boyfriendJoined),
             girlfriendJoined: Boolean(meta.girlfriendJoined),
             boyfriendLastSeen: meta.boyfriendLastSeen || 0,
@@ -2652,7 +2669,7 @@
 
         const updates = {};
         if (meta[nameField] !== nextName) updates[nameField] = nextName;
-        if ((meta[photoField] || '') !== nextPhoto) updates[photoField] = nextPhoto;
+        if (nextPhoto && (meta[photoField] || '') !== nextPhoto) updates[photoField] = nextPhoto;
 
         if (!Object.keys(updates).length) return;
 
@@ -2775,6 +2792,8 @@
             girlfriendName: role === 'girlfriend' ? State.user.name : 'Девушка',
             boyfriendPhotoUrl: role === 'boyfriend' ? State.user.photoUrl : '',
             girlfriendPhotoUrl: role === 'girlfriend' ? State.user.photoUrl : '',
+            boyfriendCustomAvatar: '',
+            girlfriendCustomAvatar: '',
             boyfriendJoined: role === 'boyfriend',
             girlfriendJoined: role === 'girlfriend',
             boyfriendLastSeen: role === 'boyfriend' ? now : 0,
@@ -3000,19 +3019,59 @@
         if (!avatarEl) return;
         const url = (photoUrl || '').trim();
         if (url) {
+          const isDataUrl = url.startsWith('data:image/');
+          const renderSrc = isDataUrl
+            ? url
+            : `${url}${url.includes('?') ? '&' : '?'}_v=${SESSION_CACHE_BUST}`;
           const existingImg = avatarEl.querySelector('img');
-          if (!existingImg || existingImg.dataset.srcUrl !== url) {
+          if (!existingImg || existingImg.dataset.rawUrl !== url) {
             avatarEl.innerHTML = '';
             const img = document.createElement('img');
             img.alt = 'avatar';
-            img.dataset.srcUrl = url;
-            img.src = url;
-            img.onerror = () => { avatarEl.textContent = fallbackText; };
+            img.referrerPolicy = 'no-referrer';
+            img.dataset.rawUrl = url;
+            img.src = renderSrc;
+            img.onerror = () => {
+              if (!isDataUrl && img.src !== url) {
+                img.src = url;
+              } else {
+                avatarEl.textContent = fallbackText;
+              }
+            };
             avatarEl.appendChild(img);
           }
         } else {
           avatarEl.textContent = fallbackText;
         }
+      }
+
+      function compressAvatarFile(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onerror = () => reject(new Error('read_error'));
+          reader.onload = () => {
+            const img = new Image();
+            img.onerror = () => reject(new Error('img_error'));
+            img.onload = () => {
+              try {
+                const size = 200;
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                const minSide = Math.min(img.width, img.height);
+                const sx = Math.floor((img.width - minSide) / 2);
+                const sy = Math.floor((img.height - minSide) / 2);
+                ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+                resolve(canvas.toDataURL('image/jpeg', 0.78));
+              } catch (e) {
+                reject(e);
+              }
+            };
+            img.src = reader.result;
+          };
+          reader.readAsDataURL(file);
+        });
       }
 
       /* ========================================================================
@@ -3102,7 +3161,8 @@
         // Couple Live Widget: My avatar + Partner avatar
         const myName = State.user.name || (isGf ? 'Девушка' : 'Парень');
         const myInitial = myName.slice(0, 1).toUpperCase() || '💞';
-        const myPhoto = State.user.photoUrl || (isGf ? meta.girlfriendPhotoUrl : meta.boyfriendPhotoUrl) || '';
+        const myCustomPhoto = isGf ? meta.girlfriendCustomAvatar : meta.boyfriendCustomAvatar;
+        const myPhoto = myCustomPhoto || State.user.photoUrl || (isGf ? meta.girlfriendPhotoUrl : meta.boyfriendPhotoUrl) || '';
         renderAvatarInto(document.getElementById('couple-my-avatar'), myPhoto, myInitial);
         document.getElementById('couple-my-name').textContent = myName;
 
@@ -3111,7 +3171,8 @@
           ? (meta.boyfriendName || 'Парень')
           : (meta.girlfriendName || 'Девушка');
         const partnerInitial = partnerJoined ? (partnerName.slice(0, 1).toUpperCase() || '✨') : '⏳';
-        const partnerPhoto = isGf ? meta.boyfriendPhotoUrl : meta.girlfriendPhotoUrl;
+        const partnerCustomPhoto = isGf ? meta.boyfriendCustomAvatar : meta.girlfriendCustomAvatar;
+        const partnerPhoto = partnerCustomPhoto || (isGf ? meta.boyfriendPhotoUrl : meta.girlfriendPhotoUrl) || '';
         renderAvatarInto(document.getElementById('couple-partner-avatar'), partnerPhoto, partnerInitial);
         document.getElementById('couple-partner-name').textContent = partnerJoined ? partnerName : 'Ждём пару…';
 
@@ -3268,6 +3329,109 @@
       }
 
       function renderShopTab() {
+        if (!State.pairData) return;
+        const data = State.pairData;
+        const role = State.session.role;
+        const coins = data.wallet?.coins || 0;
+        const cooldowns = data.shop?.cooldowns || {};
+        const purchases = data.shop?.purchases || [];
+        const now = Date.now();
+
+        const balEl = document.getElementById('shop-coin-balance');
+        if (balEl) balEl.textContent = formatNumber(coins);
+
+        const listEl = document.getElementById('shop-scroll-list');
+        if (!listEl) return;
+
+        let html = '';
+
+        // Boyfriend notifications for unacknowledged purchased gifts
+        if (role === 'boyfriend') {
+          const pendingGifts = purchases.filter(p => !p.acknowledgedByBoyfriend);
+          if (pendingGifts.length) {
+            html += `<div class="section-label"><span>Купленные подарки (${pendingGifts.length}) 🎁</span></div>`;
+            html += pendingGifts.map(p => `
+              <article class="glass-card withdraw-alert-card">
+                <div style="font-size:15.5px; font-weight:800;">Девушка купила подарок 🎁</div>
+                <div style="font-size:14px; line-height:1.4;">
+                  <strong>${escapeHtml(p.title)}</strong> (${formatNumber(p.price)} 🪙)
+                </div>
+                <button type="button" class="glass-btn success" data-act="ack-gift" data-pid="${p.id}">Подарено 🎁</button>
+              </article>
+            `).join('');
+          }
+        }
+
+        html += `<div class="section-label"><span>Витрина подарков</span><span>1 раз в неделю</span></div>`;
+        html += `<div class="shop-grid">`;
+        html += SHOP_ITEMS.map(item => {
+          const unlockTs = Number(cooldowns[item.id] || 0);
+          const isLocked = unlockTs > now;
+          const canAfford = coins >= item.price;
+
+          const lockOverlay = isLocked ? `
+            <div class="gift-lock-overlay" data-unlock-ts="${unlockTs}">
+              <div class="gift-lock-icon">🔒</div>
+              <div class="gift-lock-title">Нет в наличии</div>
+              <div class="gift-lock-timer">Доступно через ${formatDaysHours(unlockTs - now)}</div>
+            </div>
+          ` : '';
+
+          const actionBtn = role === 'girlfriend'
+            ? `<button type="button" class="glass-btn ${canAfford ? 'primary' : ''} sm" style="width:100%;" data-act="buy-gift" data-gid="${item.id}" ${isLocked ? 'disabled' : ''}>${canAfford ? 'Купить 🎁' : 'Копить 🪙'}</button>`
+            : `<div style="font-size:11.5px; color:var(--text-muted); text-align:center; padding:6px 0;">≈ ${formatTenge(item.price * TENGE_PER_COIN)}</div>`;
+
+          return `
+            <article class="glass-card gift-card">
+              ${lockOverlay}
+              <div class="gift-art">${item.svg}</div>
+              <div class="gift-title">${escapeHtml(item.title)}</div>
+              <div class="gift-price">🪙 ${formatNumber(item.price)}</div>
+              ${actionBtn}
+            </article>
+          `;
+        }).join('');
+        html += `</div>`;
+
+        listEl.innerHTML = html;
+      }
+
+      function renderTrackLists() {
+        const renderGroup = (mood, containerId) => {
+          const container = document.getElementById(containerId);
+          if (!container) return;
+          const tracks = TRACK_LIST.filter(t => t.mood === mood);
+          container.innerHTML = tracks.map(t => {
+            const isSelected = AudioEngine.prefs.trackId === t.id;
+            const isMissing = AudioEngine.missingTracks.has(t.id);
+            let statusHtml = '';
+            if (isMissing) {
+              statusHtml = `<span class="track-status missing">Файл не найден</span>`;
+            } else if (isSelected && AudioEngine.prefs.musicEnabled) {
+              statusHtml = `<span class="track-status">Играет ♪</span>`;
+            } else if (isSelected) {
+              statusHtml = `<span class="track-status">Выбран</span>`;
+            }
+            return `
+              <button type="button" class="track-item ${isSelected ? 'active' : ''}" data-track-id="${t.id}">
+                <div class="track-left">
+                  <div class="track-icon">${t.emoji}</div>
+                  <div>
+                    <div class="track-name">${escapeHtml(t.title)}</div>
+                    <div class="track-sub">${escapeHtml(t.file.replace('./', ''))}</div>
+                  </div>
+                </div>
+                ${statusHtml}
+              </button>
+            `;
+          }).join('');
+        };
+
+        renderGroup('happy', 'happy-tracks-list');
+        renderGroup('sad', 'sad-tracks-list');
+      }
+
+      function renderSettingsTab() {
         if (!State.pairData) return;
         const data = State.pairData;
         updateConnectionBadge();
@@ -3568,7 +3732,7 @@
           State.pairData = normalizePairData(initialSnapshot, pairCode);
           State.prevCompletedCount = State.pairData.wallet?.completedQuestsCount || 0;
           State.startedQuestIds = loadStartedQuests(State.pairData.daily?.cycleId);
-          renderAll();
+          try { renderAll(); } catch (err) { console.error('Render snapshot error:', err); }
         }
 
         DB.subscribe(pairCode, async (data) => {
@@ -3588,7 +3752,7 @@
             showToast('Парень подтвердил задание! Монеты зачислены 🎉');
           }
 
-          renderAll();
+          try { renderAll(); } catch (err) { console.error('Render update error:', err); }
           if (isFirst) touchLastSeen();
           await syncUserProfileToDB();
           await checkAndResetDailyCycle();
@@ -3993,6 +4157,52 @@
           showToast('Имя обновлено у тебя и у пары ✅');
         });
 
+        // Avatar upload & reset (instantly visible to both partners)
+        const avatarFileInput = document.getElementById('avatar-file-input');
+        const triggerAvatarPicker = () => {
+          Haptic.select();
+          AudioEngine.sfx('tap');
+          avatarFileInput.value = '';
+          avatarFileInput.click();
+        };
+        document.getElementById('btn-change-avatar').addEventListener('click', triggerAvatarPicker);
+        document.getElementById('couple-my-avatar-trigger').addEventListener('click', triggerAvatarPicker);
+
+        avatarFileInput.addEventListener('change', async e => {
+          const file = e.target.files && e.target.files[0];
+          if (!file || !State.session.pairCode) return;
+          try {
+            const dataUrl = await compressAvatarFile(file);
+            const customField = State.session.role === 'boyfriend' ? 'boyfriendCustomAvatar' : 'girlfriendCustomAvatar';
+            await DB.transact(State.session.pairCode, data => {
+              data.meta[customField] = dataUrl;
+              return data;
+            });
+            Haptic.notify('success');
+            AudioEngine.sfx('success');
+            renderAll();
+            showToast('Аватарка обновлена у тебя и у пары ✨');
+          } catch (_) {
+            Haptic.notify('error');
+            showToast('Не удалось загрузить фото');
+          }
+        });
+
+        document.getElementById('btn-reset-avatar').addEventListener('click', async () => {
+          if (!State.session.pairCode) return;
+          Haptic.select();
+          AudioEngine.sfx('tap');
+          const customField = State.session.role === 'boyfriend' ? 'boyfriendCustomAvatar' : 'girlfriendCustomAvatar';
+          const photoField = State.session.role === 'boyfriend' ? 'boyfriendPhotoUrl' : 'girlfriendPhotoUrl';
+          await DB.transact(State.session.pairCode, data => {
+            data.meta[customField] = '';
+            if (State.user.photoUrl) data.meta[photoField] = State.user.photoUrl;
+            return data;
+          });
+          renderAll();
+          showToast('Используется фото из Telegram ✨');
+        });
+
         document.getElementById('btn-save-bf-tg').addEventListener('click', async () => {
           const url = normalizeTgUrl(document.getElementById('settings-bf-tg-input').value);
           Haptic.notify('success');
@@ -4137,7 +4347,9 @@
           }
         } catch (err) {
           console.error('Bootstrap error:', err);
-          openOnboarding();
+          if (!State.session.pairCode || !State.session.role) {
+            openOnboarding();
+          }
         } finally {
           setTimeout(() => {
             const splash = document.getElementById('splash-screen');

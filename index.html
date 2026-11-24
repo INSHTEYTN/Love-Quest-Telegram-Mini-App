@@ -257,6 +257,68 @@
     .quiz-banner.lose{background:rgba(255,93,122,.18);border-color:rgba(255,93,122,.48);color:#ffb8c6}
     .quiz-banner.gold{background:rgba(255,209,102,.18);border-color:rgba(255,209,102,.5);color:#ffe9a8}
 
+    /* Hidden Secret Chat (Telegram-style Frosted Glass) */
+    #chat-fullscreen{position:fixed;inset:0;z-index:72;display:none;flex-direction:column;background:radial-gradient(120% 80% at 15% 10%,rgba(255,86,152,.24),transparent 56%),radial-gradient(110% 80% at 88% 82%,rgba(128,66,224,.24),transparent 58%),linear-gradient(165deg,#130717,#230b24 50%,#36102d);overflow:hidden}
+    #chat-fullscreen.open{display:flex;animation:tabScreenIn .22s var(--spring) both}
+    .chat-header{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:calc(10px + var(--safe-top) + var(--tg-top)) 14px 10px;background:rgba(20,10,26,.68);backdrop-filter:blur(var(--blur-bar)) saturate(145%);-webkit-backdrop-filter:blur(var(--blur-bar)) saturate(145%);border-bottom:1px solid rgba(255,255,255,.16);z-index:2}
+    .chat-back-btn{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);flex-shrink:0;transition:transform .14s var(--spring)}
+    .chat-back-btn:active{transform:scale(.92)}
+    .chat-back-btn svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .chat-peer-av{width:40px;height:40px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(255,107,169,.8);background:linear-gradient(135deg,#3c1847,#6d2458);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff}
+    .chat-peer-av img{width:100%;height:100%;object-fit:cover;display:block}
+    .chat-peer-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+    .chat-peer-name{font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-peer-status{font-size:12px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-lock-pill{padding:5px 9px;border-radius:var(--radius-pill);background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);font-size:11.5px;font-weight:700;color:var(--accent-pink);flex-shrink:0}
+    .chat-messages{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding:12px 12px 14px;display:flex;flex-direction:column;gap:8px;scrollbar-width:none}
+    .chat-messages::-webkit-scrollbar{display:none}
+    .chat-day-sep{align-self:center;padding:4px 12px;margin:4px 0;border-radius:var(--radius-pill);background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.14);font-size:11.5px;font-weight:700;color:var(--text-secondary)}
+    .chat-row{display:flex;flex-direction:column;max-width:82%}
+    .chat-row.in{align-self:flex-start}
+    .chat-row.out{align-self:flex-end}
+    .chat-bubble{padding:8px 11px 7px;border-radius:18px;background:rgba(255,255,255,.1);backdrop-filter:blur(var(--blur-card));-webkit-backdrop-filter:blur(var(--blur-card));border:1px solid rgba(255,255,255,.18);box-shadow:0 4px 14px rgba(8,2,14,.22);display:flex;flex-direction:column;gap:5px;word-break:break-word}
+    .chat-row.in .chat-bubble{border-bottom-left-radius:5px}
+    .chat-row.out .chat-bubble{border-bottom-right-radius:5px;background:linear-gradient(135deg,rgba(255,107,169,.42),rgba(154,68,214,.42));border-color:rgba(255,180,220,.34)}
+    .chat-photo-img{width:100%;max-width:240px;max-height:280px;object-fit:cover;border-radius:12px;display:block;cursor:pointer;background:rgba(0,0,0,.22)}
+    .chat-text{font-size:14.5px;line-height:1.38;color:#fff;white-space:pre-wrap}
+    .chat-meta{display:flex;align-items:center;justify-content:flex-end;gap:4px;font-size:10.5px;color:rgba(255,255,255,.65);margin-top:-1px}
+    .chat-meta .read{color:var(--accent-cyan)}
+    .chat-composer-wrap{flex-shrink:0;padding:8px 10px calc(10px + var(--safe-bottom) + var(--tg-bottom));background:rgba(20,10,26,.72);backdrop-filter:blur(var(--blur-bar)) saturate(145%);-webkit-backdrop-filter:blur(var(--blur-bar)) saturate(145%);border-top:1px solid rgba(255,255,255,.16);display:flex;flex-direction:column;gap:8px}
+    .chat-attach-preview{display:none;align-items:center;gap:10px;padding:6px 8px;border-radius:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16)}
+    .chat-attach-preview.show{display:flex}
+    .chat-attach-preview img{width:48px;height:48px;border-radius:10px;object-fit:cover;flex-shrink:0}
+    .chat-attach-preview span{flex:1;font-size:12.5px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-composer{display:flex;align-items:flex-end;gap:8px}
+    .chat-icon-btn{width:42px;height:42px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);color:#fff;transition:transform .14s var(--spring)}
+    .chat-icon-btn:active{transform:scale(.92)}
+    .chat-icon-btn.send{background:linear-gradient(135deg,rgba(255,107,169,.92),rgba(198,72,178,.92));border-color:rgba(255,210,232,.48)}
+    .chat-icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+    .chat-input{flex:1;min-height:42px;max-height:110px;padding:10px 14px;border-radius:21px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.2);color:#fff;outline:none;resize:none;line-height:1.3}
+    .chat-input::placeholder{color:var(--text-muted)}
+    .chat-input:focus{border-color:var(--accent-cyan);background:rgba(255,255,255,.13)}
+
+    /* Incoming Message Frosted Glass Widget */
+    #chat-notify-widget{position:fixed;top:calc(12px + var(--safe-top) + var(--tg-top));left:50%;transform:translate3d(-50%,-24px,0) scale(.96);z-index:95;width:calc(100vw - 24px);max-width:410px;padding:12px 13px 11px;border-radius:22px;background:rgba(26,12,34,.76);backdrop-filter:blur(22px) saturate(150%);-webkit-backdrop-filter:blur(22px) saturate(150%);border:1px solid rgba(255,255,255,.24);box-shadow:0 14px 36px rgba(6,2,12,.52),inset 0 1px 0 rgba(255,255,255,.2);display:flex;flex-direction:column;gap:8px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .24s ease,transform .28s var(--spring),visibility .24s}
+    #chat-notify-widget.show{opacity:1;visibility:visible;pointer-events:auto;transform:translate3d(-50%,0,0) scale(1)}
+    .chat-notify-head{display:flex;align-items:center;gap:9px}
+    .chat-notify-av{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;border:1.5px solid rgba(255,107,169,.85);background:linear-gradient(135deg,#3c1847,#6d2458);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff}
+    .chat-notify-av img{width:100%;height:100%;object-fit:cover;display:block}
+    .chat-notify-meta{flex:1;min-width:0;display:flex;flex-direction:column}
+    .chat-notify-name{font-size:13.5px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .chat-notify-sub{font-size:11px;color:var(--text-secondary)}
+    .chat-notify-close{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);color:var(--text-secondary);font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .chat-notify-body{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+    .chat-notify-thumb{width:44px;height:44px;border-radius:10px;object-fit:cover;flex-shrink:0;display:none}
+    .chat-notify-thumb.show{display:block}
+    .chat-notify-text{flex:1;min-width:0;font-size:13.5px;line-height:1.35;color:#fff;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+    .chat-notify-foot{display:flex;justify-content:flex-end}
+
+    /* Fullscreen Photo Viewer */
+    #chat-photo-modal{position:fixed;inset:0;z-index:110;background:rgba(8,3,14,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s ease,visibility .2s}
+    #chat-photo-modal.open{opacity:1;visibility:visible;pointer-events:auto}
+    #chat-photo-modal img{max-width:100%;max-height:84dvh;border-radius:18px;box-shadow:0 16px 44px rgba(0,0,0,.6);object-fit:contain}
+    .chat-photo-close{position:absolute;top:calc(14px + var(--safe-top) + var(--tg-top));right:14px;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.26);color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center}
+
     /* Shop */
     .shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .gift-card{position:relative;padding:12px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;overflow:hidden;content-visibility:auto;contain-intrinsic-size:185px}
@@ -397,7 +459,7 @@
               <button type="button" class="status-pill" id="couple-days-pill" style="padding:4px 9px;font-size:11.5px">Задать дату</button>
             </div>
             <div class="avatar-col">
-              <div class="avatar-ring partner">
+              <div class="avatar-ring partner" id="partner-avatar-ring">
                 <div class="avatar-inner" id="partner-avatar-box">✨</div>
                 <span class="presence-dot" id="partner-presence-dot"></span>
               </div>
@@ -633,12 +695,12 @@
         <div class="flappy-vs-player"><div class="flappy-vs-avatar bf" id="g2048-vs-bf-avatar">🛡️</div><div class="flappy-vs-score" id="g2048-vs-bf-best">0</div></div>
       </div>
       <div class="flappy-run-hud">
-        <span class="flappy-score-pill">Очки: <span id="g2048-live-score">0</span></span>
+        <span class="flappy-score-pill">Счёт: <span id="g2048-live-score">0</span></span>
       </div>
     </div>
     <div class="g2048-stage" id="g2048-stage">
       <div class="g2048-board-wrap" id="g2048-board">
-        <div class="g2048-grid" aria-hidden="true">
+        <div class="g2048-grid">
           <div class="g2048-cell"></div><div class="g2048-cell"></div><div class="g2048-cell"></div><div class="g2048-cell"></div>
           <div class="g2048-cell"></div><div class="g2048-cell"></div><div class="g2048-cell"></div><div class="g2048-cell"></div>
           <div class="g2048-cell"></div><div class="g2048-cell"></div><div class="g2048-cell"></div><div class="g2048-cell"></div>
@@ -646,13 +708,13 @@
         </div>
         <div class="g2048-tiles" id="g2048-tiles"></div>
       </div>
-      <div class="g2048-hint">Свайпай в любую сторону, чтобы объединять плитки ❤️</div>
+      <div class="g2048-hint">Свайпай в любую сторону, чтобы соединять сердечки 💘</div>
     </div>
     <div class="flappy-overlay hidden" id="g2048-overlay">
       <div class="flappy-overlay-card">
-        <h3 class="flappy-overlay-title" id="g2048-overlay-title">Игра окончена 💞</h3>
-        <p class="flappy-overlay-sub" id="g2048-overlay-sub">Твой результат сохранён!</p>
-        <button type="button" class="glass-btn primary" id="btn-g2048-overlay-action" style="width:100%">Играть снова ↻</button>
+        <h3 class="flappy-overlay-title" id="g2048-overlay-title">Ходов нет 💘</h3>
+        <p class="flappy-overlay-sub" id="g2048-overlay-sub">Отличная попытка!</p>
+        <button type="button" class="glass-btn primary" id="btn-g2048-again" style="width:100%">Сыграть ещё ↻</button>
       </div>
     </div>
     <div class="flappy-bottom-bar-wrap">
@@ -661,8 +723,7 @@
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Назад</span>
         </button>
         <button type="button" class="flappy-bar-btn active-accent" id="btn-g2048-restart">
-          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
-          <span>Заново</span>
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg><span>Заново</span>
         </button>
       </div>
     </div>
@@ -671,33 +732,31 @@
   <!-- Fullscreen Love Wheel -->
   <div id="wheel-fullscreen" aria-hidden="true">
     <div class="flappy-top-hud">
-      <div class="wheel-ticket-pill ready" id="wheel-ticket-pill">🎟️ Билетов сегодня: 1/1</div>
+      <span class="wheel-ticket-pill ready" id="wheel-ticket-pill">🎟️ 1 билет на сегодня</span>
     </div>
     <div class="wheel-stage">
       <div class="wheel-wrap">
-        <div class="wheel-pointer" aria-hidden="true"></div>
-        <div class="wheel-rotor" id="wheel-rotor">
-          <svg viewBox="0 0 300 300" id="wheel-svg"></svg>
-        </div>
+        <div class="wheel-pointer"></div>
+        <div class="wheel-rotor" id="wheel-rotor"></div>
         <button type="button" class="wheel-hub" id="btn-wheel-hub" aria-label="Крутить колесо">❤️</button>
       </div>
       <div class="wheel-results-row">
         <div class="wheel-res-card">
-          <span class="wheel-res-who" id="wheel-gf-who">💕 Девушка сегодня</span>
-          <span class="wheel-res-val" id="wheel-gf-res">Ещё не крутила</span>
+          <span class="wheel-res-who" id="wheel-res-gf-name">Девушка</span>
+          <span class="wheel-res-val" id="wheel-res-gf-val">Ещё не крутила</span>
         </div>
         <div class="wheel-res-card">
-          <span class="wheel-res-who" id="wheel-bf-who">🛡️ Парень сегодня</span>
-          <span class="wheel-res-val" id="wheel-bf-res">Ещё не крутил</span>
+          <span class="wheel-res-who" id="wheel-res-bf-name">Парень</span>
+          <span class="wheel-res-val" id="wheel-res-bf-val">Ещё не крутил</span>
         </div>
       </div>
     </div>
     <div class="flappy-overlay hidden" id="wheel-overlay">
       <div class="flappy-overlay-card">
-        <div style="font-size:44px" id="wheel-prize-emoji">🎉</div>
-        <h3 class="flappy-overlay-title" id="wheel-prize-title">Выигрыш!</h3>
-        <p class="flappy-overlay-sub" id="wheel-prize-sub"></p>
-        <button type="button" class="glass-btn primary" id="btn-wheel-overlay-ok" style="width:100%">Забрать ✨</button>
+        <div style="font-size:44px" id="wheel-win-emoji">🎁</div>
+        <h3 class="flappy-overlay-title" id="wheel-win-title">Выпал приз!</h3>
+        <p class="flappy-overlay-sub" id="wheel-win-desc"></p>
+        <button type="button" class="glass-btn primary" id="btn-wheel-win-ok" style="width:100%">Супер! 💞</button>
       </div>
     </div>
     <div class="flappy-bottom-bar-wrap">
@@ -706,8 +765,7 @@
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Назад</span>
         </button>
         <button type="button" class="flappy-bar-btn active-accent" id="btn-wheel-spin">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v9l6 3"/></svg>
-          <span id="wheel-spin-label">Крутить</span>
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg><span id="wheel-spin-label">Крутить</span>
         </button>
       </div>
     </div>
@@ -728,12 +786,69 @@
         <button type="button" class="flappy-bar-btn" id="btn-quiz-back">
           <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg><span>Назад</span>
         </button>
-        <button type="button" class="flappy-bar-btn active-accent" id="btn-quiz-levels">
-          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="2"/><rect x="3" y="14" width="18" height="6" rx="2"/></svg>
-          <span id="quiz-right-label">Уровни</span>
+        <button type="button" class="flappy-bar-btn active-accent" id="btn-quiz-menu">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg><span>Уровни</span>
         </button>
       </div>
     </div>
+  </div>
+
+  <!-- Hidden Fullscreen Secret Chat -->
+  <div id="chat-fullscreen" aria-hidden="true">
+    <header class="chat-header">
+      <button type="button" class="chat-back-btn" id="btn-chat-back" aria-label="Назад">
+        <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <div class="chat-peer-av" id="chat-peer-avatar">✨</div>
+      <div class="chat-peer-info">
+        <div class="chat-peer-name" id="chat-peer-name">Партнёр</div>
+        <div class="chat-peer-status" id="chat-peer-status">Тайный чат пары</div>
+      </div>
+      <span class="chat-lock-pill">🔒 Чат</span>
+    </header>
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-composer-wrap">
+      <div class="chat-attach-preview" id="chat-attach-preview">
+        <img id="chat-attach-img" alt="">
+        <span>Фото прикреплено • можно добавить текст</span>
+        <button type="button" class="glass-btn sm" id="btn-chat-clear-photo">✕</button>
+      </div>
+      <input type="file" id="chat-file-input" accept="image/*" style="display:none">
+      <div class="chat-composer">
+        <button type="button" class="chat-icon-btn" id="btn-chat-attach" title="Прикрепить фото">
+          <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+        </button>
+        <textarea id="chat-input" class="chat-input" rows="1" placeholder="Написать сообщение…" maxlength="1200"></textarea>
+        <button type="button" class="chat-icon-btn send" id="btn-chat-send" title="Отправить">
+          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Incoming Message Frosted Glass Widget -->
+  <div id="chat-notify-widget" role="dialog" aria-live="polite">
+    <div class="chat-notify-head">
+      <div class="chat-notify-av" id="chat-notify-av">✨</div>
+      <div class="chat-notify-meta">
+        <span class="chat-notify-name" id="chat-notify-name">Партнёр</span>
+        <span class="chat-notify-sub" id="chat-notify-time">Новое сообщение</span>
+      </div>
+      <button type="button" class="chat-notify-close" id="btn-chat-notify-close" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="chat-notify-body">
+      <img class="chat-notify-thumb" id="chat-notify-thumb" alt="">
+      <div class="chat-notify-text" id="chat-notify-text"></div>
+    </div>
+    <div class="chat-notify-foot">
+      <button type="button" class="glass-btn sm primary" id="btn-chat-notify-reply">Ответить 💌</button>
+    </div>
+  </div>
+
+  <!-- Fullscreen Chat Photo Lightbox -->
+  <div id="chat-photo-modal" aria-hidden="true">
+    <button type="button" class="chat-photo-close" id="btn-chat-photo-close" aria-label="Закрыть">✕</button>
+    <img id="chat-photo-full" alt="">
   </div>
 
   <!-- Modals -->
@@ -1111,6 +1226,8 @@
         const m = d.meta || {}, w = d.wallet || {}, dy = d.daily || genDaily([], 'girlfriend'), bdy = d.boyfriendDaily || genDaily([], 'boyfriend'), sh = d.shop || {};
         const fl = d.games?.flappy || {}, l2 = d.games?.love2048 || {}, wh = d.games?.wheel || {}, qz = d.games?.quiz || {};
         const qr = qz.romantic || {}, qs = qz.speed || {};
+        const ch = d.chat || {};
+        const rawMsgs = Array.isArray(ch.messages) ? ch.messages : (ch.messages && typeof ch.messages === 'object' ? Object.values(ch.messages) : []);
         return {
           code: code || d.code || '',
           meta: {
@@ -1174,6 +1291,11 @@
                 boyfriendHearts: +qs.boyfriendHearts || 0
               }
             }
+          },
+          chat: {
+            messages: rawMsgs.filter(x => x && typeof x === 'object' && x.id).sort((a, b) => (+a.ts || 0) - (+b.ts || 0)),
+            lastReadGirlfriend: +ch.lastReadGirlfriend || 0,
+            lastReadBoyfriend: +ch.lastReadBoyfriend || 0
           }
         };
       }
@@ -1366,7 +1488,7 @@
           if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
         },
         ensureVizLoop() {
-          if (!this.playing || document.hidden || State.activeTab !== 'home' || FlappyGame.isOpen || Love2048Game.isOpen || LoveWheelGame.isOpen || LoveQuizGame.isOpen) {
+          if (!this.playing || document.hidden || State.activeTab !== 'home' || FlappyGame.isOpen || Love2048Game.isOpen || LoveWheelGame.isOpen || LoveQuizGame.isOpen || SecretChat.isOpen) {
             this.fadeOutGlow(); return;
           }
           if (this.rafId) return;
@@ -1375,7 +1497,7 @@
           if (!ok) return;
           const minStep = Perf.low ? 34 : 22; // Crisp fast-decay response while staying light on CPU
           const tick = ts => {
-            if (!this.playing || document.hidden || State.activeTab !== 'home' || FlappyGame.isOpen || Love2048Game.isOpen || LoveWheelGame.isOpen || LoveQuizGame.isOpen) {
+            if (!this.playing || document.hidden || State.activeTab !== 'home' || FlappyGame.isOpen || Love2048Game.isOpen || LoveWheelGame.isOpen || LoveQuizGame.isOpen || SecretChat.isOpen) {
               this.fadeOutGlow(); return;
             }
             if (ts - this.lastVizTs >= minStep) {
@@ -1491,688 +1613,662 @@
         }
       };
 
-      /* 10. FLAPPY LOVE MINI-GAME (ADAPTIVE DPR, CACHED SKY/SPRITES, ZERO-ALLOC LOOP) */
+      /* 10A. FLAPPY LOVE (60/120 FPS FIXED-TIMESTEP, DAY/NIGHT 30S CYCLE, MOUNTAINS & GRASS) */
       const FlappyGame = {
-        canvas: null, ctx: null, w: 360, h: 640, dpr: 1, isOpen: false,
-        rafId: null, idleId: null, lastTs: 0, acc: 0, FIXED_DT: 1 / 120,
-        PIPE_W: 56, GROUND_H: 108, state: 'idle',
-        bird: { x: 96, y: 260, vy: 0, r: 19, rot: 0 },
-        pipes: [], coins: [], popups: [],
-        gOff: 0, hOff: 0, mnOff: 0, mfOff: 0, cycleTime: 0,
-        stars: [], spawnT: 0, passed: 0, earned: 0, pCount: 0,
-        avImg: null, avSrc: '', avReady: false,
-        pipeGrad: null, birdSpr: null, birdSz: 0, coinSpr: null, coinSz: 0,
-        skyCache: { nf: -1, grad: null, pal: null },
+        canvas: null, ctx: null, isOpen: false, state: 'idle',
+        w: 360, h: 640, dpr: 1, rafId: null, lastTs: 0, accum: 0,
+        bird: { x: 96, y: 260, vy: 0, rot: 0, r: 19 },
+        pipes: [], coins: [], floats: [], stars: [],
+        score: 0, runCoins: 0, savedRun: false,
+        cycleT: 0, bgScroll: 0, spawnDist: 0,
+        avatarUrl: '', birdSprite: null, coinSprite: null,
+        skyCache: { key: '', grad: null },
 
         init() {
-          this.canvas = $('flappy-canvas'); if (!this.canvas) return;
+          this.canvas = $('flappy-canvas');
+          if (!this.canvas) return;
           this.ctx = this.canvas.getContext('2d', { alpha: false });
-          this.stars = Array.from({ length: Perf.low ? 22 : 36 }, (_, i) => ({ rx: ((i * 73 + 19) % 100) / 100, ry: ((i * 41 + 11) % 52) / 100, r: .9 + (i % 3) * .5, ph: i * 1.17 }));
-          this.buildCoinSprite(); this.buildBirdSprite();
+          this.stars = Array.from({ length: 34 }, () => ({ x: Math.random(), y: Math.random() * 0.48, r: 0.9 + Math.random() * 1.4, p: Math.random() * 6.28 }));
+          this.buildCoinSprite();
+          this.buildBirdSprite(null);
 
-          window.addEventListener('resize', () => { if (this.isOpen) this.resize(); });
-          this.canvas.addEventListener('pointerdown', e => {
-            e.preventDefault(); if (!this.isOpen) return;
-            if (this.state === 'playing') this.flap();
-            else if (this.state === 'idle') this.start();
-            else if (this.state === 'paused') this.resume();
-          }, { passive: false });
-
-          $('btn-flappy-start')?.addEventListener('click', () => this.state === 'paused' ? this.resume() : this.start());
+          const flapAction = e => {
+            if (!this.isOpen) return;
+            if (e.target.closest('.flappy-bottom-bar') || e.target.closest('.flappy-overlay-card')) return;
+            if (this.state === 'playing') { e.preventDefault(); this.flap(); }
+          };
+          this.canvas.addEventListener('pointerdown', flapAction, { passive: false });
+          $('btn-flappy-start')?.addEventListener('click', () => { Haptic.impact('light'); AudioEngine.sfx('tap'); this.startRun(); });
           $('btn-flappy-back')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); this.close(); });
-          $('btn-flappy-pause')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('switch'); this.togglePause(); });
-
+          $('btn-flappy-pause')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); this.togglePause(); });
+          window.addEventListener('resize', () => { if (this.isOpen) this.resize(); });
           document.addEventListener('keydown', e => {
             if (!this.isOpen) return;
-            if (e.code === 'Escape') return this.close();
             if (e.code === 'Space' || e.code === 'ArrowUp') {
               e.preventDefault();
               if (this.state === 'playing') this.flap();
-              else if (this.state === 'paused') this.resume();
-              else this.start();
-            }
-          });
-          document.addEventListener('visibilitychange', () => {
-            if (document.hidden) { if (this.state === 'playing') this.pause(); this.stopIdle(); }
-            else if (this.isOpen && this.state === 'idle') this.startIdle();
+              else if (this.state === 'idle' || this.state === 'gameover') this.startRun();
+            } else if (e.code === 'Escape') this.close();
           });
         },
 
-        lc(a, b, t) { return `rgb(${(a[0] + (b[0] - a[0]) * t) | 0},${(a[1] + (b[1] - a[1]) * t) | 0},${(a[2] + (b[2] - a[2]) * t) | 0})`; },
-        getSky(nf) {
-          if (this.skyCache.grad && Math.abs(nf - this.skyCache.nf) < 0.008) return this.skyCache;
-          const mT=[92,184,255],mB=[255,224,184],dT=[74,46,126],dB=[255,134,126],nT=[14,13,38],nB=[42,24,72];
-          const fD=[110,150,204],fK=[118,76,138],fN=[28,28,62],rD=[76,126,158],rK=[82,54,108],rN=[20,24,52];
-          const hD=[86,174,96],hK=[76,104,88],hN=[22,56,52],gD=[70,188,86],gN=[26,84,62];
-          const lo = nf <= .5, t = lo ? nf * 2 : (nf - .5) * 2;
-          const pal = {
-            skyTop: this.lc(lo ? mT : dT, lo ? dT : nT, t),
-            skyBot: this.lc(lo ? mB : dB, lo ? dB : nB, t),
-            mFar: this.lc(lo ? fD : fK, lo ? fK : fN, t),
-            mNear: this.lc(lo ? rD : rK, lo ? rK : rN, t),
-            hill: this.lc(lo ? hD : hK, lo ? hK : hN, t),
-            grass: this.lc(gD, gN, nf)
-          };
-          const grad = this.ctx.createLinearGradient(0, 0, 0, this.h - this.GROUND_H);
-          grad.addColorStop(0, pal.skyTop); grad.addColorStop(1, pal.skyBot);
-          this.skyCache = { nf, grad, pal };
-          return this.skyCache;
+        buildCoinSprite() {
+          const s = 44, c = document.createElement('canvas'); c.width = c.height = s;
+          const g = c.getContext('2d'), cx = s / 2;
+          const glow = g.createRadialGradient(cx, cx, 4, cx, cx, cx);
+          glow.addColorStop(0, 'rgba(255,216,102,.85)'); glow.addColorStop(0.65, 'rgba(255,209,102,.22)'); glow.addColorStop(1, 'rgba(255,209,102,0)');
+          g.fillStyle = glow; g.beginPath(); g.arc(cx, cx, cx, 0, Math.PI * 2); g.fill();
+          const body = g.createLinearGradient(cx - 12, cx - 12, cx + 12, cx + 12);
+          body.addColorStop(0, '#fff1a8'); body.addColorStop(0.5, '#ffd166'); body.addColorStop(1, '#e69b24');
+          g.fillStyle = body; g.beginPath(); g.arc(cx, cx, 12, 0, Math.PI * 2); g.fill();
+          g.strokeStyle = 'rgba(255,255,255,.78)'; g.lineWidth = 1.8; g.stroke();
+          g.fillStyle = '#a45b00'; g.font = '800 12px -apple-system,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+          g.fillText('★', cx, cx + 0.5);
+          this.coinSprite = c;
+        },
+
+        buildBirdSprite(img) {
+          const s = 54, c = document.createElement('canvas'); c.width = c.height = s;
+          const g = c.getContext('2d'), cx = s / 2, r = 19;
+          const ring = g.createLinearGradient(0, 0, s, s);
+          ring.addColorStop(0, '#ff6ba9'); ring.addColorStop(1, '#5ae2ff');
+          g.fillStyle = ring; g.beginPath(); g.arc(cx, cx, r + 3.5, 0, Math.PI * 2); g.fill();
+          g.save();
+          g.beginPath(); g.arc(cx, cx, r, 0, Math.PI * 2); g.clip();
+          if (img && img.complete && img.naturalWidth > 0) {
+            const m = Math.min(img.naturalWidth, img.naturalHeight);
+            g.drawImage(img, (img.naturalWidth - m) / 2, (img.naturalHeight - m) / 2, m, m, cx - r, cx - r, r * 2, r * 2);
+          } else {
+            const bg = g.createLinearGradient(0, 0, s, s);
+            bg.addColorStop(0, '#ff6ba9'); bg.addColorStop(1, '#6f247d');
+            g.fillStyle = bg; g.fillRect(0, 0, s, s);
+            g.fillStyle = '#fff'; g.font = '20px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
+            g.fillText('❤️', cx, cx + 1);
+          }
+          g.restore();
+          this.birdSprite = c;
+        },
+
+        syncAvatar() {
+          const d = State.pairData; if (!d) return;
+          const m = d.meta, isGf = State.session.role === 'girlfriend';
+          const url = (isGf ? (m.girlfriendCustomAvatar || m.girlfriendPhotoUrl) : (m.boyfriendCustomAvatar || m.boyfriendPhotoUrl)) || State.user.photoUrl || '';
+          if (url === this.avatarUrl) return;
+          this.avatarUrl = url;
+          if (!url) return this.buildBirdSprite(null);
+          const img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.onload = () => this.buildBirdSprite(img);
+          img.onerror = () => this.buildBirdSprite(null);
+          img.src = url.startsWith('data:image/') ? url : `${url}${url.includes('?') ? '&' : '?'}_v=${BUST}`;
+        },
+
+        syncVs() {
+          const d = State.pairData; if (!d) return;
+          const m = d.meta, fl = d.games.flappy;
+          renderAvatar($('flappy-vs-gf-avatar'), m.girlfriendCustomAvatar || m.girlfriendPhotoUrl, m.girlfriendName || '💕');
+          renderAvatar($('flappy-vs-bf-avatar'), m.boyfriendCustomAvatar || m.boyfriendPhotoUrl, m.boyfriendName || '🛡️');
+          const isGf = State.session.role === 'girlfriend';
+          const gfBest = isGf ? Math.max(fl.girlfriendBest, this.score) : fl.girlfriendBest;
+          const bfBest = !isGf ? Math.max(fl.boyfriendBest, this.score) : fl.boyfriendBest;
+          $('flappy-vs-gf-best').textContent = fmt(gfBest);
+          $('flappy-vs-bf-best').textContent = fmt(bfBest);
+          $('flappy-live-coins-wrap').style.display = isGf ? 'inline-flex' : 'none';
+        },
+
+        resize() {
+          if (!this.canvas) return;
+          this.dpr = Perf.dpr();
+          this.w = Math.max(280, window.innerWidth);
+          this.h = Math.max(400, window.innerHeight);
+          this.canvas.width = Math.round(this.w * this.dpr);
+          this.canvas.height = Math.round(this.h * this.dpr);
+          this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
+          this.skyCache.key = '';
+          this.bird.x = Math.round(Math.min(126, this.w * 0.28));
+          if (this.state === 'idle') this.bird.y = this.h * 0.44;
+        },
+
+        open() {
+          const fs = $('flappy-fullscreen'); if (!fs) return;
+          this.isOpen = true;
+          document.body.classList.add('game-playing');
+          AudioEngine.fadeOutGlow();
+          fs.classList.add('open'); fs.setAttribute('aria-hidden', 'false');
+          this.syncAvatar(); this.syncVs(); this.resize();
+          this.resetToIdle();
+          this.lastTs = performance.now();
+          this.startLoop();
+        },
+
+        close() {
+          if (!this.isOpen) return;
+          if (this.state === 'playing' || this.state === 'paused') this.commitRun();
+          this.isOpen = false;
+          this.state = 'idle';
+          document.body.classList.remove('game-playing');
+          if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; }
+          $('flappy-fullscreen').classList.remove('open');
+          $('flappy-fullscreen').setAttribute('aria-hidden', 'true');
+          AudioEngine.ensureVizLoop();
+        },
+
+        resetToIdle() {
+          this.state = 'idle'; this.pipes = []; this.coins = []; this.floats = [];
+          this.score = 0; this.runCoins = 0; this.savedRun = false; this.spawnDist = 0;
+          this.bird.y = this.h * 0.44; this.bird.vy = 0; this.bird.rot = 0;
+          this.updateHud(); this.updatePauseBtn();
+          $('flappy-overlay-title').textContent = 'Flappy Love ✨';
+          $('flappy-overlay-sub').textContent = State.session.role === 'girlfriend'
+            ? 'Пролетай между столбами (+1 🪙) и лови золотые монетки (+10 🪙).'
+            : 'Пролетай сквозь столбы и побей рекорд пары!';
+          $('btn-flappy-start').textContent = 'Играть ▶️';
+          $('flappy-overlay').classList.remove('hidden');
+        },
+
+        startRun() {
+          this.state = 'playing'; this.pipes = []; this.coins = []; this.floats = [];
+          this.score = 0; this.runCoins = 0; this.savedRun = false; this.spawnDist = 140;
+          this.bird.y = this.h * 0.44; this.bird.vy = -315; this.bird.rot = -0.35;
+          this.accum = 0; this.lastTs = performance.now();
+          this.updateHud(); this.updatePauseBtn();
+          $('flappy-overlay').classList.add('hidden');
+        },
+
+        togglePause() {
+          if (this.state === 'playing') {
+            this.state = 'paused';
+            $('flappy-overlay-title').textContent = 'Пауза ⏸';
+            $('flappy-overlay-sub').textContent = `Пройдено столбов: ${this.score}`;
+            $('btn-flappy-start').textContent = 'Продолжить ▶️';
+            $('btn-flappy-start').onclick = () => { $('btn-flappy-start').onclick = null; this.togglePause(); };
+            $('flappy-overlay').classList.remove('hidden');
+            this.updatePauseBtn();
+          } else if (this.state === 'paused') {
+            this.state = 'playing';
+            this.lastTs = performance.now(); this.accum = 0;
+            $('flappy-overlay').classList.add('hidden');
+            this.updatePauseBtn();
+          }
         },
 
         updatePauseBtn() {
           const paused = this.state === 'paused';
           $('flappy-pause-label').textContent = paused ? 'Продолжить' : 'Пауза';
           $('flappy-pause-icon').innerHTML = paused
-            ? '<polygon points="7,4 20,12 7,20" fill="currentColor" stroke="none"/>'
+            ? '<polygon points="6,4 20,12 6,20" fill="currentColor" stroke="none"/>'
             : '<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';
         },
-        open() {
-          const fs = $('flappy-fullscreen'); if (!fs) return;
-          this.isOpen = true; AudioEngine.fadeOutGlow();
-          fs.classList.add('open'); fs.setAttribute('aria-hidden', 'false');
-          this.state = 'idle'; this.cycleTime = 0; this.resetRound(); this.updatePauseBtn();
-          $('flappy-overlay-title').textContent = 'Flappy Love ✨';
-          $('flappy-overlay-sub').textContent = 'Нажимай на экран, чтобы пролетать между столбами и ловить золотые монетки.';
-          $('btn-flappy-start').textContent = 'Играть ▶️';
-          $('flappy-overlay').classList.remove('hidden');
-          requestAnimationFrame(() => { this.resize(); this.startIdle(); });
-        },
-        close() {
-          if (!this.isOpen) return;
-          this.stopRun(true); this.stopIdle();
-          this.isOpen = false; this.state = 'idle';
-          document.body.classList.remove('game-playing');
-          $('flappy-fullscreen').classList.remove('open');
-          $('flappy-fullscreen').setAttribute('aria-hidden', 'true');
-          AudioEngine.ensureVizLoop();
-        },
-        pause() {
-          if (this.state !== 'playing') return;
-          this.state = 'paused'; cancelAnimationFrame(this.rafId); this.rafId = null;
-          document.body.classList.remove('game-playing'); this.updatePauseBtn();
-          $('flappy-overlay-title').textContent = 'Пауза ⏸';
-          $('flappy-overlay-sub').textContent = `Пройдено столбов: ${this.passed}. Нажми «Продолжить», чтобы лететь дальше.`;
-          $('btn-flappy-start').textContent = 'Продолжить ▶️';
-          $('flappy-overlay').classList.remove('hidden');
-        },
-        resume() {
-          if (this.state !== 'paused') return;
-          this.state = 'playing'; this.lastTs = 0; this.acc = 0;
-          document.body.classList.add('game-playing');
-          $('flappy-overlay').classList.add('hidden');
-          this.updatePauseBtn(); this.flap();
-          this.rafId = requestAnimationFrame(ts => this.loop(ts));
-        },
-        togglePause() {
-          if (this.state === 'playing') this.pause();
-          else if (this.state === 'paused') this.resume();
-          else this.start();
-        },
-        syncVs() {
-          if (!State.pairData) return;
-          const m = State.pairData.meta, fl = State.pairData.games.flappy, isGf = State.session.role === 'girlfriend';
-          renderAvatar($('flappy-vs-gf-avatar'), m.girlfriendCustomAvatar || m.girlfriendPhotoUrl || (isGf ? State.user.photoUrl : ''), m.girlfriendName || 'Девушка');
-          renderAvatar($('flappy-vs-bf-avatar'), m.boyfriendCustomAvatar || m.boyfriendPhotoUrl || (!isGf ? State.user.photoUrl : ''), m.boyfriendName || 'Парень');
-          $('flappy-vs-gf-best').textContent = fmt(Math.max(fl.girlfriendBest || 0, isGf ? this.passed : 0));
-          $('flappy-vs-bf-best').textContent = fmt(Math.max(fl.boyfriendBest || 0, !isGf ? this.passed : 0));
-        },
-        myAvInfo() {
-          const isGf = State.session.role === 'girlfriend', m = State.pairData?.meta || {};
-          const url = (isGf ? m.girlfriendCustomAvatar : m.boyfriendCustomAvatar) || State.user.photoUrl || (isGf ? m.girlfriendPhotoUrl : m.boyfriendPhotoUrl) || '';
-          const name = State.user.name || (isGf ? 'Девушка' : 'Парень');
-          return { url, init: name.slice(0, 1).toUpperCase() || '💞' };
-        },
-        buildCoinSprite() {
-          const d = Perf.dpr(), r = 13, pad = 10, sz = (r + pad) * 2;
-          const c = document.createElement('canvas'); c.width = c.height = Math.round(sz * d);
-          const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0);
-          const cx = sz / 2;
-          const h = g.createRadialGradient(cx, cx, r * .5, cx, cx, r + pad);
-          h.addColorStop(0, 'rgba(255,209,102,.52)'); h.addColorStop(1, 'rgba(255,209,102,0)');
-          g.fillStyle = h; g.beginPath(); g.arc(cx, cx, r + pad, 0, 6.29); g.fill();
-          const cg = g.createRadialGradient(cx - 3, cx - 3, 2, cx, cx, r);
-          cg.addColorStop(0, '#fff7b2'); cg.addColorStop(.6, '#ffd166'); cg.addColorStop(1, '#f4a226');
-          g.fillStyle = cg; g.beginPath(); g.arc(cx, cx, r, 0, 6.29); g.fill();
-          g.lineWidth = 2; g.strokeStyle = 'rgba(255,255,255,.88)'; g.stroke();
-          g.fillStyle = '#5c3400'; g.font = '800 10px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-          g.fillText('10', cx, cx + .5);
-          this.coinSpr = c; this.coinSz = sz;
-        },
-        buildBirdSprite() {
-          const d = Perf.dpr(), r = this.bird.r, sz = (r + 4) * 2;
-          const c = document.createElement('canvas'); c.width = c.height = Math.round(sz * d);
-          const g = c.getContext('2d'); g.setTransform(d, 0, 0, d, 0, 0);
-          const cx = sz / 2;
-          g.beginPath(); g.arc(cx, cx, r + 2.5, 0, 6.29); g.fillStyle = 'rgba(255,255,255,.94)'; g.fill();
-          g.save(); g.beginPath(); g.arc(cx, cx, r, 0, 6.29); g.clip();
-          if (this.avReady && this.avImg) g.drawImage(this.avImg, cx - r, cx - r, r * 2, r * 2);
-          else {
-            const ag = g.createLinearGradient(0, 0, sz, sz); ag.addColorStop(0, '#ff6ba9'); ag.addColorStop(1, '#7b4dff');
-            g.fillStyle = ag; g.fillRect(cx - r, cx - r, r * 2, r * 2);
-            g.fillStyle = '#fff'; g.font = '800 16px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle';
-            g.fillText(this.myAvInfo().init, cx, cx + 1);
-          }
-          g.restore(); this.birdSpr = c; this.birdSz = sz;
-        },
-        syncAvatar() {
-          const { url } = this.myAvInfo();
-          if (url === this.avSrc) return;
-          this.avSrc = url; this.avReady = false;
-          if (!url) { this.avImg = null; this.buildBirdSprite(); return; }
-          const img = new Image(); img.referrerPolicy = 'no-referrer';
-          img.onload = () => { this.avImg = img; this.avReady = true; this.buildBirdSprite(); if (this.isOpen && this.state !== 'playing') this.draw(0); };
-          img.onerror = () => { this.avImg = null; this.avReady = false; this.buildBirdSprite(); };
-          img.src = url.startsWith('data:image/') ? url : `${url}${url.includes('?') ? '&' : '?'}_v=${BUST}`;
-        },
-        resize() {
-          const rect = $('flappy-fullscreen')?.getBoundingClientRect();
-          if (!rect || rect.width < 20 || rect.height < 20) return;
-          this.dpr = Perf.dpr(); this.w = rect.width; this.h = rect.height;
-          this.GROUND_H = Math.max(106, Math.round(this.h * .15));
-          this.canvas.width = Math.round(this.w * this.dpr);
-          this.canvas.height = Math.round(this.h * this.dpr);
-          this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-          this.skyCache.nf = -1;
-          if (this.state === 'idle') { this.bird.x = Math.round(this.w * .28); this.bird.y = Math.round(this.h * .45); }
-          this.draw(performance.now());
-        },
-        startIdle() {
-          this.stopIdle(); if (!this.isOpen || this.state !== 'idle') return;
-          let prev = 0;
-          const tick = ts => {
-            if (!this.isOpen || this.state !== 'idle') { this.idleId = null; return; }
-            if (!prev || ts - prev >= 33) {
-              const dt = prev ? Math.min(0.06, (ts - prev) / 1000) : 0.033;
-              prev = ts;
-              this.gOff = (this.gOff + 42 * dt) % 24; this.hOff = (this.hOff + 14 * dt) % 160;
-              this.mnOff = (this.mnOff + 7 * dt) % 240; this.mfOff = (this.mfOff + 3.5 * dt) % 300;
-              this.draw(ts);
-            }
-            this.idleId = requestAnimationFrame(tick);
-          };
-          this.idleId = requestAnimationFrame(tick);
-        },
-        stopIdle() { if (this.idleId) { cancelAnimationFrame(this.idleId); this.idleId = null; } },
-        resetRound() {
-          this.resize(); this.syncAvatar();
-          this.bird = { x: Math.round(this.w * .28), y: Math.round(this.h * .45), vy: 0, r: 19, rot: 0 };
-          this.pipes.length = this.coins.length = this.popups.length = 0;
-          this.spawnT = .85; this.passed = this.earned = this.pCount = this.acc = this.lastTs = 0;
-          this.updateHud();
-        },
+
         updateHud() {
-          $('flappy-live-score').textContent = fmt(this.passed);
-          $('flappy-live-coins').textContent = fmt(this.earned);
-          $('flappy-live-coins-wrap').style.display = State.session.role === 'girlfriend' ? 'inline-flex' : 'none';
+          $('flappy-live-score').textContent = String(this.score);
+          $('flappy-live-coins').textContent = String(this.runCoins);
           this.syncVs();
         },
-        start() {
-          this.stopIdle(); this.resetRound(); this.state = 'playing';
-          document.body.classList.add('game-playing');
-          $('flappy-overlay').classList.add('hidden');
-          this.updatePauseBtn(); this.flap();
-          cancelAnimationFrame(this.rafId);
-          this.rafId = requestAnimationFrame(ts => this.loop(ts));
+
+        flap() {
+          this.bird.vy = -355;
+          Haptic.impact('light'); AudioEngine.sfx('tap');
         },
-        stopRun(save = true) {
-          if (this.state === 'playing' || this.state === 'paused') {
-            cancelAnimationFrame(this.rafId); this.rafId = null; this.state = 'idle';
-            document.body.classList.remove('game-playing'); this.updatePauseBtn();
-            if (save && (this.passed > 0 || this.earned > 0)) this.persist(this.passed, this.earned);
-          }
-        },
-        flap() { this.bird.vy = -335; Haptic.impact('light'); AudioEngine.sfx('tap'); },
+
         spawnPipe() {
-          const gap = Math.max(134, Math.min(162, this.h * .24));
-          const minT = Math.max(122, Math.round(this.h * .18));
-          const maxT = Math.max(minT + 28, this.h - this.GROUND_H - gap - 64);
-          const topH = minT + Math.random() * (maxT - minT);
-          const p = { x: this.w + 26, w: this.PIPE_W, topH, gap, passed: false };
-          this.pipes.push(p); this.pCount++;
-          if (this.pCount % 2 === 0 || Math.random() < .45) {
-            const cy = Math.max(minT + 20, Math.min(this.h - this.GROUND_H - 56, topH + gap * (.3 + Math.random() * .4)));
-            this.coins.push({ x: p.x + this.PIPE_W * .5 + (Math.random() < .5 ? 0 : 82), baseY: cy, y: cy, ph: Math.random() * 6.28 });
+          const groundH = 74, topPad = 92, gap = Math.max(146, Math.min(182, this.h * 0.27));
+          const maxTop = Math.max(topPad + 30, this.h - groundH - gap - 58);
+          const gapY = topPad + Math.random() * (maxTop - topPad);
+          const x = this.w + 46;
+          this.pipes.push({ x, w: 60, gapY, gap, passed: false });
+          if (State.session.role === 'girlfriend' && Math.random() < 0.6) {
+            this.coins.push({ x: x + 30, y: gapY + gap * (0.28 + Math.random() * 0.44), r: 14, phase: Math.random() * 6.28 });
           }
         },
-        async persist(passed, coins) {
-          if (!State.session.pairCode || (!passed && !coins)) return;
+
+        gameOver() {
+          if (this.state === 'gameover') return;
+          this.state = 'gameover';
+          Haptic.notify('error'); AudioEngine.sfx('tap');
+          this.commitRun();
           const isGf = State.session.role === 'girlfriend';
+          $('flappy-overlay-title').textContent = 'Полёт завершён 💞';
+          $('flappy-overlay-sub').textContent = isGf
+            ? `Столбов: ${this.score} • Заработано: +${this.runCoins} 🪙`
+            : `Столбов пройдено: ${this.score} ✨`;
+          $('btn-flappy-start').onclick = null;
+          $('btn-flappy-start').textContent = 'Ещё раз ▶️';
+          $('flappy-overlay').classList.remove('hidden');
+          this.updatePauseBtn();
+        },
+
+        async commitRun() {
+          if (this.savedRun || !State.session.pairCode || (this.score <= 0 && this.runCoins <= 0)) return;
+          this.savedRun = true;
+          const sc = this.score, earned = this.runCoins, isGf = State.session.role === 'girlfriend';
           await DB.transact(State.session.pairCode, d => {
             const fl = d.games.flappy;
             if (isGf) {
-              fl.girlfriendTotal += passed;
-              if (passed > fl.girlfriendBest) fl.girlfriendBest = passed;
-              if (coins > 0) { d.wallet.coins += coins; d.wallet.totalEarned += coins; }
+              fl.girlfriendTotal += sc;
+              if (sc > fl.girlfriendBest) fl.girlfriendBest = sc;
+              if (earned > 0) { d.wallet.coins += earned; d.wallet.totalEarned += earned; }
             } else {
-              fl.boyfriendTotal += passed;
-              if (passed > fl.boyfriendBest) fl.boyfriendBest = passed;
+              fl.boyfriendTotal += sc;
+              if (sc > fl.boyfriendBest) fl.boyfriendBest = sc;
             }
             return d;
           });
         },
-        gameOver() {
-          this.state = 'over'; cancelAnimationFrame(this.rafId); this.rafId = null;
-          document.body.classList.remove('game-playing'); this.updatePauseBtn(); Haptic.notify('error');
-          const p = this.passed, c = this.earned, isGf = State.session.role === 'girlfriend';
-          this.persist(p, c);
-          $('flappy-overlay-title').textContent = `Пройдено столбов: ${p}`;
-          $('flappy-overlay-sub').textContent = isGf
-            ? (c > 0 ? `Заработано +${fmt(c)} 🪙 (добавлено на баланс!)` : 'Пролетай между столбами и лови золотые монетки ✨')
-            : 'Результат сохранён в статистике пары ✨';
-          $('btn-flappy-start').textContent = 'Играть снова ↻';
-          $('flappy-overlay').classList.remove('hidden');
-          if (isGf && c > 0) showToast(`+${fmt(c)} 🪙 за игру Flappy Love!`);
-        },
-        loop(ts) {
-          if (this.state !== 'playing') return;
-          if (!this.lastTs) this.lastTs = ts;
-          this.acc += Math.min(0.05, Math.max(0, (ts - this.lastTs) / 1000));
-          this.lastTs = ts;
-          let steps = 0;
-          while (this.acc >= this.FIXED_DT && steps < 6) {
-            this.step(this.FIXED_DT);
-            if (this.state !== 'playing') break;
-            this.acc -= this.FIXED_DT; steps++;
-          }
-          if (steps >= 6) this.acc = 0;
-          this.draw(ts);
-          if (this.state === 'playing') this.rafId = requestAnimationFrame(t => this.loop(t));
-        },
+
         step(dt) {
-          const spd = 148, isGf = State.session.role === 'girlfriend', b = this.bird;
-          this.cycleTime += dt;
-          this.gOff = (this.gOff + spd * dt) % 24;
-          this.hOff = (this.hOff + spd * .32 * dt) % 160;
-          this.mnOff = (this.mnOff + spd * .16 * dt) % 240;
-          this.mfOff = (this.mfOff + spd * .08 * dt) % 300;
-          b.vy = Math.min(480, b.vy + 890 * dt); b.y += b.vy * dt;
-          b.rot += (Math.max(-.48, Math.min(1.15, b.vy / 430)) - b.rot) * Math.min(1, dt * 16);
+          this.cycleT = (this.cycleT + dt) % 60; // 30s morning->night, 30s night->morning
+          if (this.state === 'idle') {
+            this.bgScroll += 34 * dt;
+            this.bird.y = this.h * 0.44 + Math.sin(this.cycleT * 3.4) * 9;
+            this.bird.rot = Math.sin(this.cycleT * 3.4) * 0.08;
+            return;
+          }
+          if (this.state !== 'playing') return;
+
+          const speed = Math.min(245, 168 + this.score * 1.4);
+          this.bgScroll += speed * dt;
+          this.spawnDist += speed * dt;
+          if (this.spawnDist >= 225) { this.spawnDist = 0; this.spawnPipe(); }
+
+          const b = this.bird;
+          b.vy = Math.min(540, b.vy + 1040 * dt);
+          b.y += b.vy * dt;
+          const targetRot = Math.max(-0.46, Math.min(1.18, b.vy / 430));
+          b.rot += (targetRot - b.rot) * Math.min(1, dt * 11);
+
+          const groundY = this.h - 74;
+          if (b.y + b.r >= groundY) { b.y = groundY - b.r; return this.gameOver(); }
           if (b.y - b.r < 0) { b.y = b.r; b.vy = 0; }
-          if (b.y + b.r >= this.h - this.GROUND_H) { b.y = this.h - this.GROUND_H - b.r; return this.gameOver(); }
-          if ((this.spawnT -= dt) <= 0) { this.spawnPipe(); this.spawnT = 1.62; }
 
-          const hitR = b.r - 3; let dirty = false;
+          const hitR = b.r - 3;
           for (let i = this.pipes.length - 1; i >= 0; i--) {
-            const p = this.pipes[i]; p.x -= spd * dt;
+            const p = this.pipes[i];
+            p.x -= speed * dt;
             if (!p.passed && p.x + p.w < b.x) {
-              p.passed = true; this.passed++; dirty = true;
-              if (isGf) { this.earned++; this.popups.push({ x: b.x + 12, y: b.y - 24, t: '+1 🪙', c: '#ffd166', l: .85 }); }
-              else this.popups.push({ x: b.x + 12, y: b.y - 24, t: '+1 ✨', c: '#5ae2ff', l: .85 });
-              AudioEngine.sfx('switch');
+              p.passed = true; this.score += 1;
+              if (State.session.role === 'girlfriend') {
+                this.runCoins += 1;
+                this.floats.push({ x: b.x + 12, y: b.y - 22, txt: '+1 🪙', a: 1 });
+              }
+              AudioEngine.sfx('switch'); this.updateHud();
             }
-            if (b.x + hitR > p.x && b.x - hitR < p.x + p.w && (b.y - hitR < p.topH || b.y + hitR > p.topH + p.gap)) {
-              if (dirty) this.updateHud(); return this.gameOver();
+            if (b.x + hitR > p.x && b.x - hitR < p.x + p.w) {
+              if (b.y - hitR < p.gapY || b.y + hitR > p.gapY + p.gap) return this.gameOver();
             }
-            if (p.x + p.w <= -40) this.pipes.splice(i, 1);
+            if (p.x + p.w < -40) this.pipes.splice(i, 1);
           }
 
-          const cDistSq = (b.r + 15) * (b.r + 15);
           for (let i = this.coins.length - 1; i >= 0; i--) {
-            const c = this.coins[i]; c.x -= spd * dt; c.ph += dt * 4.5; c.y = c.baseY + Math.sin(c.ph) * 9;
-            const dx = b.x - c.x, dy = b.y - c.y;
-            if (dx * dx + dy * dy < cDistSq) {
-              this.coins.splice(i, 1); Haptic.notify('success'); AudioEngine.sfx('coin');
-              if (isGf) { this.earned += 10; dirty = true; this.popups.push({ x: c.x, y: c.y - 10, t: '+10 🪙', c: '#ffe066', l: .9 }); }
-              else this.popups.push({ x: c.x, y: c.y - 10, t: '✨', c: '#5ae2ff', l: .9 });
-              continue;
-            }
-            if (c.x <= -30) this.coins.splice(i, 1);
+            const c = this.coins[i];
+            c.x -= speed * dt; c.phase += dt * 4.2;
+            const cy = c.y + Math.sin(c.phase) * 5;
+            const dx = b.x - c.x, dy = b.y - cy;
+            if (dx * dx + dy * dy < (hitR + c.r) * (hitR + c.r)) {
+              this.coins.splice(i, 1);
+              this.runCoins += 10;
+              this.floats.push({ x: c.x, y: cy - 10, txt: '+10 🪙', a: 1 });
+              Haptic.impact('medium'); AudioEngine.sfx('coin'); this.updateHud();
+            } else if (c.x < -30) this.coins.splice(i, 1);
           }
-          if (dirty) this.updateHud();
-          for (let i = this.popups.length - 1; i >= 0; i--) {
-            const pop = this.popups[i]; pop.y -= 38 * dt;
-            if ((pop.l -= dt) <= 0) this.popups.splice(i, 1);
+
+          for (let i = this.floats.length - 1; i >= 0; i--) {
+            const f = this.floats[i];
+            f.y -= 42 * dt; f.a -= 1.35 * dt;
+            if (f.a <= 0) this.floats.splice(i, 1);
           }
         },
-        drawMtn(g, baseY, off, per, h, col) {
-          g.fillStyle = col; g.beginPath(); g.moveTo(-per, baseY);
-          for (let x = -off - per; x < this.w + per * 2; x += per) { g.lineTo(x + per * .48, baseY - h); g.lineTo(x + per, baseY); }
-          g.lineTo(this.w + per, baseY + 40); g.lineTo(-per, baseY + 40); g.closePath(); g.fill();
+
+        lerp(a, b, t) { return a + (b - a) * t; },
+        lerpRgb(c1, c2, t) {
+          return `rgb(${Math.round(this.lerp(c1[0], c2[0], t))},${Math.round(this.lerp(c1[1], c2[1], t))},${Math.round(this.lerp(c1[2], c2[2], t))})`;
         },
-        draw(ts) {
-          const g = this.ctx; if (!g) return;
-          const w = this.w, h = this.h, gY = h - this.GROUND_H;
-          const raw = (this.cycleTime % 60) / 30;
-          const nf = .5 - .5 * Math.cos((raw <= 1 ? raw : 2 - raw) * Math.PI);
-          const { grad, pal } = this.getSky(nf);
 
-          g.fillStyle = grad; g.fillRect(0, 0, w, gY);
+        render() {
+          const g = this.ctx, w = this.w, h = this.h, groundY = h - 74;
+          // Smooth 30s morning -> night -> 30s night -> morning factor (0 = morning, 1 = night)
+          const rawN = this.cycleT < 30 ? (this.cycleT / 30) : (2 - this.cycleT / 30);
+          const night = rawN * rawN * (3 - 2 * rawN);
+          const skyKey = `${Math.round(night * 60)}_${h}`;
+          if (this.skyCache.key !== skyKey) {
+            const grad = g.createLinearGradient(0, 0, 0, groundY);
+            grad.addColorStop(0, this.lerpRgb([98, 178, 255], [14, 16, 42], night));
+            grad.addColorStop(0.58, this.lerpRgb([184, 224, 255], [34, 22, 68], night));
+            grad.addColorStop(1, this.lerpRgb([255, 206, 176], [76, 30, 82], night));
+            this.skyCache = { key: skyKey, grad };
+          }
+          g.fillStyle = this.skyCache.grad; g.fillRect(0, 0, w, groundY);
 
-          if (nf > .35) {
-            const sa = Math.min(1, (nf - .35) / .55); g.fillStyle = '#fff';
+          // Twinkling stars at night
+          if (night > 0.22) {
+            g.fillStyle = '#fff';
             for (let i = 0; i < this.stars.length; i++) {
-              const s = this.stars[i];
-              g.globalAlpha = sa * (.45 + .55 * Math.sin((ts || 0) / 550 + s.ph)) * .85;
-              g.beginPath(); g.arc(s.rx * w, s.ry * gY, s.r, 0, 6.29); g.fill();
+              const st = this.stars[i];
+              g.globalAlpha = Math.max(0, (night - 0.22) * 1.15 * (0.55 + 0.45 * Math.sin(this.cycleT * 2.5 + st.p)));
+              g.beginPath(); g.arc(st.x * w, st.y * groundY, st.r, 0, Math.PI * 2); g.fill();
             }
             g.globalAlpha = 1;
           }
 
-          const sunA = Math.max(0, 1 - nf * 1.45);
-          if (sunA > .02) {
-            const sx = w * .78, sy = gY * (.24 + nf * .52);
-            g.globalAlpha = sunA * .3; g.fillStyle = '#ffe58f'; g.beginPath(); g.arc(sx, sy, 42, 0, 6.29); g.fill();
-            g.globalAlpha = sunA; g.fillStyle = '#fff3b0'; g.beginPath(); g.arc(sx, sy, 23, 0, 6.29); g.fill();
+          // Sun (day) & Moon (night)
+          const sunY = this.lerp(h * 0.19, groundY + 46, night);
+          if (night < 0.85) {
+            g.globalAlpha = Math.max(0, 1 - night * 1.25);
+            g.fillStyle = 'rgba(255,228,132,.28)'; g.beginPath(); g.arc(w * 0.78, sunY, 44, 0, Math.PI * 2); g.fill();
+            g.fillStyle = '#ffe57f'; g.beginPath(); g.arc(w * 0.78, sunY, 24, 0, Math.PI * 2); g.fill();
             g.globalAlpha = 1;
           }
-          const moonA = Math.max(0, (nf - .38) / .62);
-          if (moonA > .02) {
-            const mx = w * .22, my = gY * (.58 - moonA * .34);
-            g.globalAlpha = moonA * .22; g.fillStyle = '#c8e0ff'; g.beginPath(); g.arc(mx, my, 32, 0, 6.29); g.fill();
-            g.globalAlpha = moonA; g.fillStyle = '#eef5ff'; g.beginPath(); g.arc(mx, my, 18, 0, 6.29); g.fill();
-            g.fillStyle = pal.skyTop; g.beginPath(); g.arc(mx + 6, my - 4, 14, 0, 6.29); g.fill();
+          const moonY = this.lerp(groundY + 48, h * 0.18, night);
+          if (night > 0.2) {
+            g.globalAlpha = Math.min(1, (night - 0.2) * 1.3);
+            g.fillStyle = 'rgba(186,216,255,.22)'; g.beginPath(); g.arc(w * 0.78, moonY, 36, 0, Math.PI * 2); g.fill();
+            g.fillStyle = '#edf5ff'; g.beginPath(); g.arc(w * 0.78, moonY, 20, 0, Math.PI * 2); g.fill();
             g.globalAlpha = 1;
           }
 
-          this.drawMtn(g, gY, this.mfOff, 300, Math.min(180, gY * .34), pal.mFar);
-          this.drawMtn(g, gY, this.mnOff, 240, Math.min(126, gY * .24), pal.mNear);
+          // Distant parallax mountains
+          const drawMtn = (col, speedMul, baseH, amp, span) => {
+            g.fillStyle = col; g.beginPath(); g.moveTo(0, groundY);
+            const off = (this.bgScroll * speedMul) % span;
+            for (let x = -span; x <= w + span; x += span) {
+              const px = x - off;
+              g.lineTo(px + span * 0.5, groundY - baseH - amp);
+              g.lineTo(px + span, groundY - baseH * 0.35);
+            }
+            g.lineTo(w, groundY); g.closePath(); g.fill();
+          };
+          drawMtn(this.lerpRgb([124, 154, 212], [38, 30, 74], night), 0.14, 92, 62, 230);
+          drawMtn(this.lerpRgb([92, 134, 186], [28, 22, 58], night), 0.26, 64, 44, 175);
 
-          g.fillStyle = pal.hill; g.beginPath(); g.moveTo(-160, gY);
-          for (let x = -this.hOff - 160; x < w + 320; x += 160) g.quadraticCurveTo(x + 80, gY - 44, x + 160, gY);
-          g.lineTo(w + 160, gY + 16); g.lineTo(-160, gY + 16); g.closePath(); g.fill();
+          // Rolling green hills
+          g.fillStyle = this.lerpRgb([90, 188, 120], [28, 72, 68], night);
+          g.beginPath(); g.moveTo(0, groundY);
+          const hSpan = 160, hOff = (this.bgScroll * 0.42) % hSpan;
+          for (let x = -hSpan; x <= w + hSpan; x += hSpan) {
+            const px = x - hOff;
+            g.quadraticCurveTo(px + hSpan * 0.5, groundY - 46, px + hSpan, groundY - 8);
+          }
+          g.lineTo(w, groundY); g.closePath(); g.fill();
 
-          // Pipes: direct rect drawing with highlight strip (zero per-pipe save/restore/translate)
+          // Pipes
+          const pipeCol = this.lerpRgb([255, 118, 174], [198, 72, 162], night);
+          const pipeCap = this.lerpRgb([255, 164, 204], [240, 112, 198], night);
           for (let i = 0; i < this.pipes.length; i++) {
-            const p = this.pipes[i], px = Math.round(p.x), by = p.topH + p.gap, bh = gY - by + 4;
-            g.fillStyle = '#3eb86a';
-            g.fillRect(px, 0, p.w, p.topH); g.fillRect(px - 4, p.topH - 18, p.w + 8, 18);
-            g.fillRect(px, by, p.w, bh); g.fillRect(px - 4, by, p.w + 8, 18);
-            g.fillStyle = '#7ce090';
-            g.fillRect(px + 9, 0, 12, p.topH); g.fillRect(px + 9, by, 12, bh);
-            g.fillStyle = '#257d47';
-            g.fillRect(px + p.w - 10, 0, 10, p.topH); g.fillRect(px + p.w - 10, by, 10, bh);
-            g.strokeStyle = 'rgba(255,255,255,.35)'; g.lineWidth = 1.2;
-            g.strokeRect(px - 4, p.topH - 18, p.w + 8, 18); g.strokeRect(px - 4, by, p.w + 8, 18);
+            const p = this.pipes[i], botY = p.gapY + p.gap;
+            g.fillStyle = pipeCol;
+            g.fillRect(p.x, 0, p.w, p.gapY);
+            g.fillRect(p.x, botY, p.w, groundY - botY);
+            g.fillStyle = pipeCap;
+            g.fillRect(p.x - 4, p.gapY - 18, p.w + 8, 18);
+            g.fillRect(p.x - 4, botY, p.w + 8, 18);
           }
 
-          if (this.coinSpr && this.coins.length) {
-            const half = this.coinSz / 2;
-            for (let i = 0; i < this.coins.length; i++) g.drawImage(this.coinSpr, this.coins[i].x - half, this.coins[i].y - half, this.coinSz, this.coinSz);
+          // Floating coins
+          if (this.coinSprite) {
+            for (let i = 0; i < this.coins.length; i++) {
+              const c = this.coins[i], cy = c.y + Math.sin(c.phase) * 5;
+              g.drawImage(this.coinSprite, c.x - 22, cy - 22);
+            }
           }
 
-          g.fillStyle = nf > .5 ? '#1b1d26' : '#3d2c28'; g.fillRect(0, gY, w, this.GROUND_H);
-          g.fillStyle = pal.grass; g.fillRect(0, gY, w, 20);
-          g.beginPath();
-          for (let gx = -this.gOff; gx < w + 24; gx += 12) { g.moveTo(gx, gY + 2); g.lineTo(gx + 5, gY - 7); g.lineTo(gx + 10, gY + 2); }
-          g.fill();
+          // Grass strip + ground
+          g.fillStyle = this.lerpRgb([72, 182, 98], [24, 78, 56], night);
+          g.fillRect(0, groundY, w, 16);
+          g.fillStyle = this.lerpRgb([64, 142, 78], [22, 52, 46], night);
+          g.fillRect(0, groundY + 16, w, h - groundY - 16);
+          const gOff = this.bgScroll % 26;
+          g.fillStyle = this.lerpRgb([118, 218, 132], [44, 118, 86], night);
+          for (let x = -26; x < w + 26; x += 26) g.fillRect(x - gOff, groundY + 3, 12, 5);
 
-          if (this.birdSpr) {
-            const b = this.bird, halfB = this.birdSz / 2, bob = this.state === 'idle' ? Math.sin((ts || 0) / 260) * 6 : 0;
-            g.save(); g.translate(b.x, b.y + bob);
-            if (this.state === 'playing' || this.state === 'paused') g.rotate(b.rot);
-            g.drawImage(this.birdSpr, -halfB, -halfB, this.birdSz, this.birdSz);
+          // Bird sprite
+          if (this.birdSprite) {
+            g.save();
+            g.translate(this.bird.x, this.bird.y);
+            g.rotate(this.bird.rot);
+            g.drawImage(this.birdSprite, -27, -27);
             g.restore();
           }
 
-          if (this.popups.length) {
-            g.font = '800 16px sans-serif'; g.textAlign = 'center';
-            for (let i = 0; i < this.popups.length; i++) {
-              const pop = this.popups[i];
-              g.globalAlpha = Math.max(0, pop.l / .9); g.fillStyle = pop.c; g.fillText(pop.t, pop.x, pop.y);
+          // Floating score pops
+          if (this.floats.length) {
+            g.font = '800 15px -apple-system,sans-serif'; g.textAlign = 'center';
+            for (let i = 0; i < this.floats.length; i++) {
+              const f = this.floats[i];
+              g.globalAlpha = Math.max(0, f.a);
+              g.fillStyle = '#ffd166';
+              g.fillText(f.txt, f.x, f.y);
             }
             g.globalAlpha = 1;
           }
+        },
+
+        startLoop() {
+          if (this.rafId) cancelAnimationFrame(this.rafId);
+          const STEP = 1 / 120;
+          const loop = ts => {
+            if (!this.isOpen) return;
+            const rawDt = Math.min(0.05, Math.max(0, (ts - this.lastTs) / 1000));
+            this.lastTs = ts;
+            if (this.state === 'playing') {
+              this.accum += rawDt;
+              while (this.accum >= STEP) { this.step(STEP); this.accum -= STEP; }
+            } else if (this.state === 'idle') {
+              this.step(rawDt);
+            }
+            this.render();
+            this.rafId = requestAnimationFrame(loop);
+          };
+          this.rafId = requestAnimationFrame(loop);
         }
       };
 
-      /* 10B. LOVE 2048 MINI-GAME (SMOOTH 60FPS TRANSFORMS + ZERO-LAG SWIPES) */
+      /* 10B. LOVE 2048 (SMOOTH SWIPES, ROMANTIC TILES, COUPLE VS SCORE) */
       const Love2048Game = {
-        isOpen: false, grid: null, score: 0, won: false, over: false, busy: false, nextId: 1,
-        tileEls: new Map(), cellSize: 74, gap: 9, saveTimer: null,
-        touchStartX: 0, touchStartY: 0, touchActive: false, swipeConsumed: false,
+        isOpen: false, grid: [], tiles: new Map(), nextId: 1,
+        score: 0, moving: false, sx: 0, sy: 0, tracking: false,
 
         init() {
-          const stage = $('g2048-stage'); if (!stage) return;
           $('btn-g2048-back')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); this.close(); });
           $('btn-g2048-restart')?.addEventListener('click', () => { Haptic.impact('light'); AudioEngine.sfx('switch'); this.startNew(); });
-          $('btn-g2048-overlay-action')?.addEventListener('click', () => {
-            Haptic.impact('light'); AudioEngine.sfx('tap');
-            if (this.won && !this.over) { $('g2048-overlay').classList.add('hidden'); }
-            else this.startNew();
-          });
+          $('btn-g2048-again')?.addEventListener('click', () => { Haptic.impact('light'); AudioEngine.sfx('switch'); this.startNew(); });
 
-          // Direct touch swipe handling with passive:false to eliminate WebView scroll/bounce jitter
-          stage.addEventListener('touchstart', e => {
-            if (!this.isOpen || !e.touches.length) return;
-            const t = e.touches[0];
-            this.touchStartX = t.clientX; this.touchStartY = t.clientY;
-            this.touchActive = true; this.swipeConsumed = false;
-          }, { passive: true });
-          stage.addEventListener('touchmove', e => {
-            if (!this.isOpen || !this.touchActive || !e.touches.length) return;
-            e.preventDefault();
-            if (this.swipeConsumed) return;
-            const t = e.touches[0], dx = t.clientX - this.touchStartX, dy = t.clientY - this.touchStartY;
-            if (Math.abs(dx) > 22 || Math.abs(dy) > 22) {
-              this.swipeConsumed = true;
+          const stage = $('g2048-stage');
+          if (stage) {
+            stage.addEventListener('touchstart', e => {
+              if (!this.isOpen || !e.touches.length) return;
+              this.sx = e.touches[0].clientX; this.sy = e.touches[0].clientY; this.tracking = true;
+            }, { passive: true });
+            stage.addEventListener('touchmove', e => {
+              if (this.isOpen && this.tracking) e.preventDefault();
+            }, { passive: false });
+            stage.addEventListener('touchend', e => {
+              if (!this.isOpen || !this.tracking || !e.changedTouches.length) return;
+              this.tracking = false;
+              const dx = e.changedTouches[0].clientX - this.sx, dy = e.changedTouches[0].clientY - this.sy;
+              if (Math.max(Math.abs(dx), Math.abs(dy)) < 24) return;
               this.move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
-            }
-          }, { passive: false });
-          stage.addEventListener('touchend', () => { this.touchActive = false; this.swipeConsumed = false; }, { passive: true });
-
-          // Mouse drag fallback for desktop preview
-          let mDown = false, mx = 0, my = 0;
-          stage.addEventListener('mousedown', e => { if (!this.isOpen) return; mDown = true; mx = e.clientX; my = e.clientY; });
-          window.addEventListener('mouseup', e => {
-            if (!mDown || !this.isOpen) return; mDown = false;
-            const dx = e.clientX - mx, dy = e.clientY - my;
-            if (Math.abs(dx) > 26 || Math.abs(dy) > 26) {
-              this.move(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up'));
-            }
-          });
+            }, { passive: true });
+          }
 
           document.addEventListener('keydown', e => {
             if (!this.isOpen) return;
-            if (e.code === 'Escape') return this.close();
-            const map = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' };
-            if (map[e.code]) { e.preventDefault(); this.move(map[e.code]); }
+            const m = { ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down' }[e.code];
+            if (m) { e.preventDefault(); this.move(m); }
+            else if (e.code === 'Escape') this.close();
           });
-          window.addEventListener('resize', () => { if (this.isOpen) { this.measure(); this.layoutAll(); } });
+          window.addEventListener('resize', () => { if (this.isOpen) this.layoutAll(); });
         },
 
-        measure() {
-          const layer = $('g2048-tiles'); if (!layer) return;
-          const w = layer.clientWidth; if (w < 40) return;
-          this.gap = 9;
-          this.cellSize = (w - this.gap * 3) / 4;
+        syncVs() {
+          const d = State.pairData; if (!d) return;
+          const m = d.meta, l2 = d.games.love2048, isGf = State.session.role === 'girlfriend';
+          renderAvatar($('g2048-vs-gf-avatar'), m.girlfriendCustomAvatar || m.girlfriendPhotoUrl, m.girlfriendName || '💕');
+          renderAvatar($('g2048-vs-bf-avatar'), m.boyfriendCustomAvatar || m.boyfriendPhotoUrl, m.boyfriendName || '🛡️');
+          $('g2048-vs-gf-best').textContent = fmt(isGf ? Math.max(l2.girlfriendBest, this.score) : l2.girlfriendBest);
+          $('g2048-vs-bf-best').textContent = fmt(!isGf ? Math.max(l2.boyfriendBest, this.score) : l2.boyfriendBest);
+          $('g2048-live-score').textContent = fmt(this.score);
         },
 
         open() {
           const fs = $('love2048-fullscreen'); if (!fs) return;
-          this.isOpen = true; AudioEngine.fadeOutGlow();
+          this.isOpen = true;
+          AudioEngine.fadeOutGlow();
           fs.classList.add('open'); fs.setAttribute('aria-hidden', 'false');
-          document.body.classList.add('game-playing');
           this.syncVs();
-          requestAnimationFrame(() => {
-            this.measure();
-            if (!this.grid) this.startNew();
-            else this.layoutAll();
-          });
+          if (!this.grid.length) this.startNew();
+          else requestAnimationFrame(() => this.layoutAll());
         },
 
         close() {
           if (!this.isOpen) return;
-          this.flushBest();
           this.isOpen = false;
-          document.body.classList.remove('game-playing');
+          this.saveBest();
           $('love2048-fullscreen').classList.remove('open');
           $('love2048-fullscreen').setAttribute('aria-hidden', 'true');
           AudioEngine.ensureVizLoop();
         },
 
-        syncVs() {
-          if (!State.pairData) return;
-          const m = State.pairData.meta, l2 = State.pairData.games.love2048, isGf = State.session.role === 'girlfriend';
-          renderAvatar($('g2048-vs-gf-avatar'), m.girlfriendCustomAvatar || m.girlfriendPhotoUrl || (isGf ? State.user.photoUrl : ''), m.girlfriendName || 'Девушка');
-          renderAvatar($('g2048-vs-bf-avatar'), m.boyfriendCustomAvatar || m.boyfriendPhotoUrl || (!isGf ? State.user.photoUrl : ''), m.boyfriendName || 'Парень');
-          $('g2048-vs-gf-best').textContent = fmt(Math.max(l2.girlfriendBest || 0, isGf ? this.score : 0));
-          $('g2048-vs-bf-best').textContent = fmt(Math.max(l2.boyfriendBest || 0, !isGf ? this.score : 0));
-        },
-
-        scheduleBest() {
-          if (!State.session.pairCode || this.score <= 0) return;
-          const isGf = State.session.role === 'girlfriend';
-          const curBest = isGf ? (State.pairData?.games?.love2048?.girlfriendBest || 0) : (State.pairData?.games?.love2048?.boyfriendBest || 0);
-          if (this.score <= curBest) return;
-          clearTimeout(this.saveTimer);
-          this.saveTimer = setTimeout(() => this.flushBest(), 600);
-        },
-
-        async flushBest() {
-          clearTimeout(this.saveTimer); this.saveTimer = null;
-          if (!State.session.pairCode || this.score <= 0) return;
-          const isGf = State.session.role === 'girlfriend', s = this.score;
-          await DB.transact(State.session.pairCode, d => {
-            const l2 = d.games.love2048;
-            if (isGf) { if (s <= l2.girlfriendBest) return; l2.girlfriendBest = s; }
-            else { if (s <= l2.boyfriendBest) return; l2.boyfriendBest = s; }
-            return d;
-          });
-        },
-
         startNew() {
           this.grid = Array.from({ length: 4 }, () => [null, null, null, null]);
-          this.score = 0; this.won = false; this.over = false; this.busy = false;
-          this.tileEls.forEach(el => el.remove()); this.tileEls.clear();
+          this.tiles.clear(); this.score = 0; this.moving = false;
           $('g2048-tiles').innerHTML = '';
           $('g2048-overlay').classList.add('hidden');
-          $('g2048-live-score').textContent = '0';
-          this.measure();
           this.spawnTile(); this.spawnTile();
           this.syncVs();
+          requestAnimationFrame(() => this.layoutAll());
         },
 
-        tileHeart(v) { return v >= 2048 ? '👑' : v >= 512 ? '💖' : v >= 128 ? '💘' : v >= 32 ? '❤️' : '♡'; },
-
-        createEl(tile, r, c, cls) {
-          const el = document.createElement('div');
-          const dCls = tile.v >= 1000 ? 'd4' : tile.v >= 100 ? 'd3' : '';
-          el.className = `g2048-tile t-${tile.v <= 2048 ? tile.v : 'super'} ${dCls} ${cls || ''}`;
-          el.innerHTML = `<div class="g2048-tile-inner"><span class="g2048-tile-val">${tile.v}</span><span class="g2048-tile-heart">${this.tileHeart(tile.v)}</span></div>`;
-          this.posEl(el, r, c);
-          $('g2048-tiles').appendChild(el);
-          this.tileEls.set(tile.id, el);
-          return el;
+        tileMetrics() {
+          const box = $('g2048-tiles');
+          const sz = box ? box.clientWidth : 320;
+          const gap = 9, cell = (sz - gap * 3) / 4;
+          return { cell, step: cell + gap };
         },
 
-        posEl(el, r, c) {
-          const s = this.cellSize, x = c * (s + this.gap), y = r * (s + this.gap);
-          el.style.width = `${s}px`; el.style.height = `${s}px`;
-          el.style.transform = `translate3d(${x}px,${y}px,0)`;
+        posTile(el, r, c) {
+          const { cell, step } = this.tileMetrics();
+          el.style.width = `${cell}px`; el.style.height = `${cell}px`;
+          el.style.transform = `translate3d(${c * step}px,${r * step}px,0)`;
         },
 
-        layoutAll() {
-          if (!this.grid) return;
-          for (let r = 0; r < 4; r++) {
-            for (let c = 0; c < 4; c++) {
-              const t = this.grid[r][c];
-              if (t && this.tileEls.has(t.id)) this.posEl(this.tileEls.get(t.id), r, c);
-            }
-          }
+        styleTile(el, val) {
+          const cls = val <= 2048 ? `t-${val}` : 't-super';
+          const dCls = val >= 1000 ? ' d4' : (val >= 100 ? ' d3' : '');
+          el.className = `g2048-tile ${cls}${dCls}`;
+          el.querySelector('.g2048-tile-val').textContent = String(val);
+          el.querySelector('.g2048-tile-heart').textContent = val >= 512 ? '💖' : (val >= 64 ? '💘' : '♥');
         },
 
         spawnTile() {
           const empty = [];
           for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) if (!this.grid[r][c]) empty.push([r, c]);
-          if (!empty.length) return false;
+          if (!empty.length) return;
           const [r, c] = empty[(Math.random() * empty.length) | 0];
-          const tile = { id: this.nextId++, v: Math.random() < .9 ? 2 : 4 };
-          this.grid[r][c] = tile;
-          this.createEl(tile, r, c, 'spawn');
-          return true;
+          const val = Math.random() < 0.9 ? 2 : 4, id = this.nextId++;
+          const el = document.createElement('div');
+          el.innerHTML = '<div class="g2048-tile-inner"><span class="g2048-tile-val"></span><span class="g2048-tile-heart"></span></div>';
+          this.styleTile(el, val);
+          el.classList.add('spawn');
+          this.posTile(el, r, c);
+          $('g2048-tiles').appendChild(el);
+          const t = { id, val, r, c, el };
+          this.grid[r][c] = t; this.tiles.set(id, t);
         },
 
-        hasMoves() {
+        layoutAll() {
+          for (const t of this.tiles.values()) this.posTile(t.el, t.r, t.c);
+        },
+
+        move(dir) {
+          if (this.moving) return;
+          const dr = dir === 'up' ? -1 : (dir === 'down' ? 1 : 0);
+          const dc = dir === 'left' ? -1 : (dir === 'right' ? 1 : 0);
+          const rs = dr === 1 ? [3, 2, 1, 0] : [0, 1, 2, 3];
+          const cs = dc === 1 ? [3, 2, 1, 0] : [0, 1, 2, 3];
+          const mergedSet = new Set(), toRemove = [];
+          let moved = false, gained = 0;
+
+          for (const r of rs) {
+            for (const c of cs) {
+              const t = this.grid[r][c]; if (!t) continue;
+              let nr = r, nc = c;
+              while (true) {
+                const tr = nr + dr, tc = nc + dc;
+                if (tr < 0 || tr > 3 || tc < 0 || tc > 3) break;
+                const nxt = this.grid[tr][tc];
+                if (!nxt) { nr = tr; nc = tc; }
+                else if (nxt.val === t.val && !mergedSet.has(nxt.id)) { nr = tr; nc = tc; break; }
+                else break;
+              }
+              if (nr === r && nc === c) continue;
+              moved = true;
+              const target = this.grid[nr][nc];
+              this.grid[r][c] = null;
+              if (target) {
+                target.val *= 2; gained += target.val;
+                mergedSet.add(target.id);
+                t.r = nr; t.c = nc; this.posTile(t.el, nr, nc);
+                t.el.style.zIndex = '0'; target.el.style.zIndex = '2';
+                toRemove.push(t);
+              } else {
+                t.r = nr; t.c = nc; this.grid[nr][nc] = t;
+                this.posTile(t.el, nr, nc);
+              }
+            }
+          }
+          if (!moved) return;
+
+          this.moving = true;
+          if (gained > 0) { this.score += gained; Haptic.impact('light'); AudioEngine.sfx('coin'); }
+          else AudioEngine.sfx('tap');
+          this.syncVs();
+
+          setTimeout(() => {
+            for (const t of toRemove) { t.el.remove(); this.tiles.delete(t.id); }
+            for (const id of mergedSet) {
+              const t = this.tiles.get(id); if (!t) continue;
+              this.styleTile(t.el, t.val); t.el.classList.add('merged');
+              this.posTile(t.el, t.r, t.c);
+            }
+            this.spawnTile();
+            this.moving = false;
+            this.saveBest();
+            if (!this.canMove()) {
+              $('g2048-overlay-title').textContent = 'Ходов больше нет 💘';
+              $('g2048-overlay-sub').textContent = `Твой результат: ${fmt(this.score)} очков`;
+              $('g2048-overlay').classList.remove('hidden');
+              Haptic.notify('warning');
+            }
+          }, 115);
+        },
+
+        canMove() {
           for (let r = 0; r < 4; r++) {
             for (let c = 0; c < 4; c++) {
               const t = this.grid[r][c]; if (!t) return true;
-              if (c < 3 && this.grid[r][c + 1]?.v === t.v) return true;
-              if (r < 3 && this.grid[r + 1][c]?.v === t.v) return true;
+              if (r < 3 && this.grid[r + 1][c]?.val === t.val) return true;
+              if (c < 3 && this.grid[r][c + 1]?.val === t.val) return true;
             }
           }
           return false;
         },
 
-        move(dir) {
-          if (this.over || this.busy || !this.grid) return;
-          const dr = dir === 'down' ? 1 : dir === 'up' ? -1 : 0;
-          const dc = dir === 'right' ? 1 : dir === 'left' ? -1 : 0;
-          const rows = dr === 1 ? [3, 2, 1, 0] : [0, 1, 2, 3];
-          const cols = dc === 1 ? [3, 2, 1, 0] : [0, 1, 2, 3];
-          const mergedSet = new Set(), toRemove = [], toCreate = [];
-          let moved = false, gained = 0, hit2048 = false;
-
-          for (const r of rows) {
-            for (const c of cols) {
-              const tile = this.grid[r][c]; if (!tile) continue;
-              let nr = r, nc = c;
-              while (true) {
-                const tr = nr + dr, tc = nc + dc;
-                if (tr < 0 || tr > 3 || tc < 0 || tc > 3) break;
-                const next = this.grid[tr][tc];
-                if (!next) { nr = tr; nc = tc; }
-                else if (next.v === tile.v && !mergedSet.has(next.id)) {
-                  // Merge into next cell
-                  this.grid[r][c] = null;
-                  const nv = tile.v * 2, nt = { id: this.nextId++, v: nv };
-                  this.grid[tr][tc] = nt; mergedSet.add(nt.id);
-                  gained += nv; moved = true;
-                  if (nv === 2048 && !this.won) hit2048 = true;
-                  const srcEl = this.tileEls.get(tile.id), dstEl = this.tileEls.get(next.id);
-                  if (srcEl) { this.posEl(srcEl, tr, tc); toRemove.push([tile.id, srcEl]); }
-                  if (dstEl) toRemove.push([next.id, dstEl]);
-                  toCreate.push([nt, tr, tc]);
-                  nr = -1; break;
-                } else break;
-              }
-              if (nr >= 0 && (nr !== r || nc !== c)) {
-                this.grid[r][c] = null; this.grid[nr][nc] = tile; moved = true;
-                const el = this.tileEls.get(tile.id);
-                if (el) this.posEl(el, nr, nc);
-              }
-            }
-          }
-
-          if (!moved) return;
-          this.busy = true;
-          if (gained > 0) {
-            this.score += gained;
-            $('g2048-live-score').textContent = fmt(this.score);
-            Haptic.impact('light'); AudioEngine.sfx(gained >= 64 ? 'coin' : 'switch');
-            this.syncVs(); this.scheduleBest();
-          } else { Haptic.select(); AudioEngine.sfx('tap'); }
-
-          if (toRemove.length || toCreate.length) {
-            setTimeout(() => {
-              for (const [id, el] of toRemove) { el.remove(); this.tileEls.delete(id); }
-              for (const [nt, tr, tc] of toCreate) this.createEl(nt, tr, tc, 'merged');
-            }, 95);
-          }
-
-          setTimeout(() => {
-            this.busy = false;
-            if (!this.isOpen) return;
-            this.spawnTile();
-            if (hit2048) {
-              this.won = true; this.flushBest(); Haptic.notify('success'); AudioEngine.sfx('success');
-              $('g2048-overlay-title').textContent = '2048 собрано! 💖';
-              $('g2048-overlay-sub').textContent = `Невероятно! Очков: ${fmt(this.score)}. Можно продолжить и побить рекорд!`;
-              $('btn-g2048-overlay-action').textContent = 'Продолжить ✨';
-              $('g2048-overlay').classList.remove('hidden');
-            } else if (!this.hasMoves()) {
-              this.over = true; this.flushBest(); Haptic.notify('error');
-              $('g2048-overlay-title').textContent = `Счёт: ${fmt(this.score)} 💘`;
-              $('g2048-overlay-sub').textContent = 'Ходов больше нет. Рекорд сохранён в таблице пары ✨';
-              $('btn-g2048-overlay-action').textContent = 'Играть снова ↻';
-              $('g2048-overlay').classList.remove('hidden');
-            }
-          }, 115);
+        saveBest() {
+          if (!State.session.pairCode || !State.pairData || this.score <= 0) return;
+          const isGf = State.session.role === 'girlfriend', curBest = isGf ? State.pairData.games.love2048.girlfriendBest : State.pairData.games.love2048.boyfriendBest;
+          if (this.score <= curBest) return;
+          const sc = this.score;
+          DB.transact(State.session.pairCode, d => {
+            if (isGf && sc > d.games.love2048.girlfriendBest) d.games.love2048.girlfriendBest = sc;
+            if (!isGf && sc > d.games.love2048.boyfriendBest) d.games.love2048.boyfriendBest = sc;
+            return d;
+          });
         }
       };
 
-      /* 10C. LOVE WHEEL MINI-GAME (1 TICKET PER DAY PER PARTNER, 6 SECTORS) */
+      /* 10C. LOVE WHEEL (1 DAILY TICKET, 6 PRIZES, INSTANT REWARDS) */
       const LoveWheelGame = {
-        isOpen: false, spinning: false, angle: 0,
+        isOpen: false, spinning: false, angle: 0, built: false,
 
         init() {
           this.buildSvg();
@@ -2180,54 +2276,55 @@
           $('btn-wheel-spin')?.addEventListener('click', () => this.spin());
           $('btn-wheel-hub')?.addEventListener('click', () => this.spin());
           $('wheel-rotor')?.addEventListener('click', () => this.spin());
-          $('btn-wheel-overlay-ok')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); $('wheel-overlay').classList.add('hidden'); });
+          $('btn-wheel-win-ok')?.addEventListener('click', () => { Haptic.select(); $('wheel-overlay').classList.add('hidden'); });
           document.addEventListener('keydown', e => { if (this.isOpen && e.code === 'Escape') this.close(); });
         },
 
         buildSvg() {
-          const svg = $('wheel-svg'); if (!svg) return;
-          const n = WHEEL_PRIZES.length, step = 360 / n, cx = 150, cy = 150, r = 146;
-          let html = '';
+          if (this.built) return;
+          this.built = true;
+          const n = WHEEL_PRIZES.length, step = 360 / n, cx = 150, cy = 150, r = 148;
+          let paths = '', labels = '';
           for (let i = 0; i < n; i++) {
             const p = WHEEL_PRIZES[i];
-            const a0 = (i * step - 90) * Math.PI / 180, a1 = ((i + 1) * step - 90) * Math.PI / 180;
-            const x0 = cx + r * Math.cos(a0), y0 = cy + r * Math.sin(a0);
+            const a1 = (i * step - 90) * Math.PI / 180, a2 = ((i + 1) * step - 90) * Math.PI / 180;
             const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
-            const midDeg = i * step + step / 2;
-            html += `<path d="M${cx} ${cy} L${x0.toFixed(1)} ${y0.toFixed(1)} A${r} ${r} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)} Z" fill="${p.color}" stroke="rgba(255,255,255,.38)" stroke-width="2"/>`;
-            html += `<g transform="rotate(${midDeg} ${cx} ${cy})"><text x="${cx}" y="54" text-anchor="middle" font-size="25">${p.emoji}</text><text x="${cx}" y="76" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1b071e">${esc(p.label)}</text></g>`;
+            const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+            paths += `<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 0,1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${p.color}" stroke="rgba(255,255,255,.32)" stroke-width="2"/>`;
+            const mid = i * step + step / 2;
+            labels += `<g transform="rotate(${mid} ${cx} ${cy})"><text x="${cx}" y="46" text-anchor="middle" font-size="24">${p.emoji}</text><text x="${cx}" y="68" text-anchor="middle" font-size="11.5" font-weight="800" fill="#1a081e">${esc(p.label)}</text></g>`;
           }
-          svg.innerHTML = html;
+          const rotor = $('wheel-rotor');
+          if (rotor) rotor.innerHTML = `<svg viewBox="0 0 300 300">${paths}${labels}</svg>`;
         },
 
         hasTicket() {
-          if (!State.pairData) return false;
-          const wh = State.pairData.games.wheel, isGf = State.session.role === 'girlfriend';
-          const last = isGf ? wh.girlfriendLastDate : wh.boyfriendLastDate;
+          const wh = State.pairData?.games?.wheel; if (!wh) return true;
+          const last = State.session.role === 'girlfriend' ? wh.girlfriendLastDate : wh.boyfriendLastDate;
           return last !== todayKey();
         },
 
         syncUI() {
-          if (!State.pairData) return;
-          const wh = State.pairData.games.wheel, m = State.pairData.meta, tk = this.hasTicket(), today = todayKey();
-          const pill = $('wheel-ticket-pill'), spinBtn = $('btn-wheel-spin'), spinLbl = $('wheel-spin-label');
+          const d = State.pairData; if (!d) return;
+          const m = d.meta, wh = d.games.wheel, ready = this.hasTicket();
+          const pill = $('wheel-ticket-pill');
           if (pill) {
-            pill.textContent = tk ? '🎟️ Билетов сегодня: 1/1' : '🎟️ Билет использован (0/1)';
-            pill.classList.toggle('ready', tk);
+            pill.classList.toggle('ready', ready);
+            pill.textContent = ready ? '🎟️ 1 билет доступен сегодня' : '⏳ Билет на сегодня использован';
           }
-          if (spinBtn) spinBtn.disabled = !tk || this.spinning;
-          if (spinLbl) spinLbl.textContent = this.spinning ? 'Крутится…' : (tk ? 'Крутить' : 'Завтра');
-          $('wheel-gf-who').textContent = `💕 ${m.girlfriendName || 'Девушка'}`;
-          $('wheel-bf-who').textContent = `🛡️ ${m.boyfriendName || 'Парень'}`;
-          $('wheel-gf-res').textContent = wh.girlfriendLastDate === today && wh.girlfriendLastPrize ? wh.girlfriendLastPrize : 'Ещё не крутила';
-          $('wheel-bf-res').textContent = wh.boyfriendLastDate === today && wh.boyfriendLastPrize ? wh.boyfriendLastPrize : 'Ещё не крутил';
+          const lbl = $('wheel-spin-label');
+          if (lbl) lbl.textContent = this.spinning ? 'Крутим…' : (ready ? 'Крутить' : 'Завтра');
+          $('wheel-res-gf-name').textContent = m.girlfriendName || 'Девушка';
+          $('wheel-res-bf-name').textContent = m.boyfriendName || 'Парень';
+          $('wheel-res-gf-val').textContent = wh.girlfriendLastDate === todayKey() ? (wh.girlfriendLastPrize || 'Выиграла!') : 'Ещё не крутила';
+          $('wheel-res-bf-val').textContent = wh.boyfriendLastDate === todayKey() ? (wh.boyfriendLastPrize || 'Выиграл!') : 'Ещё не крутил';
         },
 
         open() {
           const fs = $('wheel-fullscreen'); if (!fs) return;
-          this.isOpen = true; AudioEngine.fadeOutGlow();
+          this.isOpen = true;
+          AudioEngine.fadeOutGlow();
           fs.classList.add('open'); fs.setAttribute('aria-hidden', 'false');
-          document.body.classList.add('game-playing');
           $('wheel-overlay').classList.add('hidden');
           this.syncUI();
         },
@@ -2235,163 +2332,137 @@
         close() {
           if (!this.isOpen) return;
           this.isOpen = false;
-          document.body.classList.remove('game-playing');
           $('wheel-fullscreen').classList.remove('open');
           $('wheel-fullscreen').setAttribute('aria-hidden', 'true');
           AudioEngine.ensureVizLoop();
         },
 
-        async spin() {
-          if (this.spinning || !State.pairData) return;
-          if (!this.hasTicket()) {
-            Haptic.notify('warning'); showToast('Твой билет на сегодня уже использован! Новый будет завтра 🎟️');
-            return;
-          }
+        spin() {
+          if (this.spinning) return;
+          if (!this.hasTicket()) return showToast('Твой билет на сегодня уже использован ⏳');
           this.spinning = true; this.syncUI();
           Haptic.impact('medium'); AudioEngine.sfx('switch');
 
           const n = WHEEL_PRIZES.length, step = 360 / n;
-          const winIdx = (Math.random() * n) | 0;
-          const prize = WHEEL_PRIZES[winIdx];
-          // Align chosen sector center under top pointer (0 deg)
-          const sectorCenter = winIdx * step + step / 2;
-          const jitter = (Math.random() - 0.5) * (step * 0.52);
-          const targetMod = (360 - ((sectorCenter + jitter + 360) % 360)) % 360;
+          const idx = (Math.random() * n) | 0;
+          const prize = WHEEL_PRIZES[idx];
+          const targetSectorCenter = idx * step + step / 2;
+          const jitter = (Math.random() - 0.5) * (step * 0.55);
+          const targetMod = (360 - targetSectorCenter + jitter + 360) % 360;
           const curMod = ((this.angle % 360) + 360) % 360;
-          const delta = ((targetMod - curMod + 360) % 360) + 360 * 5;
+          const delta = 360 * 5 + ((targetMod - curMod + 360) % 360);
           this.angle += delta;
 
           const rotor = $('wheel-rotor');
-          rotor.style.transition = 'transform 4.1s cubic-bezier(.16,.88,.2,1)';
-          rotor.style.transform = `rotate(${this.angle.toFixed(1)}deg)`;
+          rotor.style.transition = 'transform 4.2s cubic-bezier(.15,.85,.2,1)';
+          rotor.style.transform = `rotate(${this.angle}deg)`;
 
-          // Persist ticket spend & reward immediately so refresh cannot exploit tickets
-          const isGf = State.session.role === 'girlfriend', today = todayKey();
-          await DB.transact(State.session.pairCode, d => {
-            const wh = d.games.wheel;
-            if (isGf) {
-              if (wh.girlfriendLastDate === today) return;
-              wh.girlfriendLastDate = today;
-              wh.girlfriendLastPrize = `${prize.emoji} ${prize.label}`;
-            } else {
-              if (wh.boyfriendLastDate === today) return;
-              wh.boyfriendLastDate = today;
-              wh.boyfriendLastPrize = `${prize.emoji} ${prize.label}`;
+          setTimeout(async () => {
+            this.spinning = false;
+            const isGf = State.session.role === 'girlfriend', tKey = todayKey();
+            const prizeText = `${prize.emoji} ${prize.label}`;
+            if (State.session.pairCode) {
+              await DB.transact(State.session.pairCode, d => {
+                if (isGf) { d.games.wheel.girlfriendLastDate = tKey; d.games.wheel.girlfriendLastPrize = prizeText; }
+                else { d.games.wheel.boyfriendLastDate = tKey; d.games.wheel.boyfriendLastPrize = prizeText; }
+                if (prize.coins) { d.wallet.coins += prize.coins; d.wallet.totalEarned += prize.coins; }
+                if (prize.hearts) { d.wallet.hearts += prize.hearts; d.wallet.totalHeartsEarned += prize.hearts; }
+                return d;
+              });
             }
-            if (prize.coins) { d.wallet.coins += prize.coins; d.wallet.totalEarned += prize.coins; }
-            if (prize.hearts) { d.wallet.hearts += prize.hearts; d.wallet.totalHeartsEarned += prize.hearts; }
-            return d;
-          });
-
-          setTimeout(() => {
-            this.spinning = false; this.syncUI();
-            if (!this.isOpen) return;
-            Haptic.notify('success'); AudioEngine.sfx(prize.coins || prize.hearts ? 'coin' : 'success');
-            $('wheel-prize-emoji').textContent = prize.emoji;
-            $('wheel-prize-title').textContent = prize.label;
-            $('wheel-prize-sub').textContent = prize.desc;
+            Haptic.notify('success'); AudioEngine.sfx('coin');
+            $('wheel-win-emoji').textContent = prize.emoji;
+            $('wheel-win-title').textContent = prize.label;
+            $('wheel-win-desc').textContent = prize.desc;
             $('wheel-overlay').classList.remove('hidden');
-          }, 4200);
+            this.syncUI();
+          }, 4300);
         }
       };
 
-      /* 10D. LOVEQUIZ MINI-GAME (LEVEL 1: ROMANTIC NON-REPEATING + LEVEL 2: 12x15s SPEED BATTLE) */
+      /* 10D. LOVE QUIZ (LEVEL 1: ROMANTIC QUIZ, LEVEL 2: 12x15s SMART SPEED BATTLE) */
       const LoveQuizGame = {
-        isOpen: false, view: 'menu', tickId: null, lastSig: '', settlingKey: '',
+        isOpen: false, view: 'menu', timerId: null, lastRenderKey: '',
 
         init() {
-          $('btn-quiz-back')?.addEventListener('click', () => {
-            Haptic.select(); AudioEngine.sfx('tap');
-            if (this.view !== 'menu') { this.view = 'menu'; this.stopTick(); this.syncUI(true); }
-            else this.close();
-          });
-          $('btn-quiz-levels')?.addEventListener('click', () => {
-            Haptic.select(); AudioEngine.sfx('switch');
-            this.view = 'menu'; this.stopTick(); this.syncUI(true);
-          });
+          $('btn-quiz-back')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); this.close(); });
+          $('btn-quiz-menu')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); this.view = 'menu'; this.lastRenderKey = ''; this.syncUI(); });
           $('quiz-stage')?.addEventListener('click', e => {
             const btn = e.target.closest('[data-qact]'); if (!btn) return;
-            const act = btn.dataset.qact;
-            if (act === 'open-romantic') { Haptic.impact('light'); AudioEngine.sfx('switch'); this.openRomantic(); }
-            else if (act === 'open-speed') { Haptic.impact('light'); AudioEngine.sfx('switch'); this.openSpeed(); }
-            else if (act === 'rom-pick-q') this.romPickQuestion(btn.dataset.qid);
-            else if (act === 'rom-answer') this.romAnswer(Number(btn.dataset.opt));
-            else if (act === 'rom-judge') this.romJudge(btn.dataset.ok === '1');
-            else if (act === 'rom-next') this.romNextRound();
-            else if (act === 'spd-start') this.spdCreateMatch();
-            else if (act === 'spd-ready') this.spdSetReady(false);
-            else if (act === 'spd-force-start') this.spdSetReady(true);
-            else if (act === 'spd-answer') this.spdSubmitAnswer(Number(btn.dataset.opt));
-            else if (act === 'spd-next') this.spdAdvance();
+            const act = btn.dataset.qact, val = btn.dataset.qval;
+            if (act === 'open-romantic') { this.view = 'romantic'; this.lastRenderKey = ''; this.ensureRomanticChoices(); this.syncUI(); }
+            else if (act === 'open-speed') { this.view = 'speed'; this.lastRenderKey = ''; this.syncUI(); }
+            else if (act === 'rom-pick') this.romPickQuestion(val);
+            else if (act === 'rom-guess') this.romSubmitGuess(Number(val));
+            else if (act === 'rom-judge') this.romJudge(val === '1');
+            else if (act === 'spd-start') this.speedStartMatch();
+            else if (act === 'spd-ans') this.speedAnswer(Number(val));
+            else if (act === 'spd-next') this.speedNextQuestion();
           });
           document.addEventListener('keydown', e => { if (this.isOpen && e.code === 'Escape') this.close(); });
         },
 
         open() {
           const fs = $('quiz-fullscreen'); if (!fs) return;
-          this.isOpen = true; this.view = 'menu'; this.lastSig = '';
+          this.isOpen = true; this.view = 'menu'; this.lastRenderKey = '';
           AudioEngine.fadeOutGlow();
           fs.classList.add('open'); fs.setAttribute('aria-hidden', 'false');
-          document.body.classList.add('game-playing');
-          this.syncUI(true);
+          this.syncUI();
+          this.startTimer();
         },
 
         close() {
           if (!this.isOpen) return;
-          this.stopTick(); this.isOpen = false;
-          document.body.classList.remove('game-playing');
+          this.isOpen = false;
+          if (this.timerId) { clearInterval(this.timerId); this.timerId = null; }
           $('quiz-fullscreen').classList.remove('open');
           $('quiz-fullscreen').setAttribute('aria-hidden', 'true');
           AudioEngine.ensureVizLoop();
         },
 
-        stopTick() { if (this.tickId) { clearInterval(this.tickId); this.tickId = null; } },
-
-        pickRomanticChoices(usedIds) {
-          let used = Array.isArray(usedIds) ? [...usedIds] : [];
-          let avail = ROMANTIC_QUIZ_POOL.filter(x => !used.includes(x.id));
-          if (avail.length < 3) { used = []; avail = [...ROMANTIC_QUIZ_POOL]; }
-          const picked = [...avail].sort(() => Math.random() - .5).slice(0, 3).map(x => x.id);
-          return { choices: picked, usedIds: used };
+        pickNonRepeating(usedIds, count) {
+          const used = new Set(Array.isArray(usedIds) ? usedIds : []);
+          let pool = ROMANTIC_QUIZ_POOL.filter(x => !used.has(x.id));
+          let resetUsed = false;
+          if (pool.length < count) { pool = [...ROMANTIC_QUIZ_POOL]; resetUsed = true; }
+          const picked = [...pool].sort(() => Math.random() - 0.5).slice(0, count).map(x => x.id);
+          return { picked, resetUsed };
         },
 
-        async openRomantic() {
-          this.view = 'romantic'; this.stopTick();
-          const qr = State.pairData?.games?.quiz?.romantic;
-          if (State.session.pairCode && (!qr || !qr.choices?.length)) {
-            await DB.transact(State.session.pairCode, d => {
-              const r = d.games.quiz.romantic;
-              if (!r.choices || !r.choices.length) {
-                const { choices, usedIds } = this.pickRomanticChoices(r.usedIds);
-                r.phase = 'pick'; r.picker = r.picker || 'boyfriend'; r.guesser = r.picker === 'girlfriend' ? 'boyfriend' : 'girlfriend';
-                r.choices = choices; r.usedIds = usedIds; r.qId = ''; r.guessOpt = -1; r.lastResult = '';
-              }
-              return d;
-            });
-          }
-          this.syncUI(true);
-        },
-
-        async romPickQuestion(qid) {
-          if (!State.session.pairCode || !qid) return;
-          const myRole = State.session.role;
-          Haptic.impact('light'); AudioEngine.sfx('tap');
+        async ensureRomanticChoices() {
+          if (!State.session.pairCode || !State.pairData) return;
+          const qr = State.pairData.games.quiz.romantic;
+          if (qr.phase === 'pick' && qr.choices.length) return;
+          if (qr.phase !== 'pick') return;
           await DB.transact(State.session.pairCode, d => {
             const r = d.games.quiz.romantic;
-            if (r.phase !== 'pick' || r.picker !== myRole) return;
-            r.qId = qid; r.guessOpt = -1; r.lastResult = ''; r.phase = 'answer';
-            if (!r.usedIds.includes(qid)) r.usedIds.push(qid);
+            if (r.phase === 'pick' && !r.choices.length) {
+              const { picked, resetUsed } = this.pickNonRepeating(r.usedIds, 3);
+              r.choices = picked;
+              if (resetUsed) r.usedIds = [];
+            }
             return d;
           });
         },
 
-        async romAnswer(optIdx) {
-          if (!State.session.pairCode || optIdx < 0) return;
-          const myRole = State.session.role;
-          Haptic.impact('light'); AudioEngine.sfx('switch');
+        async romPickQuestion(qId) {
+          if (!State.session.pairCode || !qId) return;
+          Haptic.impact('light'); AudioEngine.sfx('tap');
           await DB.transact(State.session.pairCode, d => {
             const r = d.games.quiz.romantic;
-            if (r.phase !== 'answer' || r.guesser !== myRole) return;
+            if (r.phase !== 'pick' || r.picker !== State.session.role) return;
+            r.qId = qId; r.guessOpt = -1; r.phase = 'answer'; r.lastResult = '';
+            r.usedIds = [...new Set([...(r.usedIds || []), qId])];
+            return d;
+          });
+        },
+
+        async romSubmitGuess(optIdx) {
+          if (!State.session.pairCode) return;
+          Haptic.impact('light'); AudioEngine.sfx('tap');
+          await DB.transact(State.session.pairCode, d => {
+            const r = d.games.quiz.romantic;
+            if (r.phase !== 'answer' || r.guesser !== State.session.role) return;
             r.guessOpt = optIdx; r.phase = 'judge';
             return d;
           });
@@ -2399,60 +2470,43 @@
 
         async romJudge(isCorrect) {
           if (!State.session.pairCode) return;
-          const myRole = State.session.role;
           Haptic.notify(isCorrect ? 'success' : 'warning');
           AudioEngine.sfx(isCorrect ? 'coin' : 'tap');
           await DB.transact(State.session.pairCode, d => {
             const r = d.games.quiz.romantic;
-            if (r.phase !== 'judge' || r.picker !== myRole) return;
-            r.lastResult = isCorrect ? 'win' : 'lose';
-            r.phase = 'result';
+            if (r.phase !== 'judge' || r.picker !== State.session.role) return;
+            const prevGuesser = r.guesser;
             if (isCorrect) {
-              if (r.guesser === 'girlfriend') { r.girlfriendScore += 1; d.wallet.coins += 5; d.wallet.totalEarned += 5; }
+              if (prevGuesser === 'girlfriend') { r.girlfriendScore += 1; d.wallet.coins += 5; d.wallet.totalEarned += 5; }
               else { r.boyfriendScore += 1; d.wallet.hearts += 5; d.wallet.totalHeartsEarned += 5; }
-            }
-            return d;
-          });
-        },
-
-        async romNextRound() {
-          if (!State.session.pairCode) return;
-          Haptic.select(); AudioEngine.sfx('switch');
-          await DB.transact(State.session.pairCode, d => {
-            const r = d.games.quiz.romantic;
-            if (r.phase !== 'result') return;
-            // If guesser won, they become the next picker; if wrong, guesser answers another question!
-            if (r.lastResult === 'win') {
-              const prevGuesser = r.guesser;
-              r.guesser = r.picker;
+              // Winner becomes the next picker!
               r.picker = prevGuesser;
+              r.guesser = prevGuesser === 'girlfriend' ? 'boyfriend' : 'girlfriend';
+              r.lastResult = 'win';
+            } else {
+              // Wrong answer: same guesser answers another question
+              r.lastResult = 'wrong';
             }
-            const { choices, usedIds } = this.pickRomanticChoices(r.usedIds);
-            r.choices = choices; r.usedIds = usedIds; r.qId = ''; r.guessOpt = -1; r.lastResult = ''; r.phase = 'pick';
+            const { picked, resetUsed } = this.pickNonRepeating(r.usedIds, 3);
+            r.choices = picked;
+            if (resetUsed) r.usedIds = [];
+            r.qId = ''; r.guessOpt = -1; r.phase = 'pick';
             return d;
           });
         },
 
-        openSpeed() {
-          this.view = 'speed';
-          this.syncUI(true);
-          this.ensureSpeedTick();
-        },
-
-        async spdCreateMatch() {
+        async speedStartMatch() {
           if (!State.session.pairCode) return;
-          const myRole = State.session.role;
           Haptic.impact('medium'); AudioEngine.sfx('switch');
-          // Pick 12 mixed non-repeating questions (4 easy, 4 medium, 4 hard)
-          const pickN = (diff, n) => SMART_QUIZ_POOL.filter(x => x.diff === diff).sort(() => Math.random() - .5).slice(0, n);
-          const qIds = [...pickN('Лёгкий', 4), ...pickN('Средний', 4), ...pickN('Сложный', 4)]
-            .sort(() => Math.random() - .5).map(x => x.id);
+          const easy = SMART_QUIZ_POOL.filter(x => x.diff === 'Лёгкий').sort(() => Math.random() - 0.5).slice(0, 4);
+          const med = SMART_QUIZ_POOL.filter(x => x.diff === 'Средний').sort(() => Math.random() - 0.5).slice(0, 4);
+          const hard = SMART_QUIZ_POOL.filter(x => x.diff === 'Сложный').sort(() => Math.random() - 0.5).slice(0, 4);
+          const qIds = [...easy, ...med, ...hard].map(x => x.id);
           await DB.transact(State.session.pairCode, d => {
             d.games.quiz.speed = {
-              matchId: `spd_${Date.now()}`,
-              status: 'lobby',
-              ready: { girlfriend: myRole === 'girlfriend', boyfriend: myRole === 'boyfriend' },
-              qIds, qIdx: 0, qStartTs: 0,
+              matchId: `sp_${Date.now()}`, status: 'playing',
+              ready: { girlfriend: true, boyfriend: true },
+              qIds, qIdx: 0, qStartTs: Date.now(),
               answers: {}, settled: {},
               girlfriendScore: 0, boyfriendScore: 0, girlfriendCoins: 0, boyfriendHearts: 0
             };
@@ -2460,336 +2514,476 @@
           });
         },
 
-        async spdSetReady(forceStart) {
-          if (!State.session.pairCode) return;
-          const myRole = State.session.role;
+        async speedAnswer(optIdx) {
+          if (!State.session.pairCode || !State.pairData) return;
+          const sp = State.pairData.games.quiz.speed;
+          if (sp.status !== 'playing') return;
+          const qk = String(sp.qIdx), role = State.session.role;
+          if (sp.answers?.[qk]?.[role] !== undefined) return;
           Haptic.impact('light'); AudioEngine.sfx('tap');
           await DB.transact(State.session.pairCode, d => {
             const s = d.games.quiz.speed;
-            if (s.status !== 'lobby') return;
-            s.ready[myRole] = true;
-            if (forceStart || (s.ready.girlfriend && s.ready.boyfriend)) {
-              s.status = 'playing'; s.qIdx = 0; s.qStartTs = Date.now();
-            }
+            if (s.status !== 'playing' || String(s.qIdx) !== qk) return;
+            if (!s.answers[qk]) s.answers[qk] = {};
+            if (s.answers[qk][role] !== undefined) return;
+            s.answers[qk][role] = optIdx;
+            this.trySettleSpeedRound(d, qk);
             return d;
           });
         },
 
-        async spdSubmitAnswer(optIdx) {
-          if (!State.session.pairCode || optIdx < 0) return;
-          const myRole = State.session.role;
-          Haptic.impact('light'); AudioEngine.sfx('tap');
-          await DB.transact(State.session.pairCode, d => {
-            const s = d.games.quiz.speed;
-            if (s.status !== 'playing') return;
-            const k = String(s.qIdx);
-            if (!s.answers[k]) s.answers[k] = {};
-            if (s.answers[k][myRole]) return;
-            s.answers[k][myRole] = { opt: optIdx, ts: Date.now() };
-            if (s.answers[k].girlfriend && s.answers[k].boyfriend) this.settleQuestionInTx(d, s.qIdx);
-            return d;
-          });
-        },
-
-        settleQuestionInTx(d, idx) {
-          const s = d.games.quiz.speed, k = String(idx);
-          if (s.settled[k]) return;
-          const qObj = SMART_QUIZ_POOL.find(x => x.id === s.qIds[idx]);
-          if (!qObj) return;
-          const aG = s.answers[k]?.girlfriend, aB = s.answers[k]?.boyfriend;
-          const gfOk = Boolean(aG && aG.opt === qObj.a), bfOk = Boolean(aB && aB.opt === qObj.a);
-          s.settled[k] = true; s.status = 'reveal';
+        trySettleSpeedRound(d, qk) {
+          const s = d.games.quiz.speed;
+          if (s.settled?.[qk]) return false;
+          const ans = s.answers?.[qk] || {};
+          const expired = (Date.now() - (+s.qStartTs || 0)) >= 15200;
+          const bothAnswered = ans.girlfriend !== undefined && ans.boyfriend !== undefined;
+          if (!bothAnswered && !expired) return false;
+          const q = SMART_QUIZ_POOL.find(x => x.id === s.qIds[Number(qk)]); if (!q) return false;
+          const gfOk = ans.girlfriend === q.a, bfOk = ans.boyfriend === q.a;
+          s.settled[qk] = true;
           if (gfOk && bfOk) {
             s.girlfriendScore += 1; s.boyfriendScore += 1;
             s.girlfriendCoins += 2; s.boyfriendHearts += 2;
             d.wallet.coins += 2; d.wallet.totalEarned += 2;
             d.wallet.hearts += 2; d.wallet.totalHeartsEarned += 2;
           } else if (gfOk) {
-            s.girlfriendScore += 1; s.girlfriendCoins += 2;
-            d.wallet.coins += 2; d.wallet.totalEarned += 2;
+            s.girlfriendScore += 1;
           } else if (bfOk) {
-            s.boyfriendScore += 1; s.boyfriendHearts += 2;
-            d.wallet.hearts += 2; d.wallet.totalHeartsEarned += 2;
+            s.boyfriendScore += 1;
           }
-          // If both lost (!gfOk && !bfOk): strictly 0 points awarded
+          // If both lost: 0 points & 0 rewards
+          return true;
         },
 
-        async spdTimeoutSettle(matchId, idx) {
-          const key = `${matchId}_${idx}`;
-          if (!State.session.pairCode || this.settlingKey === key) return;
-          this.settlingKey = key;
-          try {
-            await DB.transact(State.session.pairCode, d => {
-              const s = d.games.quiz.speed;
-              if (s.matchId !== matchId || s.status !== 'playing' || s.qIdx !== idx) return;
-              this.settleQuestionInTx(d, idx);
-              return d;
-            });
-          } finally { setTimeout(() => { if (this.settlingKey === key) this.settlingKey = ''; }, 900); }
-        },
-
-        async spdAdvance() {
+        async speedNextQuestion() {
           if (!State.session.pairCode) return;
           Haptic.select(); AudioEngine.sfx('switch');
           await DB.transact(State.session.pairCode, d => {
             const s = d.games.quiz.speed;
-            if (s.status !== 'reveal') return;
-            if (s.qIdx + 1 >= s.qIds.length) { s.status = 'finished'; }
-            else { s.qIdx += 1; s.status = 'playing'; s.qStartTs = Date.now(); }
+            if (s.status !== 'playing') return;
+            const qk = String(s.qIdx);
+            if (!s.settled?.[qk]) this.trySettleSpeedRound(d, qk);
+            if (s.qIdx + 1 >= s.qIds.length) s.status = 'finished';
+            else { s.qIdx += 1; s.qStartTs = Date.now(); }
             return d;
           });
         },
 
-        ensureSpeedTick() {
-          this.stopTick();
-          if (!this.isOpen || this.view !== 'speed') return;
-          this.tickId = setInterval(() => {
-            if (!this.isOpen || this.view !== 'speed') return this.stopTick();
-            const s = State.pairData?.games?.quiz?.speed;
-            if (!s || s.status !== 'playing' || !s.qStartTs) return;
-            const remMs = Math.max(0, 15000 - (Date.now() - s.qStartTs));
-            const sec = Math.ceil(remMs / 1000);
-            const tLbl = $('quiz-timer-sec'), tBar = $('quiz-timer-fill');
-            if (tLbl) tLbl.textContent = `⏱ ${sec} с`;
-            if (tBar) {
-              tBar.style.transform = `scaleX(${(remMs / 15000).toFixed(3)})`;
-              tBar.classList.toggle('warn', sec <= 5);
+        startTimer() {
+          if (this.timerId) clearInterval(this.timerId);
+          this.timerId = setInterval(() => {
+            if (!this.isOpen || this.view !== 'speed' || !State.pairData) return;
+            const sp = State.pairData.games.quiz.speed;
+            if (sp.status !== 'playing') return;
+            const qk = String(sp.qIdx);
+            const left = Math.max(0, 15 - (Date.now() - (+sp.qStartTs || 0)) / 1000);
+            const tLbl = $('quiz-speed-timer'), tFill = $('quiz-speed-fill');
+            if (tLbl) tLbl.textContent = `${Math.ceil(left)} сек`;
+            if (tFill) {
+              tFill.style.transform = `scaleX(${Math.max(0, left / 15).toFixed(3)})`;
+              tFill.classList.toggle('warn', left <= 5);
             }
-            if (remMs <= 0) this.spdTimeoutSettle(s.matchId, s.qIdx);
+            if (left <= 0 && !sp.settled?.[qk]) {
+              DB.transact(State.session.pairCode, d => this.trySettleSpeedRound(d, qk) ? d : undefined);
+            }
           }, 200);
         },
 
-        syncUI(force = false) {
-          if (!this.isOpen || !State.pairData) return;
-          const d = State.pairData, m = d.meta, qz = d.games.quiz, isGf = State.session.role === 'girlfriend';
+        syncUI() {
+          const d = State.pairData; if (!d) return;
+          const m = d.meta, qr = d.games.quiz.romantic, qs = d.games.quiz.speed;
           const gfN = m.girlfriendName || 'Девушка', bfN = m.boyfriendName || 'Парень';
+          renderAvatar($('quiz-vs-gf-avatar'), m.girlfriendCustomAvatar || m.girlfriendPhotoUrl, gfN);
+          renderAvatar($('quiz-vs-bf-avatar'), m.boyfriendCustomAvatar || m.boyfriendPhotoUrl, bfN);
+          $('quiz-vs-gf-score').textContent = fmt(this.view === 'speed' ? qs.girlfriendScore : qr.girlfriendScore);
+          $('quiz-vs-bf-score').textContent = fmt(this.view === 'speed' ? qs.boyfriendScore : qr.boyfriendScore);
 
-          renderAvatar($('quiz-vs-gf-avatar'), m.girlfriendCustomAvatar || m.girlfriendPhotoUrl || (isGf ? State.user.photoUrl : ''), gfN);
-          renderAvatar($('quiz-vs-bf-avatar'), m.boyfriendCustomAvatar || m.boyfriendPhotoUrl || (!isGf ? State.user.photoUrl : ''), bfN);
+          const key = this.view === 'menu'
+            ? `menu|${qr.girlfriendScore}|${qr.boyfriendScore}|${qs.status}|${qs.qIdx}`
+            : (this.view === 'romantic'
+              ? `rom|${qr.phase}|${qr.picker}|${qr.guesser}|${qr.qId}|${qr.guessOpt}|${qr.lastResult}|${qr.choices.join(',')}`
+              : `spd|${qs.status}|${qs.qIdx}|${qs.matchId}|${JSON.stringify(qs.answers?.[qs.qIdx])}|${Boolean(qs.settled?.[qs.qIdx])}`);
+          if (this.lastRenderKey === key) return;
+          this.lastRenderKey = key;
 
-          const gfSc = this.view === 'speed' ? qz.speed.girlfriendScore : qz.romantic.girlfriendScore;
-          const bfSc = this.view === 'speed' ? qz.speed.boyfriendScore : qz.romantic.boyfriendScore;
-          $('quiz-vs-gf-score').textContent = fmt(gfSc);
-          $('quiz-vs-bf-score').textContent = fmt(bfSc);
-          $('quiz-right-label').textContent = this.view === 'menu' ? 'Уровни' : 'Режимы';
+          const stage = $('quiz-stage'); if (!stage) return;
+          const myRole = State.session.role;
 
-          if (this.view === 'speed') this.ensureSpeedTick(); else this.stopTick();
-
-          const sig = `${this.view}|${isGf}|${gfN}|${bfN}|${JSON.stringify(this.view === 'speed' ? qz.speed : (this.view === 'romantic' ? qz.romantic : {}))}`;
-          if (!force && this.lastSig === sig) return;
-          this.lastSig = sig;
-
-          const stage = $('quiz-stage');
           if (this.view === 'menu') {
             stage.innerHTML = `
-              <div class="quiz-card" style="text-align:center;gap:6px">
-                <div style="font-size:34px">💘</div>
-                <div style="font-size:20px;font-weight:800">LoveQuiz</div>
-                <div style="font-size:13px;color:var(--text-secondary)">Выбери уровень игры для вашей пары</div>
-              </div>
               <button type="button" class="quiz-mode-btn" data-qact="open-romantic">
-                <div class="quiz-mode-head"><span class="quiz-mode-title">1. Романтическая викторина</span><span class="quiz-mode-tag pink">Уровень 1</span></div>
-                <div class="quiz-mode-desc">Игра сама даёт неповторяющиеся вопросы и варианты. Один отвечает, другой проверяет: угадал — выбираешь следующий вопрос, ошибся — отвечаешь снова!</div>
+                <div class="quiz-mode-head"><span class="quiz-mode-title">💘 Уровень 1: Романтическая викторина</span><span class="quiz-mode-tag pink">Для пары</span></div>
+                <div class="quiz-mode-desc">Неповторяющиеся вопросы о вас двоих. Угадал — выбираешь следующий вопрос! Ошибся — отвечаешь снова.</div>
               </button>
               <button type="button" class="quiz-mode-btn" data-qact="open-speed">
-                <div class="quiz-mode-head"><span class="quiz-mode-title">2. Умный баттл на скорость</span><span class="quiz-mode-tag">12 × 15 сек</span></div>
-                <div class="quiz-mode-desc">12 одинаковых вопросов (лёгких и сложных) по 15 секунд на каждый. Видно, кто что выбрал. Победа вдвоём = +2 🪙 и +2 💖, проигрыш обоих = 0!</div>
+                <div class="quiz-mode-head"><span class="quiz-mode-title">⚡ Уровень 2: Умный баттл (12×15 сек)</span><span class="quiz-mode-tag">На скорость</span></div>
+                <div class="quiz-mode-desc">12 одинаковых вопросов разной сложности по 15 секунд. Оба выиграли → +2 🪙 и +2 💖! Оба проиграли → 0.</div>
               </button>`;
             return;
           }
 
           if (this.view === 'romantic') {
-            const r = qz.romantic, myRole = State.session.role;
-            const pickerN = r.picker === 'girlfriend' ? gfN : bfN;
-            const guesserN = r.guesser === 'girlfriend' ? gfN : bfN;
-            const qObj = ROMANTIC_QUIZ_POOL.find(x => x.id === r.qId);
+            const pickerN = qr.picker === 'girlfriend' ? gfN : bfN;
+            const guesserN = qr.guesser === 'girlfriend' ? gfN : bfN;
+            const amPicker = myRole === qr.picker;
+            let banner = '';
+            if (qr.lastResult === 'win') banner = `<div class="quiz-banner win">🎉 Верно! Победитель получил +5 и теперь выбирает следующий вопрос</div>`;
+            else if (qr.lastResult === 'wrong') banner = `<div class="quiz-banner lose">🙈 Не угадал(а)! ${esc(guesserN)} снова отвечает на новый вопрос</div>`;
 
-            if (r.phase === 'pick') {
-              if (r.picker === myRole) {
-                const list = (r.choices || []).map(id => ROMANTIC_QUIZ_POOL.find(x => x.id === id)).filter(Boolean);
-                stage.innerHTML = `
-                  <div class="quiz-card">
-                    <div class="quiz-q-meta"><span>💞 Уровень 1 • Твой выбор</span><span>Пройдено: ${r.usedIds.length}/${ROMANTIC_QUIZ_POOL.length}</span></div>
-                    <div class="quiz-q-text">Выбери вопрос для ${esc(guesserN)}</div>
-                    <div class="quiz-opts">
-                      ${list.map(it => `<button type="button" class="quiz-opt-btn" data-qact="rom-pick-q" data-qid="${esc(it.id)}"><span>${esc(it.q)}</span><span>→</span></button>`).join('')}
-                    </div>
-                  </div>`;
-              } else {
-                stage.innerHTML = `
-                  <div class="quiz-card" style="text-align:center;padding:24px 16px">
-                    <div style="font-size:36px">💭</div>
-                    <div class="quiz-q-text">${esc(pickerN)} выбирает вопрос…</div>
-                    <div style="font-size:13px;color:var(--text-secondary)">Как только вопрос будет выбран, у тебя появятся варианты ответа ✨</div>
-                  </div>`;
-              }
+            if (qr.phase === 'pick') {
+              const qsList = (qr.choices || []).map(id => ROMANTIC_QUIZ_POOL.find(x => x.id === id)).filter(Boolean);
+              if (!qsList.length) { this.ensureRomanticChoices(); stage.innerHTML = `<div class="quiz-card"><div class="empty-box">Подбираем неповторяющиеся вопросы… 💘</div></div>`; return; }
+              stage.innerHTML = `${banner}<div class="quiz-card">
+                <div class="quiz-q-meta"><span>💘 Уровень 1 • Выбор вопроса</span><span>Отвечает: ${esc(guesserN)}</span></div>
+                <div class="quiz-q-text">${amPicker ? `Выбери вопрос для ${esc(guesserN)}:` : `${esc(pickerN)} выбирает вопрос для тебя…`}</div>
+                ${amPicker ? `<div class="quiz-opts">${qsList.map(item => `<button type="button" class="quiz-opt-btn" data-qact="rom-pick" data-qval="${esc(item.id)}"><span>${esc(item.q)}</span><span>→</span></button>`).join('')}</div>`
+                  : `<div class="empty-box" style="padding:12px">Подожди пару секунд, пока партнёр выберет вопрос из 3 вариантов ✨</div>`}
+              </div>`;
               return;
             }
 
-            if (r.phase === 'answer' && qObj) {
-              if (r.guesser === myRole) {
-                stage.innerHTML = `
-                  <div class="quiz-card">
-                    <div class="quiz-q-meta"><span>💞 Отвечает: ${esc(guesserN)}</span><span>Проверяет: ${esc(pickerN)}</span></div>
-                    <div class="quiz-q-text">${esc(qObj.q)}</div>
-                    <div class="quiz-opts">
-                      ${qObj.opts.map((o, i) => `<button type="button" class="quiz-opt-btn" data-qact="rom-answer" data-opt="${i}"><span>${esc(o)}</span></button>`).join('')}
-                    </div>
-                  </div>`;
-              } else {
-                stage.innerHTML = `
-                  <div class="quiz-card">
-                    <div class="quiz-q-meta"><span>👀 Смотришь ответ</span><span>Отвечает: ${esc(guesserN)}</span></div>
-                    <div class="quiz-q-text">${esc(qObj.q)}</div>
-                    <div class="quiz-banner">Ждём, какой вариант выберет ${esc(guesserN)}… ⏳</div>
-                  </div>`;
-              }
+            const curQ = ROMANTIC_QUIZ_POOL.find(x => x.id === qr.qId);
+            if (!curQ) { stage.innerHTML = `<div class="quiz-card"><div class="empty-box">Загрузка вопроса…</div></div>`; return; }
+
+            if (qr.phase === 'answer') {
+              const amGuesser = myRole === qr.guesser;
+              stage.innerHTML = `<div class="quiz-card">
+                <div class="quiz-q-meta"><span>💘 Романтический вопрос</span><span>Отвечает: ${esc(guesserN)}</span></div>
+                <div class="quiz-q-text">${esc(curQ.q)}</div>
+                <div class="quiz-opts">${curQ.opts.map((opt, idx) => `<button type="button" class="quiz-opt-btn" data-qact="rom-guess" data-qval="${idx}" ${amGuesser ? '' : 'disabled'}><span>${esc(opt)}</span></button>`).join('')}</div>
+                ${!amGuesser ? `<div class="setting-sub" style="text-align:center">Ждём ответ ${esc(guesserN)}…</div>` : ''}
+              </div>`;
               return;
             }
 
-            if (r.phase === 'judge' && qObj) {
-              const pickedText = qObj.opts[r.guessOpt] || '';
-              if (r.picker === myRole) {
-                stage.innerHTML = `
-                  <div class="quiz-card">
-                    <div class="quiz-q-meta"><span>👀 Проверка ответа</span><span>Ответил(а): ${esc(guesserN)}</span></div>
-                    <div class="quiz-q-text">${esc(qObj.q)}</div>
-                    <div class="quiz-banner gold">Выбран ответ: «${esc(pickedText)}»</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-                      <button type="button" class="glass-btn danger" data-qact="rom-judge" data-ok="0">❌ Неверно</button>
-                      <button type="button" class="glass-btn success" data-qact="rom-judge" data-ok="1">✅ Верно!</button>
-                    </div>
-                  </div>`;
-              } else {
-                stage.innerHTML = `
-                  <div class="quiz-card">
-                    <div class="quiz-q-meta"><span>💞 Ответ отправлен</span><span>Проверяет: ${esc(pickerN)}</span></div>
-                    <div class="quiz-q-text">${esc(qObj.q)}</div>
-                    <div class="quiz-banner gold">Твой ответ: «${esc(pickedText)}»</div>
-                    <div style="text-align:center;font-size:13px;color:var(--text-secondary)">${esc(pickerN)} смотрит твой ответ и решает, угадал(а) ли ты 👀</div>
-                  </div>`;
-              }
-              return;
-            }
-
-            if (r.phase === 'result' && qObj) {
-              const win = r.lastResult === 'win';
-              const pickedText = qObj.opts[r.guessOpt] || '';
-              const rw = r.guesser === 'girlfriend' ? '+5 🪙' : '+5 💖';
-              stage.innerHTML = `
-                <div class="quiz-card">
-                  <div class="quiz-q-meta"><span>💞 Результат раунда</span><span>${esc(guesserN)}</span></div>
-                  <div class="quiz-q-text">${esc(qObj.q)}</div>
-                  <div class="quiz-banner ${win ? 'win' : 'lose'}">
-                    ${win ? `🎉 Верно! ${esc(guesserN)} выигрывает (${rw}) и выбирает следующий вопрос!` : `😅 Неверно! ${esc(guesserN)} снова отвечает на другой вопрос!`}
-                  </div>
-                  <div style="font-size:13px;color:var(--text-secondary);text-align:center">Ответ был: «${esc(pickedText)}»</div>
-                  <button type="button" class="glass-btn primary" data-qact="rom-next" style="width:100%">Следующий вопрос →</button>
-                </div>`;
-              return;
-            }
+            const pickedTxt = curQ.opts[qr.guessOpt] || '—';
+            stage.innerHTML = `<div class="quiz-card">
+              <div class="quiz-q-meta"><span>💘 Проверка ответа</span><span>Ответил(а): ${esc(guesserN)}</span></div>
+              <div class="quiz-q-text">${esc(curQ.q)}</div>
+              <div class="quiz-banner gold">Выбран ответ: «${esc(pickedTxt)}»</div>
+              ${amPicker
+                ? `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+                    <button type="button" class="glass-btn danger" data-qact="rom-judge" data-qval="0">Неверно ✕</button>
+                    <button type="button" class="glass-btn success" data-qact="rom-judge" data-qval="1">Верно ✓</button>
+                  </div>`
+                : `<div class="setting-sub" style="text-align:center">${esc(pickerN)} проверяет твой ответ…</div>`}
+            </div>`;
+            return;
           }
 
-          /* Level 2: Speed Battle 12 x 15s */
-          if (this.view === 'speed') {
-            const s = qz.speed, myRole = State.session.role;
-            if (s.status === 'idle') {
-              stage.innerHTML = `
-                <div class="quiz-card" style="text-align:center">
-                  <div style="font-size:38px">⚡</div>
-                  <div class="quiz-q-text">Умный баттл на скорость</div>
-                  <div style="font-size:13px;color:var(--text-secondary);line-height:1.45">
-                    12 одинаковых вопросов (лёгкие, средние и сложные), по 15 секунд на ответ.<br>
-                    • Оба правы → <strong>+2 🪙</strong> девушке и <strong>+2 💖</strong> парню<br>
-                    • Оба ошиблись → <strong>0 очков</strong>
-                  </div>
-                  <button type="button" class="glass-btn primary" data-qact="spd-start" style="width:100%">Создать матч (12 вопросов) ⚡</button>
-                </div>`;
-              return;
+          // Level 2: Speed battle
+          if (qs.status === 'idle' || !qs.qIds.length) {
+            stage.innerHTML = `<div class="quiz-card">
+              <div class="quiz-q-meta"><span>⚡ Уровень 2</span><span>12 вопросов × 15 сек</span></div>
+              <div class="quiz-q-text">Умный баттл на скорость</div>
+              <div class="quiz-mode-desc">Вам обоим придут одинаковые 12 вопросов (лёгкие, средние и сложные). Если оба ответите правильно — девушка получит <strong>+2 🪙</strong>, а парень <strong>+2 💖</strong>!</div>
+              <button type="button" class="glass-btn primary" data-qact="spd-start">Начать баттл ⚡</button>
+            </div>`;
+            return;
+          }
+
+          if (qs.status === 'finished') {
+            const winTxt = qs.girlfriendScore === qs.boyfriendScore ? 'Ничья! Идеальная команда 💞'
+              : (qs.girlfriendScore > qs.boyfriendScore ? `Победила ${esc(gfN)} 🏆` : `Победил ${esc(bfN)} 🏆`);
+            stage.innerHTML = `<div class="quiz-card">
+              <div class="quiz-q-meta"><span>🏁 Баттл завершён</span><span>12 / 12</span></div>
+              <div class="quiz-q-text" style="text-align:center">${winTxt}</div>
+              <div class="quiz-compare-grid">
+                <div class="quiz-compare-box ok"><span class="quiz-compare-who">${esc(gfN)}</span><span class="quiz-compare-ans">${qs.girlfriendScore} верных • +${qs.girlfriendCoins} 🪙</span></div>
+                <div class="quiz-compare-box ok"><span class="quiz-compare-who">${esc(bfN)}</span><span class="quiz-compare-ans">${qs.boyfriendScore} верных • +${qs.boyfriendHearts} 💖</span></div>
+              </div>
+              <button type="button" class="glass-btn primary" data-qact="spd-start">Новый баттл ↻</button>
+            </div>`;
+            return;
+          }
+
+          const qk = String(qs.qIdx), curQ = SMART_QUIZ_POOL.find(x => x.id === qs.qIds[qs.qIdx]);
+          if (!curQ) return;
+          const ans = qs.answers?.[qk] || {}, myAns = ans[myRole], settled = Boolean(qs.settled?.[qk]);
+          const left = Math.max(0, 15 - (Date.now() - (+qs.qStartTs || 0)) / 1000);
+
+          let compareHtml = '';
+          if (settled) {
+            const gfOk = ans.girlfriend === curQ.a, bfOk = ans.boyfriend === curQ.a;
+            const gfTxt = ans.girlfriend !== undefined ? curQ.opts[ans.girlfriend] : 'Не успела';
+            const bfTxt = ans.boyfriend !== undefined ? curQ.opts[ans.boyfriend] : 'Не успел';
+            const resBanner = (gfOk && bfOk)
+              ? `<div class="quiz-banner win">🎉 Оба выиграли! +2 🪙 и +2 💖</div>`
+              : (!gfOk && !bfOk)
+                ? `<div class="quiz-banner lose">😅 Оба ошиблись — 0 очков</div>`
+                : `<div class="quiz-banner gold">🏆 Победил(а): ${esc(gfOk ? gfN : bfN)}!</div>`;
+            compareHtml = `${resBanner}
+              <div class="quiz-compare-grid">
+                <div class="quiz-compare-box ${gfOk ? 'ok' : 'bad'}"><span class="quiz-compare-who">${esc(gfN)} ${gfOk ? '✓' : '✕'}</span><span class="quiz-compare-ans">${esc(gfTxt)}</span></div>
+                <div class="quiz-compare-box ${bfOk ? 'ok' : 'bad'}"><span class="quiz-compare-who">${esc(bfN)} ${bfOk ? '✓' : '✕'}</span><span class="quiz-compare-ans">${esc(bfTxt)}</span></div>
+              </div>
+              <button type="button" class="glass-btn primary" data-qact="spd-next">${qs.qIdx + 1 >= qs.qIds.length ? 'Итоги баттла 🏁' : 'Следующий вопрос →'}</button>`;
+          }
+
+          stage.innerHTML = `<div class="quiz-card">
+            <div class="quiz-q-meta"><span>Вопрос ${qs.qIdx + 1}/${qs.qIds.length} • ${esc(curQ.diff)} (${esc(curQ.cat)})</span><span id="quiz-speed-timer">${settled ? 'Готово' : `${Math.ceil(left)} сек`}</span></div>
+            <div class="quiz-timer-track"><div class="quiz-timer-fill ${left <= 5 ? 'warn' : ''}" id="quiz-speed-fill" style="transform:scaleX(${settled ? 0 : Math.max(0, left / 15).toFixed(3)})"></div></div>
+            <div class="quiz-q-text">${esc(curQ.q)}</div>
+            <div class="quiz-opts">${curQ.opts.map((opt, idx) => {
+              let cls = '';
+              if (settled) cls = idx === curQ.a ? ' correct' : (idx === myAns ? ' wrong' : '');
+              else if (idx === myAns) cls = ' picked';
+              return `<button type="button" class="quiz-opt-btn${cls}" data-qact="spd-ans" data-qval="${idx}" ${settled || myAns !== undefined ? 'disabled' : ''}><span>${esc(opt)}</span></button>`;
+            }).join('')}</div>
+            ${!settled && myAns !== undefined ? `<div class="setting-sub" style="text-align:center">Ответ принят! Ждём второго игрока или окончания таймера…</div>` : ''}
+            ${compareHtml}
+          </div>`;
+        }
+      };
+
+      /* 10E. HIDDEN SECRET CHAT (3-TAP ON PARTNER AVATAR + PHOTOS + FROSTED NOTIFICATION WIDGET) */
+      const SecretChat = {
+        isOpen: false, pendingPhoto: '', tapCount: 0, tapTimer: null,
+        lastRenderSig: '', dismissedMsgId: '', notifiedMsgId: '', sending: false,
+
+        init() {
+          // Hidden 3-tap trigger on partner's avatar
+          $('partner-avatar-ring')?.addEventListener('click', () => {
+            this.tapCount++;
+            clearTimeout(this.tapTimer);
+            if (this.tapCount >= 3) {
+              this.tapCount = 0;
+              Haptic.impact('medium'); AudioEngine.sfx('switch');
+              this.open();
+            } else {
+              this.tapTimer = setTimeout(() => { this.tapCount = 0; }, 900);
             }
+          });
 
-            if (s.status === 'lobby') {
-              const myReady = Boolean(s.ready?.[myRole]);
-              stage.innerHTML = `
-                <div class="quiz-card" style="text-align:center">
-                  <div style="font-size:34px">🏁</div>
-                  <div class="quiz-q-text">Готовность к баттлу</div>
-                  <div class="quiz-compare-grid">
-                    <div class="quiz-compare-box ${s.ready.girlfriend ? 'ok' : ''}"><span class="quiz-compare-who">💕 ${esc(gfN)}</span><span class="quiz-compare-ans">${s.ready.girlfriend ? 'Готова ✅' : 'Ждём…'}</span></div>
-                    <div class="quiz-compare-box ${s.ready.boyfriend ? 'ok' : ''}"><span class="quiz-compare-who">🛡️ ${esc(bfN)}</span><span class="quiz-compare-ans">${s.ready.boyfriend ? 'Готов ✅' : 'Ждём…'}</span></div>
-                  </div>
-                  ${!myReady ? `<button type="button" class="glass-btn primary" data-qact="spd-ready" style="width:100%">Я готов(а)! ⚡</button>`
-                    : `<div class="quiz-banner">Ждём вторую половинку… ⏳</div>`}
-                  <button type="button" class="glass-btn sm" data-qact="spd-force-start" style="width:100%">Начать прямо сейчас ▶️</button>
-                </div>`;
-              return;
+          $('btn-chat-back')?.addEventListener('click', () => { Haptic.select(); AudioEngine.sfx('tap'); this.close(); });
+          $('btn-chat-attach')?.addEventListener('click', () => { Haptic.select(); $('chat-file-input')?.click(); });
+          $('btn-chat-clear-photo')?.addEventListener('click', () => { Haptic.select(); this.clearPhoto(); });
+          $('chat-file-input')?.addEventListener('change', async e => {
+            const f = e.target.files?.[0]; e.target.value = ''; if (!f) return;
+            try {
+              this.pendingPhoto = await compressImg(f, 720, false, 0.72);
+              $('chat-attach-img').src = this.pendingPhoto;
+              $('chat-attach-preview').classList.add('show');
+              Haptic.impact('light'); AudioEngine.sfx('tap');
+            } catch (_) { showToast('Не удалось прикрепить фото'); }
+          });
+
+          const inp = $('chat-input');
+          inp?.addEventListener('input', () => {
+            inp.style.height = 'auto';
+            inp.style.height = `${Math.min(110, inp.scrollHeight)}px`;
+          });
+          inp?.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); this.send(); }
+          });
+          $('btn-chat-send')?.addEventListener('click', () => this.send());
+
+          // Click photo inside chat to open fullscreen lightbox
+          $('chat-messages')?.addEventListener('click', e => {
+            const img = e.target.closest('.chat-photo-img'); if (!img) return;
+            $('chat-photo-full').src = img.src;
+            $('chat-photo-modal').classList.add('open');
+            $('chat-photo-modal').setAttribute('aria-hidden', 'false');
+          });
+          $('btn-chat-photo-close')?.addEventListener('click', () => this.closePhotoModal());
+          $('chat-photo-modal')?.addEventListener('click', e => { if (e.target === $('chat-photo-modal')) this.closePhotoModal(); });
+
+          // Incoming message frosted glass widget actions
+          $('btn-chat-notify-close')?.addEventListener('click', () => {
+            Haptic.select();
+            const last = this.latestPartnerMsg();
+            if (last) this.dismissedMsgId = last.id;
+            $('chat-notify-widget').classList.remove('show');
+          });
+          $('btn-chat-notify-reply')?.addEventListener('click', () => {
+            Haptic.impact('light'); AudioEngine.sfx('switch');
+            $('chat-notify-widget').classList.remove('show');
+            this.open(true);
+          });
+
+          document.addEventListener('keydown', e => {
+            if (e.code === 'Escape') {
+              if ($('chat-photo-modal')?.classList.contains('open')) this.closePhotoModal();
+              else if (this.isOpen) this.close();
             }
+          });
+        },
 
-            if (s.status === 'finished') {
-              const tie = s.girlfriendScore === s.boyfriendScore;
-              const winner = tie ? 'Ничья! 🤝' : (s.girlfriendScore > s.boyfriendScore ? `Победила ${gfN}! 💕` : `Победил ${bfN}! 🛡️`);
-              stage.innerHTML = `
-                <div class="quiz-card" style="text-align:center">
-                  <div style="font-size:40px">🏆</div>
-                  <div class="quiz-q-text">${esc(winner)}</div>
-                  <div class="quiz-compare-grid">
-                    <div class="quiz-compare-box ok"><span class="quiz-compare-who">💕 ${esc(gfN)}</span><span class="quiz-compare-ans">${s.girlfriendScore}/12 • +${s.girlfriendCoins} 🪙</span></div>
-                    <div class="quiz-compare-box ok"><span class="quiz-compare-who">🛡️ ${esc(bfN)}</span><span class="quiz-compare-ans">${s.boyfriendScore}/12 • +${s.boyfriendHearts} 💖</span></div>
-                  </div>
-                  <button type="button" class="glass-btn primary" data-qact="spd-start" style="width:100%">Сыграть ещё раз ↻</button>
-                </div>`;
-              return;
+        closePhotoModal() {
+          $('chat-photo-modal')?.classList.remove('open');
+          $('chat-photo-modal')?.setAttribute('aria-hidden', 'true');
+        },
+
+        clearPhoto() {
+          this.pendingPhoto = '';
+          $('chat-attach-img').src = '';
+          $('chat-attach-preview').classList.remove('show');
+        },
+
+        fmtTime(ts) {
+          const d = new Date(ts || Date.now());
+          return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        },
+
+        fmtDay(ts) {
+          const d = new Date(ts || Date.now()), now = new Date();
+          const k = x => `${x.getFullYear()}-${x.getMonth()}-${x.getDate()}`;
+          if (k(d) === k(now)) return 'Сегодня';
+          const y = new Date(now); y.setDate(now.getDate() - 1);
+          if (k(d) === k(y)) return 'Вчера';
+          return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' });
+        },
+
+        latestPartnerMsg() {
+          const msgs = State.pairData?.chat?.messages || [];
+          const myRole = State.session.role;
+          for (let i = msgs.length - 1; i >= 0; i--) {
+            if (msgs[i].sender !== myRole) return msgs[i];
+          }
+          return null;
+        },
+
+        async markRead() {
+          if (!State.session.pairCode || !State.pairData) return;
+          const isGf = State.session.role === 'girlfriend';
+          const msgs = State.pairData.chat?.messages || [];
+          const latestTs = msgs.length ? (+msgs[msgs.length - 1].ts || Date.now()) : Date.now();
+          const curRead = isGf ? State.pairData.chat.lastReadGirlfriend : State.pairData.chat.lastReadBoyfriend;
+          if (curRead >= latestTs) return;
+          await DB.transact(State.session.pairCode, d => {
+            if (isGf) d.chat.lastReadGirlfriend = Math.max(d.chat.lastReadGirlfriend, latestTs);
+            else d.chat.lastReadBoyfriend = Math.max(d.chat.lastReadBoyfriend, latestTs);
+            return d;
+          });
+        },
+
+        open(focusInput = false) {
+          const fs = $('chat-fullscreen'); if (!fs) return;
+          this.isOpen = true;
+          $('chat-notify-widget')?.classList.remove('show');
+          AudioEngine.fadeOutGlow();
+          fs.classList.add('open'); fs.setAttribute('aria-hidden', 'false');
+          this.lastRenderSig = '';
+          this.render(true);
+          this.markRead();
+          if (focusInput) setTimeout(() => $('chat-input')?.focus(), 220);
+        },
+
+        close() {
+          if (!this.isOpen) return;
+          this.isOpen = false;
+          $('chat-fullscreen').classList.remove('open');
+          $('chat-fullscreen').setAttribute('aria-hidden', 'true');
+          AudioEngine.ensureVizLoop();
+        },
+
+        async send() {
+          if (this.sending || !State.session.pairCode) return;
+          const inp = $('chat-input');
+          const text = (inp?.value || '').trim();
+          const photo = this.pendingPhoto;
+          if (!text && !photo) return;
+
+          this.sending = true;
+          const msg = {
+            id: `m_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+            sender: State.session.role,
+            text,
+            photo: photo || '',
+            ts: Date.now()
+          };
+          if (inp) { inp.value = ''; inp.style.height = 'auto'; }
+          this.clearPhoto();
+          Haptic.impact('light'); AudioEngine.sfx('tap');
+
+          try {
+            await DB.transact(State.session.pairCode, d => {
+              const list = Array.isArray(d.chat.messages) ? d.chat.messages : [];
+              list.push(msg);
+              d.chat.messages = list.slice(-80);
+              if (msg.sender === 'girlfriend') d.chat.lastReadGirlfriend = msg.ts;
+              else d.chat.lastReadBoyfriend = msg.ts;
+              return d;
+            });
+          } catch (_) {
+            showToast('Не удалось отправить сообщение');
+          } finally {
+            this.sending = false;
+          }
+        },
+
+        render(scrollBottom = false) {
+          if (!State.pairData) return;
+          const d = State.pairData, m = d.meta, ch = d.chat, isGf = State.session.role === 'girlfriend';
+          const ptN = (isGf ? m.boyfriendName : m.girlfriendName) || (isGf ? 'Парень' : 'Девушка');
+          const ptP = isGf ? (m.boyfriendCustomAvatar || m.boyfriendPhotoUrl) : (m.girlfriendCustomAvatar || m.girlfriendPhotoUrl);
+          const [, pLbl] = fmtPres(isGf ? m.boyfriendLastSeen : m.girlfriendLastSeen);
+
+          renderAvatar($('chat-peer-avatar'), ptP, ptN);
+          $('chat-peer-name').textContent = ptN;
+          $('chat-peer-status').textContent = pLbl;
+
+          const ptRead = isGf ? ch.lastReadBoyfriend : ch.lastReadGirlfriend;
+          const msgs = ch.messages || [];
+          const sig = `${msgs.length}|${msgs[msgs.length - 1]?.id || ''}|${ptRead}`;
+          if (this.lastRenderSig === sig) return;
+          this.lastRenderSig = sig;
+
+          const box = $('chat-messages'); if (!box) return;
+          const wasNearBottom = scrollBottom || (box.scrollHeight - box.scrollTop - box.clientHeight < 120);
+
+          if (!msgs.length) {
+            box.innerHTML = `<div class="empty-box" style="margin:auto">Это ваш тайный чат 💞<br>Напиши первое сообщение или отправь фото — всё сохранится у вас обоих!</div>`;
+            return;
+          }
+
+          let html = '', prevDay = '';
+          for (let i = 0; i < msgs.length; i++) {
+            const msg = msgs[i], day = this.fmtDay(msg.ts);
+            if (day !== prevDay) { prevDay = day; html += `<div class="chat-day-sep">${esc(day)}</div>`; }
+            const out = msg.sender === State.session.role;
+            const isRead = out && ptRead >= (+msg.ts || 0);
+            html += `<div class="chat-row ${out ? 'out' : 'in'}"><div class="chat-bubble">
+              ${msg.photo ? `<img class="chat-photo-img" src="${esc(msg.photo)}" alt="Фото" loading="lazy">` : ''}
+              ${msg.text ? `<div class="chat-text">${esc(msg.text)}</div>` : ''}
+              <div class="chat-meta"><span>${this.fmtTime(msg.ts)}</span>${out ? `<span class="${isRead ? 'read' : ''}">${isRead ? '✓✓' : '✓'}</span>` : ''}</div>
+            </div></div>`;
+          }
+          box.innerHTML = html;
+          if (wasNearBottom) requestAnimationFrame(() => { box.scrollTop = box.scrollHeight; });
+        },
+
+        onDataUpdate() {
+          if (!State.pairData) return;
+          if (this.isOpen) {
+            this.render(false);
+            this.markRead();
+            return;
+          }
+          // Check for unread incoming partner message to display frosted glass widget
+          const last = this.latestPartnerMsg();
+          if (!last) return;
+          const isGf = State.session.role === 'girlfriend';
+          const myRead = isGf ? State.pairData.chat.lastReadGirlfriend : State.pairData.chat.lastReadBoyfriend;
+          if ((+last.ts || 0) > myRead && last.id !== this.dismissedMsgId) {
+            const m = State.pairData.meta;
+            const ptN = (isGf ? m.boyfriendName : m.girlfriendName) || (isGf ? 'Парень' : 'Девушка');
+            const ptP = isGf ? (m.boyfriendCustomAvatar || m.boyfriendPhotoUrl) : (m.girlfriendCustomAvatar || m.girlfriendPhotoUrl);
+            renderAvatar($('chat-notify-av'), ptP, ptN);
+            $('chat-notify-name').textContent = ptN;
+            $('chat-notify-time').textContent = `Сообщение • ${this.fmtTime(last.ts)}`;
+            const thumb = $('chat-notify-thumb');
+            if (last.photo) { thumb.src = last.photo; thumb.classList.add('show'); }
+            else { thumb.src = ''; thumb.classList.remove('show'); }
+            $('chat-notify-text').textContent = last.text || (last.photo ? '📷 Фотография' : '');
+            $('chat-notify-widget').classList.add('show');
+            if (this.notifiedMsgId !== last.id) {
+              this.notifiedMsgId = last.id;
+              Haptic.notify('success'); AudioEngine.sfx('switch');
             }
-
-            const qObj = SMART_QUIZ_POOL.find(x => x.id === s.qIds[s.qIdx]);
-            if (!qObj) return;
-            const k = String(s.qIdx), ans = s.answers?.[k] || {};
-            const myAns = ans[myRole];
-
-            if (s.status === 'playing') {
-              const remMs = Math.max(0, 15000 - (Date.now() - s.qStartTs));
-              const sec = Math.ceil(remMs / 1000);
-              stage.innerHTML = `
-                <div class="quiz-card">
-                  <div class="quiz-q-meta">
-                    <span>Вопрос ${s.qIdx + 1}/${s.qIds.length} • ${esc(qObj.diff)} (${esc(qObj.cat)})</span>
-                    <span id="quiz-timer-sec" style="color:var(--accent-gold)">⏱ ${sec} с</span>
-                  </div>
-                  <div class="quiz-timer-track"><div class="quiz-timer-fill ${sec <= 5 ? 'warn' : ''}" id="quiz-timer-fill" style="transform:scaleX(${(remMs / 15000).toFixed(3)})"></div></div>
-                  <div class="quiz-q-text">${esc(qObj.q)}</div>
-                  <div class="quiz-opts">
-                    ${qObj.opts.map((o, i) => `<button type="button" class="quiz-opt-btn ${myAns && myAns.opt === i ? 'picked' : ''}" data-qact="spd-answer" data-opt="${i}" ${myAns ? 'disabled' : ''}><span>${esc(o)}</span></button>`).join('')}
-                  </div>
-                  ${myAns ? `<div class="quiz-banner">Ответ принят! Ждём половинку или конец таймера… ⏳</div>` : ''}
-                </div>`;
-              return;
-            }
-
-            if (s.status === 'reveal') {
-              const aG = ans.girlfriend, aB = ans.boyfriend;
-              const gfOk = Boolean(aG && aG.opt === qObj.a), bfOk = Boolean(aB && aB.opt === qObj.a);
-              const gfPick = aG ? qObj.opts[aG.opt] : 'Не успела ⏱';
-              const bfPick = aB ? qObj.opts[aB.opt] : 'Не успел ⏱';
-              let bannerCls = 'lose', bannerTxt = 'Оба ошиблись 😅 0 очков';
-              if (gfOk && bfOk) { bannerCls = 'win'; bannerTxt = '🎉 Оба победили! +2 🪙 девушке и +2 💖 парню'; }
-              else if (gfOk) { bannerCls = 'gold'; bannerTxt = `💕 Победила ${gfN}! (+2 🪙)`; }
-              else if (bfOk) { bannerCls = 'gold'; bannerTxt = `🛡️ Победил ${bfN}! (+2 💖)`; }
-
-              stage.innerHTML = `
-                <div class="quiz-card">
-                  <div class="quiz-q-meta"><span>Итог ${s.qIdx + 1}/${s.qIds.length}</span><span>${esc(qObj.diff)}</span></div>
-                  <div class="quiz-q-text">${esc(qObj.q)}</div>
-                  <div class="quiz-opts">
-                    ${qObj.opts.map((o, i) => `<button type="button" class="quiz-opt-btn ${i === qObj.a ? 'correct' : ((aG?.opt === i || aB?.opt === i) ? 'wrong' : '')}" disabled><span>${esc(o)}</span><span>${i === qObj.a ? '✅' : ''}</span></button>`).join('')}
-                  </div>
-                  <div class="quiz-compare-grid">
-                    <div class="quiz-compare-box ${gfOk ? 'ok' : 'bad'}"><span class="quiz-compare-who">💕 ${esc(gfN)}</span><span class="quiz-compare-ans">${esc(gfPick)}</span></div>
-                    <div class="quiz-compare-box ${bfOk ? 'ok' : 'bad'}"><span class="quiz-compare-who">🛡️ ${esc(bfN)}</span><span class="quiz-compare-ans">${esc(bfPick)}</span></div>
-                  </div>
-                  <div class="quiz-banner ${bannerCls}">${esc(bannerTxt)}</div>
-                  <button type="button" class="glass-btn primary" data-qact="spd-next" style="width:100%">${s.qIdx + 1 >= s.qIds.length ? 'Итоги матча 🏆' : 'Следующий вопрос →'}</button>
-                </div>`;
-            }
+          } else {
+            $('chat-notify-widget').classList.remove('show');
           }
         }
       };
@@ -2865,6 +3059,7 @@
         if (Love2048Game.isOpen) Love2048Game.syncVs();
         if (LoveWheelGame.isOpen) LoveWheelGame.syncUI();
         if (LoveQuizGame.isOpen) LoveQuizGame.syncUI();
+        SecretChat.onDataUpdate();
       }
 
       function renderActiveTab() {
@@ -3534,6 +3729,7 @@
           Love2048Game.init();
           LoveWheelGame.init();
           LoveQuizGame.init();
+          SecretChat.init();
           bindEvents();
           await DB.init();
 

@@ -484,6 +484,8 @@
     }
 
     .couple-widget-card {
+      position: relative;
+      z-index: 1;
       width: 100%;
       padding: 12px 14px 11px;
       border-radius: 24px;
@@ -496,6 +498,46 @@
       flex-direction: column;
       align-items: center;
       gap: 9px;
+      --melody-glow: 0;
+      --bass-glow: 0;
+    }
+
+    /* Music-reactive edge glow (melody/vocals + stronger bass punch) */
+    .couple-widget-card::before,
+    .couple-widget-card::after,
+    .flappy-card::before,
+    .flappy-card::after {
+      content: "";
+      position: absolute;
+      inset: -1.5px;
+      border-radius: inherit;
+      pointer-events: none;
+      z-index: -1;
+      will-change: opacity, transform;
+    }
+
+    /* Vocal & melody frequencies — soft luminous cyan/pink rim */
+    .couple-widget-card::before,
+    .flappy-card::before {
+      border: 1.5px solid rgba(138, 236, 255, 0.85);
+      box-shadow:
+        0 0 16px 2px rgba(90, 226, 255, 0.55),
+        0 0 32px 4px rgba(255, 107, 169, 0.42),
+        inset 0 0 14px rgba(90, 226, 255, 0.3);
+      opacity: var(--melody-glow, 0);
+    }
+
+    /* Bass frequencies — stronger, deeper rose/violet aura */
+    .couple-widget-card::after,
+    .flappy-card::after {
+      inset: -2px;
+      border: 2px solid rgba(255, 142, 204, 0.96);
+      box-shadow:
+        0 0 26px 6px rgba(255, 79, 154, 0.85),
+        0 0 54px 14px rgba(176, 72, 255, 0.62),
+        inset 0 0 22px rgba(255, 118, 186, 0.5);
+      opacity: var(--bass-glow, 0);
+      transform: scale(calc(1 + var(--bass-glow, 0) * 0.014));
     }
 
     .couple-avatars-row {
@@ -732,10 +774,14 @@
        7. GAMES TAB — FLAPPY LOVE AVATAR GAME
        ======================================================================== */
     .flappy-card {
+      position: relative;
+      z-index: 1;
       padding: 12px;
       display: flex;
       flex-direction: column;
       gap: 10px;
+      --melody-glow: 0;
+      --bass-glow: 0;
     }
     .flappy-top-bar {
       display: flex;
@@ -2070,6 +2116,15 @@
       const AudioEngine = {
         audio: new Audio(),
         ctx: null,
+        analyser: null,
+        mediaSource: null,
+        freqData: null,
+        vizRafId: null,
+        melodyGlow: 0,
+        bassGlow: 0,
+        melodyAvg: 24,
+        bassAvg: 40,
+        glowEls: [],
         tracks: [], // [{ file, url, title }]
         currentIndex: 0,
         isScanning: false,
@@ -2086,7 +2141,109 @@
           return clean || filename;
         },
 
+        ensureAnalyser() {
+          try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (!AudioCtx) return false;
+            if (!this.ctx) this.ctx = new AudioCtx();
+            if (this.ctx.state === 'suspended') {
+              this.ctx.resume().catch(() => {});
+            }
+            if (!this.mediaSource) {
+              this.mediaSource = this.ctx.createMediaElementSource(this.audio);
+              this.analyser = this.ctx.createAnalyser();
+              this.analyser.fftSize = 512;
+              this.analyser.smoothingTimeConstant = 0.72;
+              this.freqData = new Uint8Array(this.analyser.frequencyBinCount);
+              this.mediaSource.connect(this.analyser);
+              this.analyser.connect(this.ctx.destination);
+            }
+            return true;
+          } catch (_) {
+            return false;
+          }
+        },
+
+        refreshGlowTargets() {
+          this.glowEls = [
+            document.querySelector('.couple-widget-card'),
+            document.querySelector('.flappy-card')
+          ].filter(Boolean);
+        },
+
+        applyGlowStyles(melody, bass) {
+          if (!this.glowEls.length) this.refreshGlowTargets();
+          const mStr = melody.toFixed(3);
+          const bStr = bass.toFixed(3);
+          for (let i = 0; i < this.glowEls.length; i++) {
+            const el = this.glowEls[i];
+            el.style.setProperty('--melody-glow', mStr);
+            el.style.setProperty('--bass-glow', bStr);
+          }
+        },
+
+        startVisualizer() {
+          if (this.vizRafId) return;
+          this.refreshGlowTargets();
+
+          const tick = () => {
+            let targetMelody = 0;
+            let targetBass = 0;
+
+            if (this.isPlaying && this.analyser && this.freqData && !document.hidden) {
+              this.analyser.getByteFrequencyData(this.freqData);
+
+              // Bass frequencies (~0–260 Hz): bins 0..2 with extra weight on sub-bass/kick
+              const bassRaw = (
+                this.freqData[0] * 1.15 +
+                this.freqData[1] * 1.25 +
+                this.freqData[2] * 0.85
+              ) / 3.25;
+
+              // Vocal & melody frequencies (~350–3400 Hz): bins 4..36
+              let melSum = 0;
+              const melStart = 4;
+              const melEnd = Math.min(36, this.freqData.length - 1);
+              for (let i = melStart; i <= melEnd; i++) {
+                melSum += this.freqData[i];
+              }
+              const melRaw = melSum / Math.max(1, melEnd - melStart + 1);
+
+              // Adaptive baseline so both quiet and loud songs react vividly
+              this.bassAvg = this.bassAvg * 0.96 + bassRaw * 0.04;
+              this.melodyAvg = this.melodyAvg * 0.96 + melRaw * 0.04;
+
+              const melNorm = Math.min(1, Math.max(0, (melRaw - 14) / Math.max(68, this.melodyAvg * 1.45)));
+              const bassPunch = Math.max(0, bassRaw - this.bassAvg * 0.72) / Math.max(48, this.bassAvg * 0.65);
+              const bassAbs = Math.max(0, (bassRaw - 45) / 170);
+
+              targetMelody = Math.min(0.88, Math.pow(melNorm, 1.15) * 0.88);
+              targetBass = Math.min(1, Math.pow(Math.min(1, Math.max(bassPunch, bassAbs)), 1.25));
+            }
+
+            // Fast attack on beats, smooth organic fade-out
+            const mEase = targetMelody > this.melodyGlow ? 0.24 : 0.1;
+            const bEase = targetBass > this.bassGlow ? 0.42 : 0.13;
+            this.melodyGlow += (targetMelody - this.melodyGlow) * mEase;
+            this.bassGlow += (targetBass - this.bassGlow) * bEase;
+
+            if (this.melodyGlow < 0.004) this.melodyGlow = 0;
+            if (this.bassGlow < 0.004) this.bassGlow = 0;
+
+            this.applyGlowStyles(this.melodyGlow, this.bassGlow);
+
+            if (this.isPlaying || this.melodyGlow > 0 || this.bassGlow > 0) {
+              this.vizRafId = requestAnimationFrame(tick);
+            } else {
+              this.vizRafId = null;
+            }
+          };
+
+          this.vizRafId = requestAnimationFrame(tick);
+        },
+
         init() {
+          this.audio.crossOrigin = 'anonymous';
           this.audio.preload = 'metadata';
           this.audio.loop = false;
 
@@ -2101,6 +2258,8 @@
             this.isPlaying = true;
             this.waitingUnlock = false;
             this.consecutiveErrors = 0;
+            this.ensureAnalyser();
+            this.startVisualizer();
             renderMusicUI();
           });
 
@@ -2126,6 +2285,9 @@
 
           // If mobile WebView blocks immediate autoplay, resume on the very first touch
           const unlockPlayback = () => {
+            if (this.ctx && this.ctx.state === 'suspended') {
+              this.ctx.resume().catch(() => {});
+            }
             if (State.session.audioPrefs.musicOn && this.tracks.length && !this.isPlaying) {
               this.playIndex(this.currentIndex, false);
             }
@@ -2322,6 +2484,7 @@
             this.audio.src = tr.url;
           }
 
+          this.ensureAnalyser();
           const prom = this.audio.play();
           if (prom && typeof prom.catch === 'function') {
             prom.catch(() => {
